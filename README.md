@@ -38,6 +38,10 @@ The Visual Tests panel is provided by `@chromatic-com/storybook`. To run cloud v
 3. Push a matching git tag such as `v0.1.0`.
 4. GitHub Actions will run the test suite, pack the published files, and create a GitHub Release with the tarball attached.
 
+## Commits
+
+Use Conventional Commits for commit messages and pull request titles. The GitHub workflow accepts `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, and `test`, with an optional scope such as `feat(tabs): add keyboard support`.
+
 ## Basic Tabs
 
 ```html
