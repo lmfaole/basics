@@ -9,6 +9,9 @@ on:
       - ready_for_review
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: read
 
@@ -47,4 +50,3 @@ jobs:
           name: storybook-static-${{ github.sha }}
           path: storybook-static
           if-no-files-found: error
-
