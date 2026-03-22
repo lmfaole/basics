@@ -4,3 +4,7 @@ storybook-static
 build-storybook.log
 playwright-report
 .DS_Store
+.env
+.env.*
+!.env.example
+.idea/

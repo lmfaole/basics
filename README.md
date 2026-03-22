@@ -31,6 +31,13 @@ Storybook Test coverage is enabled through the Vitest addon. In the Storybook UI
 
 The Visual Tests panel is provided by `@chromatic-com/storybook`. To run cloud visual checks, connect the addon to a Chromatic project from the Storybook UI.
 
+## Releasing
+
+1. Update `package.json` to the version you want to ship.
+2. Publish the package to npm with `npm publish --access public --registry=https://registry.npmjs.org`.
+3. Push a matching git tag such as `v0.1.0`.
+4. GitHub Actions will run the test suite, pack the published files, and create a GitHub Release with the tarball attached.
+
 ## Basic Tabs
 
 ```html

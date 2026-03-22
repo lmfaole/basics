@@ -33,7 +33,10 @@
         "README.md",
         "index.js",
         "index.d.ts",
-        "components"
+        "components/*/index.js",
+        "components/*/index.d.ts",
+        "components/*/register.js",
+        "components/*/register.d.ts"
     ],
     "keywords": [
         "custom-element",
@@ -78,7 +81,8 @@
         "vitest": "^4.1.0"
     },
     "publishConfig": {
-        "access": "public"
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
     },
     "packageManager": "pnpm@10.30.3"
 }
