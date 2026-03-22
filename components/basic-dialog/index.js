@@ -38,6 +38,25 @@ export function normalizeDialogLabel(value) {
     return value?.trim() || DEFAULT_LABEL;
 }
 
+function isDialogBackdropClick(event, dialog) {
+    if (event.target !== dialog) {
+        return false;
+    }
+
+    const { clientX, clientY } = event;
+
+    if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) {
+        return false;
+    }
+
+    const bounds = dialog.getBoundingClientRect();
+
+    return clientX < bounds.left
+        || clientX > bounds.right
+        || clientY < bounds.top
+        || clientY > bounds.bottom;
+}
+
 export class DialogElement extends HTMLElementBase {
     static observedAttributes = ["data-backdrop-close", "data-label"];
 
@@ -142,8 +161,9 @@ export class DialogElement extends HTMLElementBase {
         }
 
         if (
-            event.target === this.#panel
+            this.#panel instanceof HTMLDialogElementBase
             && normalizeDialogBackdropClose(this.getAttribute("data-backdrop-close"))
+            && isDialogBackdropClick(event, this.#panel)
         ) {
             this.close();
         }

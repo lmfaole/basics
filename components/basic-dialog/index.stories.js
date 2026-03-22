@@ -27,6 +27,9 @@ function createStory({ label, backdropClose, includeTitle, includeSecondaryActio
 
     const dialog = document.createElement("dialog");
     dialog.dataset.dialogPanel = "";
+    dialog.style.width = "24rem";
+    dialog.style.minHeight = "12rem";
+    dialog.style.padding = "3rem";
 
     if (includeTitle) {
         const title = document.createElement("h2");
@@ -163,7 +166,7 @@ export const BackdropClose = {
     parameters: {
         docs: {
             description: {
-                story: "Interaction test proving that the modal closes when the dialog backdrop is clicked.",
+                story: "Interaction test proving that clicks inside the dialog do not dismiss it, while actual backdrop clicks still do when `data-backdrop-close` is enabled.",
             },
         },
     },
@@ -172,7 +175,24 @@ export const BackdropClose = {
         await userEvent.click(canvas.getByRole("button", { name: "Open dialog" }));
 
         const dialog = await canvas.findByRole("dialog", { name: "Bekreft handling" });
-        await userEvent.click(dialog);
+        const insideBounds = dialog.getBoundingClientRect();
+        dialog.dispatchEvent(new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            clientX: insideBounds.left + 16,
+            clientY: insideBounds.top + 16,
+        }));
+
+        await waitFor(() => {
+            expect(canvas.getByRole("dialog", { name: "Bekreft handling" })).toHaveAttribute("open");
+        });
+
+        dialog.dispatchEvent(new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            clientX: insideBounds.left - 16,
+            clientY: insideBounds.top - 16,
+        }));
 
         await waitFor(() => {
             expect(canvas.queryByRole("dialog", { name: "Bekreft handling" })).not.toBeInTheDocument();
