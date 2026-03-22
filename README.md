@@ -59,6 +59,8 @@ Merging changesets into `main` causes the `Release` workflow to open or update a
 
 Trusted publishing must be configured on npm for `@lmfaole/basics` against the GitHub Actions workflow file `.github/workflows/release.yml` in the `lmfaole/basics` repository. No `NPM_TOKEN` repository secret is needed once trusted publishing is active.
 
+If a release needs to be retried after the workflow changes land, use the `Release` workflow's `publish_current_version` manual input to publish the current `package.json` version from `main` when it is still unpublished.
+
 ## Commits
 
 Use Conventional Commits for commit messages and pull request titles. The GitHub workflow accepts `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, and `test`, with an optional scope such as `feat(tabs): add keyboard support`.

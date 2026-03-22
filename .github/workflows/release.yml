@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      publish_current_version:
+        description: Publish the current package version if it is not already on npm
+        required: false
+        default: false
+        type: boolean
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -62,7 +68,13 @@ jobs:
         shell: bash
         env:
           BEFORE_SHA: ${{ github.event.before }}
+          FORCE_RELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_current_version || 'false' }}
         run: |
+          if [ "$FORCE_RELEASE" = "true" ]; then
+            echo "is_release_commit=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           CURRENT_VERSION=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")
           HEAD_SUBJECT=$(git log -1 --pretty=%s)
 
