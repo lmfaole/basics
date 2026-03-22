@@ -138,9 +138,61 @@ jobs:
           cat /tmp/npm-view.err
           exit "$STATUS"
 
+      - name: Validate trusted publishing target
+        if: steps.publish_check.outputs.should_publish == 'true'
+        shell: bash
+        env:
+          PACKAGE_NAME: ${{ steps.package.outputs.name }}
+        run: |
+          set +e
+          npm view "${PACKAGE_NAME}" version --registry=https://registry.npmjs.org >/tmp/npm-package-view.out 2>/tmp/npm-package-view.err
+          STATUS=$?
+          set -e
+
+          if [ "$STATUS" -eq 0 ]; then
+            exit 0
+          fi
+
+          if grep -q "E404" /tmp/npm-package-view.err || grep -q "404 Not Found" /tmp/npm-package-view.err; then
+            echo "::error::${PACKAGE_NAME} is not available on npm yet. This workflow is configured for trusted publishing only. Configure the package's trusted publisher on npm for release.yml and bootstrap the initial package publish outside this workflow."
+            exit 1
+          fi
+
+          cat /tmp/npm-package-view.err
+          exit "$STATUS"
+
       - name: Publish package to npm with trusted publishing
         if: steps.publish_check.outputs.should_publish == 'true'
         run: pnpm release
+
+      - name: Verify npm registry has the release version
+        if: steps.release_commit.outputs.is_release_commit == 'true'
+        shell: bash
+        env:
+          PACKAGE_NAME: ${{ steps.package.outputs.name }}
+          PACKAGE_VERSION: ${{ steps.package.outputs.version }}
+        run: |
+          ATTEMPTS=18
+          SLEEP_SECONDS=10
+
+          for attempt in $(seq 1 "$ATTEMPTS"); do
+            set +e
+            PUBLISHED_VERSION=$(npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version --registry=https://registry.npmjs.org 2>/tmp/npm-sync.err)
+            STATUS=$?
+            set -e
+
+            if [ "$STATUS" -eq 0 ] && [ "$PUBLISHED_VERSION" = "$PACKAGE_VERSION" ]; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq "$ATTEMPTS" ]; then
+              cat /tmp/npm-sync.err
+              echo "::error::${PACKAGE_NAME}@${PACKAGE_VERSION} is not visible in the npm registry yet. Refusing to create or update the GitHub release until npm catches up."
+              exit 1
+            fi
+
+            sleep "$SLEEP_SECONDS"
+          done
 
       - name: Pack npm tarball
         if: steps.release_commit.outputs.is_release_commit == 'true'
