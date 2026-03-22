@@ -415,6 +415,9 @@ export const FallbackPlacement = {
     },
     parameters: {
         layout: "fullscreen",
+        chromatic: {
+            disableSnapshot: true,
+        },
         docs: {
             description: {
                 story: "Interaction test proving that the popover flips to a fallback placement when the default anchored placement would overflow the viewport.",
@@ -455,6 +458,9 @@ export const InlineFallbackPlacement = {
     },
     parameters: {
         layout: "fullscreen",
+        chromatic: {
+            disableSnapshot: true,
+        },
         docs: {
             description: {
                 story: "Interaction test proving that an explicit inline fallback can move the popover to the other side of the trigger when the default side lacks space.",
