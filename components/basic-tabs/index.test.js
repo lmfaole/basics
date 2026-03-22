@@ -53,6 +53,17 @@ describe("@lmfaole/basics tabs", () => {
         expect(findNextEnabledTabIndex(tabs, 0, -1)).toBe(3);
     });
 
+    it("returns no selection target when every tab is disabled", () => {
+        const tabs = [
+            { disabled: true, selected: true },
+            { disabled: true, selected: false },
+        ];
+
+        expect(getInitialSelectedTabIndex(tabs)).toBe(-1);
+        expect(findNextEnabledTabIndex(tabs, 0, 1)).toBe(-1);
+        expect(findNextEnabledTabIndex([], 0, 1)).toBe(-1);
+    });
+
     it("defines the custom element only once", () => {
         const registry = {
             get: vi.fn().mockReturnValue(undefined),

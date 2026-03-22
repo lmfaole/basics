@@ -13,6 +13,7 @@ describe("@lmfaole/basics basic-toc", () => {
     it("normalizes and slugifies heading text", () => {
         expect(normalizeHeadingText("  Flere\n   nivåer  ")).toBe("Flere nivåer");
         expect(slugifyHeading("Søk i /ds")).toBe("søk-i-ds");
+        expect(slugifyHeading(" !!! ")).toBe("overskrift");
     });
 
     it("creates unique ids for repeated headings", () => {
@@ -37,6 +38,18 @@ describe("@lmfaole/basics basic-toc", () => {
         expect(tree[0]?.children[0]?.children[0]?.id).toBe("subsection");
         expect(tree[0]?.children[0]?.children[0]?.children[0]?.id).toBe("deep");
         expect(tree[0]?.children[1]?.id).toBe("sibling");
+    });
+
+    it("starts a new root branch when heading levels move back up or skip levels", () => {
+        const tree = buildTableOfContentsTree([
+            { id: "overview", text: "Overview", level: 2 },
+            { id: "deep-child", text: "Deep Child", level: 4 },
+            { id: "another-root", text: "Another Root", level: 2 },
+        ]);
+
+        expect(tree).toHaveLength(2);
+        expect(tree[0]?.children[0]?.id).toBe("deep-child");
+        expect(tree[1]?.id).toBe("another-root");
     });
 
     it("defines the custom element only once", () => {

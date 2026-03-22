@@ -157,18 +157,31 @@ The component assigns missing ids, keeps inactive panels hidden, and supports cl
     },
 };
 
-export const Default = {};
-
-export const Vertical = {
-    args: {
-        orientation: "vertical",
-    },
+export const Default = {
     parameters: {
         docs: {
             description: {
-                story: "Shows the same markup contract with vertical arrow-key behavior.",
+                story: "Accessibility test proving that the default tabs story exposes a named tablist, correct control relationships, and hidden inactive panels.",
             },
         },
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const tablist = canvas.getByRole("tablist", { name: "Eksempelkode" });
+        const overviewTab = canvas.getByRole("tab", { name: "Oversikt" });
+        const implementationTab = canvas.getByRole("tab", { name: "Implementasjon" });
+        const overviewPanel = canvas.getByRole("tabpanel", { name: "Oversikt" });
+        const implementationPanel = canvasElement.querySelectorAll("[data-tab-panel]")[1];
+
+        await waitFor(() => {
+            expect(tablist).toHaveAttribute("aria-orientation", "horizontal");
+            expect(overviewTab).toHaveAttribute("aria-selected", "true");
+            expect(overviewTab).toHaveAttribute("aria-controls", overviewPanel.id);
+            expect(overviewPanel).toHaveAttribute("aria-labelledby", overviewTab.id);
+            expect(overviewTab).toHaveAttribute("tabindex", "0");
+            expect(implementationTab).toHaveAttribute("tabindex", "-1");
+            expect(implementationPanel).toHaveProperty("hidden", true);
+        });
     },
 };
 

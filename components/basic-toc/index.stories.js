@@ -164,18 +164,27 @@ The element assigns missing heading ids, keeps duplicate headings unique, and re
     },
 };
 
-export const Default = {};
-
-export const SectionsOnly = {
-    args: {
-        headingSelector: "h2, h3",
-    },
+export const Default = {
     parameters: {
         docs: {
             description: {
-                story: "Shows how the component behaves when the page wants to exclude the top-level `h1`.",
+                story: "Accessibility test proving that the generated navigation has the configured name and points to stable heading ids in the article.",
             },
         },
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        await waitFor(() => {
+            const toc = canvas.getByRole("navigation", { name: "Innhold" });
+            const overviewLink = within(toc).getByRole("link", { name: "Overview" });
+            const usageLink = within(toc).getByRole("link", { name: "Usage" });
+
+            expect(overviewLink).toHaveAttribute("href", "#overview");
+            expect(usageLink).toHaveAttribute("href", "#usage");
+            expect(canvasElement.querySelector("#overview")).toBeTruthy();
+            expect(canvasElement.querySelector("#usage")).toBeTruthy();
+        });
     },
 };
 
@@ -198,6 +207,29 @@ export const UpdatesAfterMutation = {
         await waitFor(() => {
             const toc = canvas.getByRole("navigation", { name: "Innhold" });
             expect(within(toc).getByRole("link", { name: "Inserted section" })).toBeInTheDocument();
+        });
+    },
+};
+
+export const NoMatchingHeadings = {
+    args: {
+        headingSelector: "h4, h5, h6",
+        includeAppendix: false,
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Interaction test proving that the table of contents hides itself when the configured selector does not match any headings.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            const toc = canvasElement.querySelector("basic-toc");
+            const nav = canvasElement.querySelector("[data-page-toc-nav]");
+
+            expect(toc).toHaveProperty("hidden", true);
+            expect(nav?.querySelectorAll("a")).toHaveLength(0);
         });
     },
 };
