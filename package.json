@@ -4,6 +4,9 @@
     "description": "Simple unstyled custom elements and DOM helpers.",
     "type": "module",
     "sideEffects": [
+        "./components/basic-accordion/register.js",
+        "./components/basic-dialog/register.js",
+        "./components/basic-popover/register.js",
         "./components/basic-toc/register.js",
         "./components/basic-tabs/register.js"
     ],
@@ -11,6 +14,30 @@
         ".": {
             "types": "./index.d.ts",
             "import": "./index.js"
+        },
+        "./components/basic-accordion": {
+            "types": "./components/basic-accordion/index.d.ts",
+            "import": "./components/basic-accordion/index.js"
+        },
+        "./components/basic-accordion/register": {
+            "types": "./components/basic-accordion/register.d.ts",
+            "import": "./components/basic-accordion/register.js"
+        },
+        "./components/basic-dialog": {
+            "types": "./components/basic-dialog/index.d.ts",
+            "import": "./components/basic-dialog/index.js"
+        },
+        "./components/basic-dialog/register": {
+            "types": "./components/basic-dialog/register.d.ts",
+            "import": "./components/basic-dialog/register.js"
+        },
+        "./components/basic-popover": {
+            "types": "./components/basic-popover/index.d.ts",
+            "import": "./components/basic-popover/index.js"
+        },
+        "./components/basic-popover/register": {
+            "types": "./components/basic-popover/register.d.ts",
+            "import": "./components/basic-popover/register.js"
         },
         "./components/basic-toc": {
             "types": "./components/basic-toc/index.d.ts",
@@ -39,9 +66,14 @@
         "components/*/register.d.ts"
     ],
     "keywords": [
+        "accordion",
         "custom-element",
+        "dialog",
         "basic-tabs",
         "basic-toc",
+        "modal",
+        "popover",
+        "overlay",
         "table-of-contents",
         "tabs",
         "tablist",
