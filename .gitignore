@@ -1,0 +1,6 @@
+node_modules
+coverage
+storybook-static
+build-storybook.log
+playwright-report
+.DS_Store

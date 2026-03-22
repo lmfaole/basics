@@ -1,0 +1,84 @@
+{
+    "name": "@lmfaole/basics",
+    "version": "0.1.0",
+    "description": "Simple unstyled custom elements and DOM helpers.",
+    "type": "module",
+    "sideEffects": [
+        "./components/basic-toc/register.js",
+        "./components/basic-tabs/register.js"
+    ],
+    "exports": {
+        ".": {
+            "types": "./index.d.ts",
+            "import": "./index.js"
+        },
+        "./components/basic-toc": {
+            "types": "./components/basic-toc/index.d.ts",
+            "import": "./components/basic-toc/index.js"
+        },
+        "./components/basic-toc/register": {
+            "types": "./components/basic-toc/register.d.ts",
+            "import": "./components/basic-toc/register.js"
+        },
+        "./components/basic-tabs": {
+            "types": "./components/basic-tabs/index.d.ts",
+            "import": "./components/basic-tabs/index.js"
+        },
+        "./components/basic-tabs/register": {
+            "types": "./components/basic-tabs/register.d.ts",
+            "import": "./components/basic-tabs/register.js"
+        }
+    },
+    "files": [
+        "README.md",
+        "index.js",
+        "index.d.ts",
+        "components"
+    ],
+    "keywords": [
+        "custom-element",
+        "basic-tabs",
+        "basic-toc",
+        "table-of-contents",
+        "tabs",
+        "tablist",
+        "toc",
+        "unstyled",
+        "vanilla-js",
+        "web-components"
+    ],
+    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lmfaole/basics.git"
+    },
+    "bugs": {
+        "url": "https://github.com/lmfaole/basics/issues"
+    },
+    "homepage": "https://github.com/lmfaole/basics",
+    "scripts": {
+        "storybook": "storybook dev -p 6006 --no-open",
+        "build-storybook": "storybook build",
+        "test": "pnpm run test:unit && pnpm run test:storybook",
+        "test:unit": "vitest run --config vitest.config.ts",
+        "test:storybook": "vitest run --config vitest.storybook.config.ts",
+        "test:storybook:watch": "vitest --config vitest.storybook.config.ts",
+        "test:storybook:coverage": "vitest run --config vitest.storybook.config.ts --coverage"
+    },
+    "devDependencies": {
+        "@chromatic-com/storybook": "^5.0.2",
+        "@storybook/addon-a11y": "^10.3.1",
+        "@storybook/addon-docs": "10.3.1",
+        "@storybook/addon-vitest": "10.3.1",
+        "@storybook/web-components-vite": "^10.3.1",
+        "@vitest/browser-playwright": "4.1.0",
+        "@vitest/coverage-v8": "4.1.0",
+        "playwright": "^1.58.2",
+        "storybook": "^10.3.1",
+        "vitest": "^4.1.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "packageManager": "pnpm@10.30.3"
+}
