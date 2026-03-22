@@ -38,12 +38,26 @@ GitHub Actions now splits Storybook automation by purpose:
 - `Storybook Pages` deploys the built Storybook from `main` to GitHub Pages.
 - `Chromatic` publishes Storybook builds on branch pushes when the `CHROMATIC_PROJECT_TOKEN` repository secret is configured.
 
+## Changesets
+
+For changes that affect the published package, run:
+
+```sh
+pnpm changeset
+```
+
+Commit the generated Markdown file under `.changeset/` with the rest of your work. If a change is repo-only and does not affect the published package, no changeset file is needed.
+
 ## Releasing
 
-1. Update `package.json` to the version you want to ship.
-2. Publish the package to npm with `npm publish --access public --registry=https://registry.npmjs.org`.
-3. Push a matching git tag such as `v0.1.0`.
-4. GitHub Actions will run the test suite, pack the published files, and create a GitHub Release with the tarball attached.
+Merging changesets into `main` causes the `Release` workflow to open or update a `chore: release` pull request. Merging that release pull request will:
+
+1. run `pnpm release`
+2. publish the package to npm
+3. create the matching `vX.Y.Z` git tag and GitHub Release
+4. attach the packed tarball to the GitHub Release
+
+GitHub Actions publishing requires an `NPM_TOKEN` repository secret with permission to publish `@lmfaole/basics`. Because npm publish for this package requires bypassing publish-time 2FA, the token must support publish with 2FA bypass.
 
 ## Commits
 

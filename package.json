@@ -60,6 +60,9 @@
     },
     "homepage": "https://github.com/lmfaole/basics",
     "scripts": {
+        "changeset": "changeset",
+        "version-packages": "changeset version",
+        "release": "pnpm test && changeset publish",
         "storybook": "storybook dev -p 6006 --no-open",
         "build-storybook": "storybook build",
         "test": "pnpm run test:unit && pnpm run test:storybook",
@@ -69,6 +72,7 @@
         "test:storybook:coverage": "vitest run --config vitest.storybook.config.ts --coverage"
     },
     "devDependencies": {
+        "@changesets/cli": "2.29.7",
         "@chromatic-com/storybook": "^5.0.2",
         "@storybook/addon-a11y": "^10.3.1",
         "@storybook/addon-docs": "10.3.1",

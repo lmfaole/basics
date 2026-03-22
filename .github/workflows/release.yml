@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
   workflow_dispatch:
 
 env:
@@ -11,13 +11,14 @@ env:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  github-release:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +37,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -43,30 +45,33 @@ jobs:
       - name: Install Chromium for Storybook tests
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Verify tag matches package version
-        if: github.event_name == 'push'
-        run: |
-          PACKAGE_VERSION=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")
-          if [ "v${PACKAGE_VERSION}" != "${GITHUB_REF_NAME}" ]; then
-            echo "Tag ${GITHUB_REF_NAME} does not match package version v${PACKAGE_VERSION}."
-            exit 1
-          fi
-
-      - name: Run test suite
-        run: pnpm test
+      - name: Create release pull request or publish to npm
+        id: changesets
+        uses: changesets/action@v1.7.0
+        with:
+          version: pnpm version-packages
+          publish: pnpm release
+          commit: "chore: release"
+          title: "chore: release"
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Pack npm tarball
+        if: steps.changesets.outputs.published == 'true'
         run: pnpm pack
 
-      - name: Create or update GitHub Release
-        if: github.event_name == 'push'
+      - name: Upload tarball to GitHub Release
+        if: steps.changesets.outputs.published == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            gh release upload "${GITHUB_REF_NAME}" ./*.tgz --clobber
+          PACKAGE_VERSION=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")
+          if gh release view "v${PACKAGE_VERSION}" >/dev/null 2>&1; then
+            gh release upload "v${PACKAGE_VERSION}" ./*.tgz --clobber
           else
-            gh release create "${GITHUB_REF_NAME}" ./*.tgz \
-              --title "${GITHUB_REF_NAME}" \
+            gh release create "v${PACKAGE_VERSION}" ./*.tgz \
+              --title "v${PACKAGE_VERSION}" \
               --generate-notes
           fi
