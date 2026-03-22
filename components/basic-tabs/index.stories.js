@@ -258,3 +258,36 @@ export const DisabledTabs = {
         });
     },
 };
+
+export const HomeKeyNavigation = {
+    args: {
+        selectedIndex: 2,
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Interaction test proving that `Home` moves focus and selection back to the first enabled tab, even when another tab starts selected.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const accessibilityTab = canvas.getByRole("tab", { name: "Tilgjengelighet" });
+
+        accessibilityTab.focus();
+
+        await waitFor(() => {
+            expect(accessibilityTab).toHaveFocus();
+            expect(accessibilityTab).toHaveAttribute("aria-selected", "true");
+        });
+
+        await userEvent.keyboard("{Home}");
+
+        await waitFor(() => {
+            const overviewTab = canvas.getByRole("tab", { name: "Oversikt" });
+            expect(overviewTab).toHaveFocus();
+            expect(overviewTab).toHaveAttribute("aria-selected", "true");
+            expect(canvas.getByRole("tabpanel", { name: "Oversikt" })).toBeInTheDocument();
+        });
+    },
+};

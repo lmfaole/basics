@@ -36,13 +36,7 @@ export function getInitialSelectedTabIndex(tabStates) {
         }
     }
 
-    for (let index = 0; index < tabStates.length; index += 1) {
-        if (!tabStates[index]?.disabled) {
-            return index;
-        }
-    }
-
-    return -1;
+    return findFirstEnabledTabIndex(tabStates);
 }
 
 export function findNextEnabledTabIndex(tabStates, startIndex, direction) {
@@ -78,6 +72,16 @@ function collectOwnedElements(root, scope, selector) {
 
 function isTabDisabled(tab) {
     return tab.hasAttribute("disabled") || tab.getAttribute("aria-disabled") === "true";
+}
+
+function findFirstEnabledTabIndex(tabStates) {
+    for (let index = 0; index < tabStates.length; index += 1) {
+        if (!tabStates[index]?.disabled) {
+            return index;
+        }
+    }
+
+    return -1;
 }
 
 function findLastEnabledTabIndex(tabStates) {
@@ -193,7 +197,7 @@ export class TabsElement extends HTMLElementBase {
                 }
                 break;
             case "Home":
-                nextIndex = getInitialSelectedTabIndex(tabStates);
+                nextIndex = findFirstEnabledTabIndex(tabStates);
                 break;
             case "End":
                 nextIndex = findLastEnabledTabIndex(tabStates);
