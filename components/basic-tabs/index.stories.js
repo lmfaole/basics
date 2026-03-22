@@ -31,48 +31,17 @@ const TAB_ITEMS = [
  * @param {TabsStoryArgs} args
  */
 function createStory({ orientation, activation, selectedIndex, disableImplementation }) {
-    const wrapper = document.createElement("div");
-    wrapper.style.padding = "2rem";
-    wrapper.style.background = "linear-gradient(180deg, #f9f6f0 0%, #ffffff 100%)";
-
-    const style = document.createElement("style");
-    style.textContent = `
-        basic-tabs [data-tab][data-selected] {
-            background: #3a2d1a;
-            border-color: #3a2d1a;
-            color: #fff7eb;
-        }
-
-        basic-tabs [data-tab]:focus-visible {
-            outline: 3px solid #8b5e34;
-            outline-offset: 2px;
-        }
-    `;
-
     const tabs = document.createElement("basic-tabs");
     tabs.dataset.label = "Eksempelkode";
     tabs.dataset.activation = activation;
     tabs.dataset.selectedIndex = String(selectedIndex);
-    tabs.style.display = "grid";
-    tabs.style.gap = "1rem";
-    tabs.style.maxWidth = "56rem";
-    tabs.style.padding = "1.5rem";
-    tabs.style.border = "1px solid #d8d1c2";
-    tabs.style.background = "#fffdf8";
-    tabs.style.boxShadow = "0 1rem 2.5rem rgb(58 45 26 / 0.08)";
 
     if (orientation === "vertical") {
         tabs.dataset.orientation = orientation;
-        tabs.style.gridTemplateColumns = "minmax(12rem, 14rem) minmax(0, 1fr)";
-        tabs.style.alignItems = "start";
     }
 
     const list = document.createElement("div");
     list.dataset.tabsList = "";
-    list.style.display = "flex";
-    list.style.flexDirection = orientation === "vertical" ? "column" : "row";
-    list.style.gap = "0.5rem";
-    list.style.flexWrap = "wrap";
 
     const panels = [];
 
@@ -81,35 +50,28 @@ function createStory({ orientation, activation, selectedIndex, disableImplementa
         tab.type = "button";
         tab.dataset.tab = "";
         tab.textContent = item.label;
-        tab.style.padding = "0.75rem 1rem";
-        tab.style.border = "1px solid #c9bea8";
-        tab.style.background = "#f6efe2";
-        tab.style.color = "#3a2d1a";
-        tab.style.font = "inherit";
-        tab.style.cursor = "pointer";
 
         if (disableImplementation && index === 1) {
             tab.disabled = true;
-            tab.style.opacity = "0.55";
-            tab.style.cursor = "not-allowed";
         }
 
         list.append(tab);
 
         const panel = document.createElement("section");
         panel.dataset.tabPanel = "";
-        panel.style.padding = "1rem 0 0";
-        panel.style.borderTop = orientation === "vertical" ? "none" : "1px solid #e7dfd0";
-        panel.innerHTML = `
-            <h2 style="margin: 0 0 0.75rem; font-size: 1.125rem;">${item.title}</h2>
-            <p style="margin: 0; line-height: 1.6;">${item.body}</p>
-        `;
+
+        const heading = document.createElement("h2");
+        heading.textContent = item.title;
+
+        const body = document.createElement("p");
+        body.textContent = item.body;
+
+        panel.append(heading, body);
         panels.push(panel);
     }
 
     tabs.append(list, ...panels);
-    wrapper.append(style, tabs);
-    return wrapper;
+    return tabs;
 }
 
 export default {

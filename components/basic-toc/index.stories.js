@@ -14,11 +14,6 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
  */
 function createStory({ title, headingSelector, includeAppendix, allowMutation }) {
     const main = document.createElement("main");
-    main.style.display = "grid";
-    main.style.gap = "2rem";
-    main.style.gridTemplateColumns = "minmax(14rem, 18rem) minmax(0, 1fr)";
-    main.style.padding = "2rem";
-    main.style.alignItems = "start";
 
     const toc = document.createElement("basic-toc");
     toc.dataset.title = title;
@@ -27,17 +22,11 @@ function createStory({ title, headingSelector, includeAppendix, allowMutation })
         toc.dataset.headingSelector = headingSelector;
     }
 
-    toc.style.position = "sticky";
-    toc.style.top = "1rem";
-    toc.style.alignSelf = "start";
-
     const nav = document.createElement("nav");
     nav.dataset.pageTocNav = "";
     toc.append(nav);
 
     const article = document.createElement("article");
-    article.style.maxWidth = "70ch";
-    article.style.lineHeight = "1.5";
     article.innerHTML = `
         <h1>Table of contents</h1>
         <p>
