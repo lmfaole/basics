@@ -11,6 +11,7 @@ env:
 
 permissions:
   contents: write
+  id-token: write
   pull-requests: write
 
 concurrency:
@@ -45,33 +46,115 @@ jobs:
       - name: Install Chromium for Storybook tests
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Create release pull request or publish to npm
+      - name: Create or update the release pull request
         id: changesets
         uses: changesets/action@v1.7.0
         with:
           version: pnpm version-packages
-          publish: pnpm release
           commit: "chore: release"
           title: "chore: release"
-          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Detect release commit
+        id: release_commit
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          CURRENT_VERSION=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")
+          HEAD_SUBJECT=$(git log -1 --pretty=%s)
+
+          if [ "$HEAD_SUBJECT" = "chore: release" ]; then
+            echo "is_release_commit=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "is_release_commit=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PREVIOUS_PACKAGE_JSON=$(git show "${BEFORE_SHA}:package.json" 2>/dev/null || true)
+          if [ -z "$PREVIOUS_PACKAGE_JSON" ]; then
+            echo "is_release_commit=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PREVIOUS_VERSION=$(printf '%s' "$PREVIOUS_PACKAGE_JSON" | node -p "JSON.parse(require('node:fs').readFileSync(0, 'utf8')).version")
+          if [ "$PREVIOUS_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "is_release_commit=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_release_commit=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Read release metadata
+        id: package
+        if: steps.release_commit.outputs.is_release_commit == 'true'
+        shell: bash
+        run: |
+          PACKAGE_NAME=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).name")
+          PACKAGE_VERSION=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")
+          echo "name=${PACKAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "version=${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether the current version is already on npm
+        id: publish_check
+        if: steps.release_commit.outputs.is_release_commit == 'true'
+        shell: bash
+        env:
+          PACKAGE_NAME: ${{ steps.package.outputs.name }}
+          PACKAGE_VERSION: ${{ steps.package.outputs.version }}
+        run: |
+          set +e
+          npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version --registry=https://registry.npmjs.org >/tmp/npm-view.out 2>/tmp/npm-view.err
+          STATUS=$?
+          set -e
+
+          if [ "$STATUS" -eq 0 ]; then
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if grep -q "E404" /tmp/npm-view.err || grep -q "404 Not Found" /tmp/npm-view.err; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          cat /tmp/npm-view.err
+          exit "$STATUS"
+
+      - name: Publish package to npm with trusted publishing
+        if: steps.publish_check.outputs.should_publish == 'true'
+        run: pnpm release
 
       - name: Pack npm tarball
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.release_commit.outputs.is_release_commit == 'true'
         run: pnpm pack
 
+      - name: Ensure git tag exists
+        if: steps.release_commit.outputs.is_release_commit == 'true'
+        env:
+          RELEASE_TAG: ${{ steps.package.outputs.tag }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${RELEASE_TAG}" >/dev/null 2>&1; then
+            exit 0
+          fi
+          git tag "${RELEASE_TAG}" "${GITHUB_SHA}"
+          git push origin "refs/tags/${RELEASE_TAG}"
+
       - name: Upload tarball to GitHub Release
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.release_commit.outputs.is_release_commit == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.package.outputs.tag }}
         run: |
-          PACKAGE_VERSION=$(node -p "JSON.parse(require('node:fs').readFileSync('package.json', 'utf8')).version")
-          if gh release view "v${PACKAGE_VERSION}" >/dev/null 2>&1; then
-            gh release upload "v${PACKAGE_VERSION}" ./*.tgz --clobber
+          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" ./*.tgz --clobber
           else
-            gh release create "v${PACKAGE_VERSION}" ./*.tgz \
-              --title "v${PACKAGE_VERSION}" \
+            gh release create "${RELEASE_TAG}" ./*.tgz \
+              --title "${RELEASE_TAG}" \
               --generate-notes
           fi

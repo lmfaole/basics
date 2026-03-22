@@ -53,11 +53,11 @@ Commit the generated Markdown file under `.changeset/` with the rest of your wor
 Merging changesets into `main` causes the `Release` workflow to open or update a `chore: release` pull request. Merging that release pull request will:
 
 1. run `pnpm release`
-2. publish the package to npm
+2. publish the package to npm with trusted publishing from GitHub Actions
 3. create the matching `vX.Y.Z` git tag and GitHub Release
 4. attach the packed tarball to the GitHub Release
 
-GitHub Actions publishing requires an `NPM_TOKEN` repository secret with permission to publish `@lmfaole/basics`. Because npm publish for this package requires bypassing publish-time 2FA, the token must support publish with 2FA bypass.
+Trusted publishing must be configured on npm for `@lmfaole/basics` against the GitHub Actions workflow file `.github/workflows/release.yml` in the `lmfaole/basics` repository. No `NPM_TOKEN` repository secret is needed once trusted publishing is active.
 
 ## Commits
 
