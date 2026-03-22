@@ -31,7 +31,12 @@ Storybook Test coverage is enabled through the Vitest addon. In the Storybook UI
 
 The Visual Tests panel is provided by `@chromatic-com/storybook`. To run cloud visual checks, connect the addon to a Chromatic project from the Storybook UI.
 
-GitHub Actions now runs Storybook validation in CI on pull requests and pushes to `main`, including the browser-backed Storybook test suite and a static Storybook build artifact. A separate `Chromatic` workflow publishes Storybook builds on branch pushes when the `CHROMATIC_PROJECT_TOKEN` repository secret is configured.
+GitHub Actions now splits Storybook automation by purpose:
+
+- `CI` runs the browser-backed Storybook test suite on pull requests and pushes to `main`.
+- `Storybook Preview` builds Storybook for pull requests and uploads `storybook-static` as an artifact.
+- `Storybook Pages` deploys the built Storybook from `main` to GitHub Pages.
+- `Chromatic` publishes Storybook builds on branch pushes when the `CHROMATIC_PROJECT_TOKEN` repository secret is configured.
 
 ## Releasing
 
