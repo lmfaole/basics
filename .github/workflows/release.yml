@@ -206,6 +206,12 @@ jobs:
           if git ls-remote --exit-code --tags origin "refs/tags/${RELEASE_TAG}" >/dev/null 2>&1; then
             exit 0
           fi
+
+          if git rev-parse "${RELEASE_TAG}" >/dev/null 2>&1; then
+            git push origin "refs/tags/${RELEASE_TAG}"
+            exit 0
+          fi
+
           git tag "${RELEASE_TAG}" "${GITHUB_SHA}"
           git push origin "refs/tags/${RELEASE_TAG}"
 
