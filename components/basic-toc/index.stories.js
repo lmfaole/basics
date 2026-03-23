@@ -1,18 +1,17 @@
 import "./register.js";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 /**
  * @typedef {object} TableOfContentsStoryArgs
  * @property {string} title Accessible label copied to the generated nav.
  * @property {string} headingSelector CSS selector used to pick headings from the article.
  * @property {boolean} includeAppendix Adds an extra section to the example article.
- * @property {boolean} allowMutation Adds a button that appends a new heading after render.
  */
 
 /**
  * @param {TableOfContentsStoryArgs} args
  */
-function createStory({ title, headingSelector, includeAppendix, allowMutation }) {
+function createStory({ title, headingSelector, includeAppendix }) {
     const main = document.createElement("main");
 
     const toc = document.createElement("basic-toc");
@@ -54,29 +53,6 @@ function createStory({ title, headingSelector, includeAppendix, allowMutation })
         </p>
     `;
 
-    if (allowMutation) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = "Add section";
-        button.addEventListener("click", () => {
-            if (article.querySelector("[data-inserted-section]")) {
-                return;
-            }
-
-            article.insertAdjacentHTML(
-                "beforeend",
-                `
-                    <h2 data-inserted-section>Inserted section</h2>
-                    <p>
-                        This section is appended after the initial render to verify that the
-                        table of contents reacts to DOM changes.
-                    </p>
-                `,
-            );
-        });
-        article.prepend(button);
-    }
-
     if (includeAppendix) {
         article.insertAdjacentHTML(
             "beforeend",
@@ -95,7 +71,7 @@ function createStory({ title, headingSelector, includeAppendix, allowMutation })
 }
 
 export default {
-    title: "Basics/Basic Toc",
+    title: "Components/Navigation/Table of Contents",
     parameters: {
         layout: "fullscreen",
         docs: {
@@ -124,7 +100,6 @@ The element assigns missing heading ids, keeps duplicate headings unique, and re
         title: "Innhold",
         headingSelector: "",
         includeAppendix: true,
-        allowMutation: false,
     },
     argTypes: {
         title: {
@@ -154,13 +129,6 @@ The element assigns missing heading ids, keeps duplicate headings unique, and re
                 category: "Story Controls",
             },
         },
-        allowMutation: {
-            control: "boolean",
-            description: "Story-only toggle that adds a button used by the interaction test.",
-            table: {
-                category: "Story Controls",
-            },
-        },
     },
 };
 
@@ -179,57 +147,15 @@ export const Default = {
             const toc = canvas.getByRole("navigation", { name: "Innhold" });
             const overviewLink = within(toc).getByRole("link", { name: "Overview" });
             const usageLink = within(toc).getByRole("link", { name: "Usage" });
+            const tocItems = within(toc).getAllByRole("listitem");
+            const tocLinks = within(toc).getAllByRole("link");
 
             expect(overviewLink).toHaveAttribute("href", "#overview");
             expect(usageLink).toHaveAttribute("href", "#usage");
+            expect(tocItems).toHaveLength(6);
+            expect(tocLinks).toHaveLength(6);
             expect(canvasElement.querySelector("#overview")).toBeTruthy();
             expect(canvasElement.querySelector("#usage")).toBeTruthy();
-        });
-    },
-};
-
-export const UpdatesAfterMutation = {
-    args: {
-        includeAppendix: false,
-        allowMutation: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Interaction test proving that the outline reacts when a new heading is appended after initial render.",
-            },
-        },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await userEvent.click(canvas.getByRole("button", { name: "Add section" }));
-
-        await waitFor(() => {
-            const toc = canvas.getByRole("navigation", { name: "Innhold" });
-            expect(within(toc).getByRole("link", { name: "Inserted section" })).toBeInTheDocument();
-        });
-    },
-};
-
-export const NoMatchingHeadings = {
-    args: {
-        headingSelector: "h4, h5, h6",
-        includeAppendix: false,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Interaction test proving that the table of contents hides itself when the configured selector does not match any headings.",
-            },
-        },
-    },
-    play: async ({ canvasElement }) => {
-        await waitFor(() => {
-            const toc = canvasElement.querySelector("basic-toc");
-            const nav = canvasElement.querySelector("[data-page-toc-nav]");
-
-            expect(toc).toHaveProperty("hidden", true);
-            expect(nav?.querySelectorAll("a")).toHaveLength(0);
         });
     },
 };

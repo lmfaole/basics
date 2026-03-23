@@ -5,7 +5,6 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
  * @typedef {object} AccordionStoryArgs
  * @property {boolean} multiple Allows multiple panels to stay open.
  * @property {boolean} collapsible Allows the last open panel in single mode to close.
- * @property {boolean} disableImplementation Disables the middle trigger to show skipped keyboard navigation.
  * @property {boolean} openFirst Marks the first item as initially open.
  * @property {boolean} openSecond Marks the second item as initially open.
  * @property {boolean} openThird Marks the third item as initially open.
@@ -32,7 +31,6 @@ const ACCORDION_ITEMS = [
 function createStory({
     multiple,
     collapsible,
-    disableImplementation,
     openFirst,
     openSecond,
     openThird,
@@ -56,10 +54,6 @@ function createStory({
         trigger.dataset.accordionTrigger = "";
         trigger.textContent = item.label;
 
-        if (disableImplementation && index === 1) {
-            trigger.disabled = true;
-        }
-
         if (openStates[index]) {
             trigger.dataset.open = "";
         }
@@ -80,7 +74,7 @@ function createStory({
 }
 
 export default {
-    title: "Basics/Basic Accordion",
+    title: "Components/Disclosure/Accordion",
     parameters: {
         layout: "fullscreen",
         docs: {
@@ -112,7 +106,6 @@ The component assigns missing ids, syncs \`aria-expanded\`, and supports \`Arrow
     args: {
         multiple: false,
         collapsible: false,
-        disableImplementation: false,
         openFirst: false,
         openSecond: false,
         openThird: false,
@@ -130,13 +123,6 @@ The component assigns missing ids, syncs \`aria-expanded\`, and supports \`Arrow
             description: "Maps to `data-collapsible` and allows the last open panel in single mode to close.",
             table: {
                 category: "Attributes",
-            },
-        },
-        disableImplementation: {
-            control: "boolean",
-            description: "Story-only toggle that disables the middle trigger.",
-            table: {
-                category: "Story Controls",
             },
         },
         openFirst: {
@@ -220,43 +206,29 @@ export const Collapsible = {
     },
 };
 
-export const KeyboardNavigation = {
+export const MultipleRegions = {
     args: {
-        disableImplementation: true,
+        multiple: true,
+        openFirst: true,
+        openSecond: true,
     },
     parameters: {
         docs: {
             description: {
-                story: "Interaction test proving that arrow-key navigation skips disabled triggers and `Enter` opens the focused panel.",
+                story: "Accessibility test proving that multiple open items are each exposed as their own named region when multi-open mode is enabled.",
             },
         },
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const overviewTrigger = canvas.getByRole("button", { name: "Oversikt" });
-
-        overviewTrigger.focus();
 
         await waitFor(() => {
-            expect(overviewTrigger).toHaveFocus();
-            expect(overviewTrigger).toHaveAttribute("aria-expanded", "true");
-        });
+            const overviewRegion = canvas.getByRole("region", { name: "Oversikt" });
+            const implementationRegion = canvas.getByRole("region", { name: "Implementasjon" });
 
-        await userEvent.keyboard("{ArrowDown}");
-
-        await waitFor(() => {
-            const accessibilityTrigger = canvas.getByRole("button", { name: "Tilgjengelighet" });
-            expect(accessibilityTrigger).toHaveFocus();
-            expect(accessibilityTrigger).toHaveAttribute("aria-expanded", "false");
-            expect(canvas.getByRole("region", { name: "Oversikt" })).toBeInTheDocument();
-        });
-
-        await userEvent.keyboard("{Enter}");
-
-        await waitFor(() => {
-            const accessibilityTrigger = canvas.getByRole("button", { name: "Tilgjengelighet" });
-            expect(accessibilityTrigger).toHaveAttribute("aria-expanded", "true");
-            expect(canvas.getByRole("region", { name: "Tilgjengelighet" })).toBeInTheDocument();
+            expect(overviewRegion).toBeInTheDocument();
+            expect(implementationRegion).toBeInTheDocument();
+            expect(canvas.queryByRole("region", { name: "Tilgjengelighet" })).not.toBeInTheDocument();
         });
     },
 };

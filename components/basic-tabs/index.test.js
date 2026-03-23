@@ -11,7 +11,7 @@ import {
 
 describe("@lmfaole/basics tabs", () => {
     it("normalizes supported and unsupported attributes", () => {
-        expect(normalizeTabsOrientation("vertical")).toBe("vertical");
+        expect(normalizeTabsOrientation("vertical")).toBe("horizontal");
         expect(normalizeTabsOrientation("horizontal")).toBe("horizontal");
         expect(normalizeTabsOrientation(" diagonal ")).toBe("horizontal");
 

@@ -8,7 +8,6 @@ const DEFAULT_LABEL = "Faner";
 const DEFAULT_ACTIVATION = "automatic";
 const DEFAULT_ORIENTATION = "horizontal";
 const MANUAL_ACTIVATION = "manual";
-const VERTICAL_ORIENTATION = "vertical";
 const TABLIST_SELECTOR = "[data-tabs-list]";
 const TAB_SELECTOR = "[data-tab]";
 const PANEL_SELECTOR = "[data-tab-panel]";
@@ -16,9 +15,7 @@ const PANEL_SELECTOR = "[data-tab-panel]";
 let nextTabsInstanceId = 1;
 
 export function normalizeTabsOrientation(value) {
-    return value?.trim().toLowerCase() === VERTICAL_ORIENTATION
-        ? VERTICAL_ORIENTATION
-        : DEFAULT_ORIENTATION;
+    return DEFAULT_ORIENTATION;
 }
 
 export function normalizeTabsActivation(value) {
@@ -98,7 +95,6 @@ export class TabsElement extends HTMLElementBase {
     static observedAttributes = [
         "data-activation",
         "data-label",
-        "data-orientation",
         "data-selected-index",
     ];
 
@@ -168,7 +164,6 @@ export class TabsElement extends HTMLElementBase {
         const tabStates = this.#getTabStates();
         const currentIndex = this.#tabs.indexOf(currentTab);
         const activation = this.#getActivation();
-        const orientation = this.#getOrientation();
         let nextIndex = -1;
 
         if (currentIndex === -1 || currentIndex >= tabStates.length) {
@@ -177,24 +172,10 @@ export class TabsElement extends HTMLElementBase {
 
         switch (event.key) {
             case "ArrowRight":
-                if (orientation === DEFAULT_ORIENTATION) {
-                    nextIndex = findNextEnabledTabIndex(tabStates, currentIndex, 1);
-                }
+                nextIndex = findNextEnabledTabIndex(tabStates, currentIndex, 1);
                 break;
             case "ArrowLeft":
-                if (orientation === DEFAULT_ORIENTATION) {
-                    nextIndex = findNextEnabledTabIndex(tabStates, currentIndex, -1);
-                }
-                break;
-            case "ArrowDown":
-                if (orientation === VERTICAL_ORIENTATION) {
-                    nextIndex = findNextEnabledTabIndex(tabStates, currentIndex, 1);
-                }
-                break;
-            case "ArrowUp":
-                if (orientation === VERTICAL_ORIENTATION) {
-                    nextIndex = findNextEnabledTabIndex(tabStates, currentIndex, -1);
-                }
+                nextIndex = findNextEnabledTabIndex(tabStates, currentIndex, -1);
                 break;
             case "Home":
                 nextIndex = findFirstEnabledTabIndex(tabStates);
@@ -252,12 +233,6 @@ export class TabsElement extends HTMLElementBase {
         return this.getAttribute("data-label")?.trim() || DEFAULT_LABEL;
     }
 
-    #getOrientation() {
-        return normalizeTabsOrientation(
-            this.getAttribute("data-orientation") ?? this.#tabList?.getAttribute("aria-orientation"),
-        );
-    }
-
     #getTabStates(configuredSelectedIndex = null) {
         const pairCount = Math.min(this.#tabs.length, this.#panels.length);
 
@@ -296,7 +271,6 @@ export class TabsElement extends HTMLElementBase {
             return;
         }
 
-        const orientation = this.#getOrientation();
         const pairCount = Math.min(this.#tabs.length, this.#panels.length);
         const baseId = this.id || this.#instanceId;
 
@@ -305,7 +279,7 @@ export class TabsElement extends HTMLElementBase {
         }
 
         this.#tabList.setAttribute("role", "tablist");
-        this.#tabList.setAttribute("aria-orientation", orientation);
+        this.#tabList.setAttribute("aria-orientation", DEFAULT_ORIENTATION);
 
         for (let index = 0; index < this.#tabs.length; index += 1) {
             const tab = this.#tabs[index];

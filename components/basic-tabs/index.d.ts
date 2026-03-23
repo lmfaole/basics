@@ -4,7 +4,7 @@ export interface TabsTabState {
 }
 
 export type TabsActivation = "automatic" | "manual";
-export type TabsOrientation = "horizontal" | "vertical";
+export type TabsOrientation = "horizontal";
 
 /**
  * Public tag name registered by `defineTabs`.
@@ -12,7 +12,7 @@ export type TabsOrientation = "horizontal" | "vertical";
 export const TABS_TAG_NAME: "basic-tabs";
 
 /**
- * Normalizes unsupported orientation values back to `"horizontal"`.
+ * Normalizes orientation values back to `"horizontal"`.
  */
 export function normalizeTabsOrientation(
     value?: string | null,
@@ -48,7 +48,6 @@ export function findNextEnabledTabIndex(
  *
  * Attributes:
  * - `data-label`: fallback accessible name when the tablist has no own label
- * - `data-orientation`: sets the keyboard orientation and `aria-orientation`
  * - `data-activation`: `automatic` or `manual`
  * - `data-selected-index`: zero-based initially selected tab index
  */

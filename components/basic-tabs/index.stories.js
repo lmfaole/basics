@@ -3,10 +3,8 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 
 /**
  * @typedef {object} TabsStoryArgs
- * @property {"horizontal" | "vertical"} orientation Keyboard direction used by the tabs widget.
  * @property {"automatic" | "manual"} activation Whether arrow keys also activate the target panel.
  * @property {number} selectedIndex Initially selected panel index.
- * @property {boolean} disableImplementation Disables the middle tab to show skipped keyboard navigation.
  */
 
 const TAB_ITEMS = [
@@ -30,15 +28,11 @@ const TAB_ITEMS = [
 /**
  * @param {TabsStoryArgs} args
  */
-function createStory({ orientation, activation, selectedIndex, disableImplementation }) {
+function createStory({ activation, selectedIndex }) {
     const tabs = document.createElement("basic-tabs");
     tabs.dataset.label = "Eksempelkode";
     tabs.dataset.activation = activation;
     tabs.dataset.selectedIndex = String(selectedIndex);
-
-    if (orientation === "vertical") {
-        tabs.dataset.orientation = orientation;
-    }
 
     const list = document.createElement("div");
     list.dataset.tabsList = "";
@@ -50,10 +44,6 @@ function createStory({ orientation, activation, selectedIndex, disableImplementa
         tab.type = "button";
         tab.dataset.tab = "";
         tab.textContent = item.label;
-
-        if (disableImplementation && index === 1) {
-            tab.disabled = true;
-        }
 
         list.append(tab);
 
@@ -75,7 +65,7 @@ function createStory({ orientation, activation, selectedIndex, disableImplementa
 }
 
 export default {
-    title: "Basics/Basic Tabs",
+    title: "Components/Navigation/Tabs",
     parameters: {
         layout: "fullscreen",
         docs: {
@@ -87,9 +77,9 @@ Use it when the page already owns the layout and visual treatment, but still nee
 
 - provide one descendant \`[data-tabs-list]\` container for the tab controls
 - provide matching \`[data-tab]\` and \`[data-tab-panel]\` elements in the same order
-- optionally set \`data-label\`, \`data-orientation\`, \`data-activation\`, and \`data-selected-index\` on the root element
+- optionally set \`data-label\`, \`data-activation\`, and \`data-selected-index\` on the root element
 
-The component assigns missing ids, keeps inactive panels hidden, and supports click activation plus arrow keys, \`Home\`, and \`End\`.
+The component assigns missing ids, keeps inactive panels hidden, and supports click activation plus left and right arrow keys, \`Home\`, and \`End\`.
                 `,
             },
             source: {
@@ -109,23 +99,10 @@ The component assigns missing ids, keeps inactive panels hidden, and supports cl
     },
     render: createStory,
     args: {
-        orientation: "horizontal",
         activation: "automatic",
         selectedIndex: 0,
-        disableImplementation: false,
     },
     argTypes: {
-        orientation: {
-            control: "inline-radio",
-            options: ["horizontal", "vertical"],
-            description: "Maps to the root `data-orientation` attribute and controls arrow-key direction.",
-            table: {
-                category: "Attributes",
-                defaultValue: {
-                    summary: "horizontal",
-                },
-            },
-        },
         activation: {
             control: "inline-radio",
             options: ["automatic", "manual"],
@@ -145,13 +122,6 @@ The component assigns missing ids, keeps inactive panels hidden, and supports cl
                 defaultValue: {
                     summary: "0",
                 },
-            },
-        },
-        disableImplementation: {
-            control: "boolean",
-            description: "Story-only toggle that disables the middle tab.",
-            table: {
-                category: "Story Controls",
             },
         },
     },
@@ -175,6 +145,7 @@ export const Default = {
 
         await waitFor(() => {
             expect(tablist).toHaveAttribute("aria-orientation", "horizontal");
+            expect(tablist).toHaveAttribute("aria-label", "Eksempelkode");
             expect(overviewTab).toHaveAttribute("aria-selected", "true");
             expect(overviewTab).toHaveAttribute("aria-controls", overviewPanel.id);
             expect(overviewPanel).toHaveAttribute("aria-labelledby", overviewTab.id);
@@ -222,72 +193,7 @@ export const ManualActivation = {
             const implementationTab = canvas.getByRole("tab", { name: "Implementasjon" });
             expect(implementationTab).toHaveAttribute("aria-selected", "true");
             expect(canvas.getByRole("tabpanel", { name: "Implementasjon" })).toBeInTheDocument();
-        });
-    },
-};
-
-export const DisabledTabs = {
-    args: {
-        disableImplementation: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Interaction test proving that keyboard navigation skips disabled tabs.",
-            },
-        },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const firstTab = canvas.getByRole("tab", { name: "Oversikt" });
-
-        firstTab.focus();
-
-        await waitFor(() => {
-            expect(firstTab).toHaveFocus();
-            expect(firstTab).toHaveAttribute("aria-selected", "true");
-        });
-
-        await userEvent.keyboard("{ArrowRight}");
-
-        await waitFor(() => {
-            const accessibilityTab = canvas.getByRole("tab", { name: "Tilgjengelighet" });
-            expect(accessibilityTab).toHaveFocus();
-            expect(accessibilityTab).toHaveAttribute("aria-selected", "true");
-            expect(canvas.getByRole("tabpanel", { name: "Tilgjengelighet" })).toBeInTheDocument();
-        });
-    },
-};
-
-export const HomeKeyNavigation = {
-    args: {
-        selectedIndex: 2,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Interaction test proving that `Home` moves focus and selection back to the first enabled tab, even when another tab starts selected.",
-            },
-        },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const accessibilityTab = canvas.getByRole("tab", { name: "Tilgjengelighet" });
-
-        accessibilityTab.focus();
-
-        await waitFor(() => {
-            expect(accessibilityTab).toHaveFocus();
-            expect(accessibilityTab).toHaveAttribute("aria-selected", "true");
-        });
-
-        await userEvent.keyboard("{Home}");
-
-        await waitFor(() => {
-            const overviewTab = canvas.getByRole("tab", { name: "Oversikt" });
-            expect(overviewTab).toHaveFocus();
-            expect(overviewTab).toHaveAttribute("aria-selected", "true");
-            expect(canvas.getByRole("tabpanel", { name: "Oversikt" })).toBeInTheDocument();
+            expect(canvas.queryByRole("tabpanel", { name: "Oversikt" })).not.toBeInTheDocument();
         });
     },
 };

@@ -224,7 +224,6 @@ The element upgrades existing markup into an accessible tab interface without ad
 ### Attributes
 
 - `data-label`: sets the generated tablist's accessible name when the tablist does not already have `aria-label` or `aria-labelledby`. Defaults to `Faner`.
-- `data-orientation`: sets arrow-key behavior and mirrors `aria-orientation` on the tablist. Supported values are `horizontal` and `vertical`.
 - `data-activation`: chooses whether arrow-key focus changes also activate the panel. Supported values are `automatic` and `manual`.
 - `data-selected-index`: sets the initially selected tab by zero-based index. Defaults to the first enabled tab.
 
@@ -232,7 +231,7 @@ The element upgrades existing markup into an accessible tab interface without ad
 
 - Missing tab and panel ids are generated automatically.
 - `aria-selected`, `aria-controls`, `aria-labelledby`, `hidden`, and `data-selected` stay in sync with the active tab.
-- Click, `Home`, `End`, and orientation-aware arrow keys move between tabs.
+- Click, `ArrowLeft`, `ArrowRight`, `Home`, and `End` move between tabs.
 - Disabled tabs are skipped during keyboard navigation.
 - In `manual` mode, arrow keys move focus and `Enter` or `Space` activates the focused tab.
 
@@ -242,6 +241,142 @@ The element upgrades existing markup into an accessible tab interface without ad
 - Provide matching counts of `[data-tab]` and `[data-tab-panel]` descendants in the same order.
 - Prefer `<button>` elements for tabs so click and keyboard activation stay native.
 - Keep layout and styling outside the package; the component only manages semantics, state, and keyboard behavior.
+
+## Basic Table
+
+```html
+<basic-table
+  data-caption="Bemanning per sprint"
+  data-description="Viser team, lokasjon og ledig kapasitet per sprint."
+  data-row-headers
+  data-row-header-column="2"
+>
+  <table>
+    <thead>
+      <tr>
+        <th>Statuskode</th>
+        <th>Team</th>
+        <th>Lokasjon</th>
+        <th>Ledige timer</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>A1</td>
+        <td>Plattform</td>
+        <td>Oslo</td>
+        <td>18</td>
+      </tr>
+      <tr>
+        <td>B4</td>
+        <td>Designsystem</td>
+        <td>Trondheim</td>
+        <td>10</td>
+      </tr>
+    </tbody>
+  </table>
+</basic-table>
+
+<script type="module">
+  import "@lmfaole/basics/components/basic-table/register";
+</script>
+```
+
+The element upgrades a regular table with stronger accessible naming and header associations without imposing any styles.
+
+### Attributes
+
+- `data-caption`: generates a visible `<caption>` when the wrapped table does not already define one.
+- `data-column-headers`: promotes the first row to column headers when the author provides a plain table without a header row.
+- `data-description`: generates a hidden description and connects it with `aria-describedby`.
+- `data-label`: sets a fallback accessible name when the table has no caption, `aria-label`, or `aria-labelledby`. Defaults to `Tabell`.
+- `data-row-header-column`: sets which one-based body column should become the generated row header. Defaults to `1`.
+- `data-row-headers`: enables generated row headers in body rows. If `data-row-header-column` is present, row-header mode is enabled automatically.
+
+### Behavior
+
+- Preserves author-provided captions and only generates one when needed.
+- Can generate hidden helper text for extra context without requiring a separate authored description element.
+- Can promote a plain first row to column headers when consumers start from simple body-only markup.
+- Infers common `scope` values for header cells and assigns missing header ids.
+- Populates each data cell's `headers` attribute from the matching row and column headers.
+- Re-runs automatically when the wrapped table changes.
+
+### Markup Contract
+
+- Provide one descendant `<table>` inside the custom element.
+- Use real table sections and header cells where possible; the component strengthens semantics but does not replace the HTML table model.
+- Add `data-row-headers` when one body column identifies each row, and use `data-row-header-column` when that column is not the first one.
+- Add `data-column-headers` when you want the component to promote a plain first row instead of authoring a header row yourself.
+- Keep layout and styling outside the package; the component only manages semantics and accessibility metadata.
+
+## Basic Summary Table
+
+```html
+<basic-summary-table
+  data-caption="Prosjektsammendrag"
+  data-description="Viser timer og total kostnad for prosjektets leveranser."
+  data-row-headers
+  data-summary-columns="2,4"
+  data-total-label="Totalt"
+>
+  <table>
+    <thead>
+      <tr>
+        <th>Post</th>
+        <th>Timer</th>
+        <th>Sats</th>
+        <th>Kostnad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Analyse</td>
+        <td>8</td>
+        <td>100</td>
+        <td>800</td>
+      </tr>
+      <tr>
+        <td>Implementasjon</td>
+        <td>12</td>
+        <td>120</td>
+        <td>1440</td>
+      </tr>
+    </tbody>
+  </table>
+</basic-summary-table>
+
+<script type="module">
+  import "@lmfaole/basics/components/basic-summary-table/register";
+</script>
+```
+
+The element upgrades a calculation-heavy table with an automatically maintained totals row in `<tfoot>`.
+
+### Attributes
+
+- `data-caption`: generates a visible `<caption>` when the wrapped table does not already define one.
+- `data-description`: generates hidden helper text and connects it with `aria-describedby`.
+- `data-label`: sets a fallback accessible name when the table has no caption, `aria-label`, or `aria-labelledby`. Defaults to `Tabell`.
+- `data-row-headers`: enables generated row headers in body rows.
+- `data-row-header-column`: sets which one-based body column should become the generated row header. Defaults to `1`.
+- `data-summary-columns`: chooses which one-based columns should be totalled in the generated footer row. If omitted, numeric body columns are inferred automatically.
+- `data-total-label`: sets the footer row label. Defaults to `Totalt`.
+- `data-locale`: passes a locale through to `Intl.NumberFormat` for generated footer totals.
+
+### Behavior
+
+- Inherits caption, description, row-header, and `headers` association behavior from `basic-table`.
+- Parses numbers from cell text and supports raw calculation values through `data-value` on individual body cells.
+- Generates or updates a totals row in `<tfoot>` without requiring consumers to author the footer manually.
+- Recalculates totals automatically when body rows or `data-value` attributes change.
+
+### Markup Contract
+
+- Provide one descendant `<table>` with line items in `<tbody>`.
+- Prefer a label column such as `Post` or `Kategori` and enable `data-row-headers` so each line item remains easy to navigate.
+- Use `data-value` on cells when the displayed text is formatted differently from the numeric value you want summed.
+- Keep layout and styling outside the package; the component only manages semantics, totals, and footer structure.
 
 ## Basic Toc
 

@@ -7,6 +7,8 @@
         "./components/basic-accordion/register.js",
         "./components/basic-dialog/register.js",
         "./components/basic-popover/register.js",
+        "./components/basic-summary-table/register.js",
+        "./components/basic-table/register.js",
         "./components/basic-toc/register.js",
         "./components/basic-tabs/register.js"
     ],
@@ -39,6 +41,22 @@
             "types": "./components/basic-popover/register.d.ts",
             "import": "./components/basic-popover/register.js"
         },
+        "./components/basic-summary-table": {
+            "types": "./components/basic-summary-table/index.d.ts",
+            "import": "./components/basic-summary-table/index.js"
+        },
+        "./components/basic-summary-table/register": {
+            "types": "./components/basic-summary-table/register.d.ts",
+            "import": "./components/basic-summary-table/register.js"
+        },
+        "./components/basic-table": {
+            "types": "./components/basic-table/index.d.ts",
+            "import": "./components/basic-table/index.js"
+        },
+        "./components/basic-table/register": {
+            "types": "./components/basic-table/register.d.ts",
+            "import": "./components/basic-table/register.js"
+        },
         "./components/basic-toc": {
             "types": "./components/basic-toc/index.d.ts",
             "import": "./components/basic-toc/index.js"
@@ -69,14 +87,18 @@
         "accordion",
         "custom-element",
         "dialog",
+        "basic-summary-table",
         "basic-tabs",
+        "basic-table",
         "basic-toc",
         "modal",
         "popover",
         "overlay",
         "table-of-contents",
+        "summary-table",
         "tabs",
         "tablist",
+        "table",
         "toc",
         "unstyled",
         "vanilla-js",

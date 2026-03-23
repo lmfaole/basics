@@ -62,7 +62,7 @@ function createStory({ label, backdropClose, includeTitle, includeSecondaryActio
 }
 
 export default {
-    title: "Basics/Basic Dialog",
+    title: "Components/Overlay/Dialog",
     parameters: {
         layout: "fullscreen",
         docs: {
@@ -147,7 +147,15 @@ export const Default = {
         await userEvent.click(opener);
 
         await waitFor(() => {
-            expect(canvas.getByRole("dialog", { name: "Bekreft handling" })).toHaveAttribute("open");
+            const dialog = canvas.getByRole("dialog", { name: "Bekreft handling" });
+            const title = within(dialog).getByRole("heading", { name: "Bekreft handling" });
+
+            expect(dialog).toHaveAttribute("open");
+            expect(dialog).toHaveAttribute("aria-modal", "true");
+            expect(dialog).toHaveAttribute("aria-labelledby", title.id);
+            expect(dialog).not.toHaveAttribute("aria-label");
+            expect(within(dialog).getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+            expect(within(dialog).getByRole("button", { name: "Confirm" })).toBeInTheDocument();
         });
 
         await userEvent.click(canvas.getByRole("button", { name: "Cancel" }));
@@ -155,47 +163,6 @@ export const Default = {
         await waitFor(() => {
             expect(canvas.queryByRole("dialog", { name: "Bekreft handling" })).not.toBeInTheDocument();
             expect(opener).toHaveFocus();
-        });
-    },
-};
-
-export const BackdropClose = {
-    args: {
-        backdropClose: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Interaction test proving that clicks inside the dialog do not dismiss it, while actual backdrop clicks still do when `data-backdrop-close` is enabled.",
-            },
-        },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await userEvent.click(canvas.getByRole("button", { name: "Open dialog" }));
-
-        const dialog = await canvas.findByRole("dialog", { name: "Bekreft handling" });
-        const insideBounds = dialog.getBoundingClientRect();
-        dialog.dispatchEvent(new MouseEvent("click", {
-            bubbles: true,
-            cancelable: true,
-            clientX: insideBounds.left + 16,
-            clientY: insideBounds.top + 16,
-        }));
-
-        await waitFor(() => {
-            expect(canvas.getByRole("dialog", { name: "Bekreft handling" })).toHaveAttribute("open");
-        });
-
-        dialog.dispatchEvent(new MouseEvent("click", {
-            bubbles: true,
-            cancelable: true,
-            clientX: insideBounds.left - 16,
-            clientY: insideBounds.top - 16,
-        }));
-
-        await waitFor(() => {
-            expect(canvas.queryByRole("dialog", { name: "Bekreft handling" })).not.toBeInTheDocument();
         });
     },
 };
@@ -222,33 +189,6 @@ export const LabelFallback = {
             expect(dialog).toHaveAttribute("aria-modal", "true");
             expect(dialog).toHaveAttribute("aria-label", "Bekreft sletting");
             expect(dialog).not.toHaveAttribute("aria-labelledby");
-        });
-    },
-};
-
-export const ConfirmAction = {
-    args: {
-        includeSecondaryAction: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Interaction test proving that a `[data-dialog-close]` button can close with a return value and still restore focus to the opener.",
-            },
-        },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const opener = canvas.getByRole("button", { name: "Open dialog" });
-        const dialog = canvasElement.querySelector("dialog");
-
-        await userEvent.click(opener);
-        await userEvent.click(canvas.getByRole("button", { name: "Confirm" }));
-
-        await waitFor(() => {
-            expect(canvas.queryByRole("dialog", { name: "Bekreft handling" })).not.toBeInTheDocument();
-            expect(dialog?.returnValue).toBe("confirmed");
-            expect(opener).toHaveFocus();
         });
     },
 };

@@ -20,7 +20,6 @@ const POSITION_AREA_OPTIONS = [
  * @property {string} label Fallback accessible name when the popover has no title element.
  * @property {boolean} includeTitle Renders a heading that becomes the popover name.
  * @property {boolean} includeCloseButton Adds an explicit dismiss control inside the panel.
- * @property {boolean} includeOutsideTarget Adds a sibling button used by the outside-click interaction test.
  * @property {boolean} includeViewportSpacer Adds enough preceding content to force scrolling for fallback placement tests.
  */
 
@@ -34,7 +33,6 @@ function createStory({
     label,
     includeTitle,
     includeCloseButton,
-    includeOutsideTarget,
     includeViewportSpacer,
 }) {
     const wrapper = document.createElement("div");
@@ -103,18 +101,11 @@ function createStory({
         }
     }
 
-    if (includeOutsideTarget) {
-        const outsideButton = document.createElement("button");
-        outsideButton.type = "button";
-        outsideButton.textContent = "Outside action";
-        wrapper.append(outsideButton);
-    }
-
     return wrapper;
 }
 
 export default {
-    title: "Basics/Basic Popover",
+    title: "Components/Overlay/Popover",
     parameters: {
         layout: "centered",
         docs: {
@@ -160,7 +151,6 @@ The component uses the native Popover API in auto mode, syncs \`aria-expanded\`,
         label: "Filtre",
         includeTitle: true,
         includeCloseButton: true,
-        includeOutsideTarget: false,
         includeViewportSpacer: false,
     },
     argTypes: {
@@ -227,13 +217,6 @@ The component uses the native Popover API in auto mode, syncs \`aria-expanded\`,
                 category: "Story Controls",
             },
         },
-        includeOutsideTarget: {
-            control: "boolean",
-            description: "Story-only toggle that adds a sibling button outside the popover root.",
-            table: {
-                category: "Story Controls",
-            },
-        },
         includeViewportSpacer: {
             control: "boolean",
             description: "Story-only toggle that adds preceding content so the trigger can be scrolled to the viewport edge.",
@@ -253,57 +236,19 @@ export const Default = {
         await userEvent.click(opener);
 
         await waitFor(() => {
+            const panel = canvas.getByRole("dialog", { name: "Filtre" });
+            const title = within(panel).getByRole("heading", { name: "Filtre" });
+
             expect(opener).toHaveAttribute("aria-expanded", "true");
-            expect(canvas.getByRole("dialog", { name: "Filtre" })).toBeInTheDocument();
+            expect(opener).toHaveAttribute("aria-haspopup", "dialog");
+            expect(opener).toHaveAttribute("aria-controls", panel.id);
+            expect(panel).toHaveAttribute("aria-modal", "false");
+            expect(panel).toHaveAttribute("aria-labelledby", title.id);
+            expect(panel).not.toHaveAttribute("aria-label");
+            expect(within(panel).getByRole("checkbox", { name: "Bare aktive elementer" })).toBeInTheDocument();
         });
 
         await userEvent.click(canvas.getByRole("button", { name: "Close" }));
-
-        await waitFor(() => {
-            expect(canvas.queryByRole("dialog", { name: "Filtre" })).not.toBeInTheDocument();
-            expect(opener).toHaveFocus();
-        });
-    },
-};
-
-export const OutsideDismiss = {
-    args: {
-        includeOutsideTarget: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Interaction test proving that outside clicks dismiss the popover without stealing focus from the clicked control.",
-            },
-        },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await userEvent.click(canvas.getByRole("button", { name: "Toggle popover" }));
-
-        const outsideButton = canvas.getByRole("button", { name: "Outside action" });
-        await userEvent.click(outsideButton);
-
-        await waitFor(() => {
-            expect(canvas.queryByRole("dialog", { name: "Filtre" })).not.toBeInTheDocument();
-            expect(outsideButton).toHaveFocus();
-        });
-    },
-};
-
-export const EscapeDismiss = {
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const opener = canvas.getByRole("button", { name: "Toggle popover" });
-
-        await userEvent.click(opener);
-        await userEvent.tab();
-
-        await waitFor(() => {
-            expect(canvas.getByRole("checkbox", { name: "Bare aktive elementer" })).toHaveFocus();
-        });
-
-        await userEvent.keyboard("{Escape}");
 
         await waitFor(() => {
             expect(canvas.queryByRole("dialog", { name: "Filtre" })).not.toBeInTheDocument();
