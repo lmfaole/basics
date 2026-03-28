@@ -1,5 +1,5 @@
-import "../../components/basic-alert/register.js";
-import "../../components/basic-tabs/register.js";
+import "../../basic-components/basic-alert/register.js";
+import "../../basic-components/basic-tabs/register.js";
 
 function withFrame(innerMarkup) {
     return `<style>

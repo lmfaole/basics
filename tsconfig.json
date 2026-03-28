@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": false,
+        "lib": ["DOM", "ES2022"],
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "noEmit": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "target": "ES2022"
+    },
+    "include": [
+        ".storybook/**/*.ts",
+        "basic-components/**/*.d.ts",
+        "basic-components/**/*.js",
+        "basic-styling/**/*.js",
+        "index.d.ts",
+        "scripts/**/*.mjs",
+        "vite-env.d.ts",
+        "vitest.config.ts",
+        "vitest.storybook.config.ts"
+    ]
+}

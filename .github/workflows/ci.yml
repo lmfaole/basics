@@ -22,6 +22,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  package-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Validate breaking-change codemods
+        run: pnpm run check:breaking-change-codemods
+
+      - name: Validate generated token files
+        run: pnpm run check:generated-files
+
+      - name: Validate package exports and packed files
+        run: pnpm run check:package
+
   unit-tests:
     runs-on: ubuntu-latest
 

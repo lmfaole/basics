@@ -1,4 +1,4 @@
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const WHITE = { components: [100, 0, 0], alpha: 1 };
@@ -230,15 +230,37 @@ function buildPaletteTokens(name, palette) {
     };
 }
 
-const tokens = {
-    $schema: "https://www.designtokens.org/schemas/2025.10/format.json",
-    basic: {
-        palette: Object.fromEntries(
-            Object.entries(PALETTES).map(([name, palette]) => [name, buildPaletteTokens(name, palette)]),
-        ),
-    },
-};
+function buildTokens() {
+    return {
+        $schema: "https://www.designtokens.org/schemas/2025.10/format.json",
+        basic: {
+            palette: Object.fromEntries(
+                Object.entries(PALETTES).map(([name, palette]) => [name, buildPaletteTokens(name, palette)]),
+            ),
+        },
+    };
+}
 
 const outputPath = fileURLToPath(new URL("../basic-styling/tokens/palette.tokens.json", import.meta.url));
+const output = `${JSON.stringify(buildTokens(), null, 2)}\n`;
 
-writeFileSync(outputPath, `${JSON.stringify(tokens, null, 2)}\n`);
+if (process.argv.includes("--check")) {
+    let existingOutput = "";
+
+    try {
+        existingOutput = readFileSync(outputPath, "utf8");
+    } catch {
+        existingOutput = "";
+    }
+
+    if (existingOutput !== output) {
+        console.error(
+            "basic-styling/tokens/palette.tokens.json is out of date. Run `node scripts/generate-palette-tokens.mjs`.",
+        );
+        process.exit(1);
+    }
+
+    console.log("basic-styling/tokens/palette.tokens.json is up to date.");
+} else {
+    writeFileSync(outputPath, output);
+}

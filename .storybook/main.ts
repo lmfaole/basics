@@ -5,7 +5,7 @@ const config: StorybookConfig = {
         "../readme.mdx",
         "../basic-styling/tokens/palette.mdx",
         "../basic-styling/**/*.stories.@(js|jsx|ts|tsx)",
-        "../components/**/*.stories.@(js|jsx|ts|tsx)",
+        "../basic-components/**/*.stories.@(js|jsx|ts|tsx)",
     ],
     addons: [
         "@storybook/addon-a11y",

@@ -1,0 +1,54 @@
+name: Feature request
+description: Propose a new component capability, styling export, or tooling improvement.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - basic-alert
+        - basic-accordion
+        - basic-dialog
+        - basic-popover
+        - basic-table
+        - basic-summary-table
+        - basic-tabs
+        - basic-toast
+        - basic-toc
+        - basic-styling
+        - Storybook
+        - package / release
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is missing or painful today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the shape of the API, behavior, or workflow you want.
+    validations:
+      required: true
+  - type: dropdown
+    id: breaking_change
+    attributes:
+      label: Breaking change?
+      options:
+        - "No"
+        - "Yes"
+        - "Unsure"
+    validations:
+      required: true
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration impact
+      description: If this may be breaking, describe whether a codemod would likely be needed.

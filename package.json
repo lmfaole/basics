@@ -5,15 +5,15 @@
     "type": "module",
     "sideEffects": [
         "./basic-styling/**/*.css",
-        "./components/basic-alert/register.js",
-        "./components/basic-accordion/register.js",
-        "./components/basic-dialog/register.js",
-        "./components/basic-popover/register.js",
-        "./components/basic-summary-table/register.js",
-        "./components/basic-table/register.js",
-        "./components/basic-toc/register.js",
-        "./components/basic-tabs/register.js",
-        "./components/basic-toast/register.js"
+        "./basic-components/basic-alert/register.js",
+        "./basic-components/basic-accordion/register.js",
+        "./basic-components/basic-dialog/register.js",
+        "./basic-components/basic-popover/register.js",
+        "./basic-components/basic-summary-table/register.js",
+        "./basic-components/basic-table/register.js",
+        "./basic-components/basic-toc/register.js",
+        "./basic-components/basic-tabs/register.js",
+        "./basic-components/basic-toast/register.js"
     ],
     "exports": {
         ".": {
@@ -25,25 +25,34 @@
         "./basic-styling/components/*.css": "./basic-styling/components/*.css",
         "./basic-styling/tokens/*.css": "./basic-styling/tokens/*.css",
         "./basic-styling/tokens/*.json": "./basic-styling/tokens/*.json",
+        "./basic-components/*/register": {
+            "types": "./basic-components/*/register.d.ts",
+            "import": "./basic-components/*/register.js"
+        },
+        "./basic-components/*": {
+            "types": "./basic-components/*/index.d.ts",
+            "import": "./basic-components/*/index.js"
+        },
         "./components/*/register": {
-            "types": "./components/*/register.d.ts",
-            "import": "./components/*/register.js"
+            "types": "./basic-components/*/register.d.ts",
+            "import": "./basic-components/*/register.js"
         },
         "./components/*": {
-            "types": "./components/*/index.d.ts",
-            "import": "./components/*/index.js"
+            "types": "./basic-components/*/index.d.ts",
+            "import": "./basic-components/*/index.js"
         }
     },
     "files": [
+        "LICENSE",
         "README.md",
         "index.js",
         "index.d.ts",
         "basic-styling/**/*.css",
         "basic-styling/**/*.json",
-        "components/*/index.js",
-        "components/*/index.d.ts",
-        "components/*/register.js",
-        "components/*/register.d.ts"
+        "basic-components/*/index.js",
+        "basic-components/*/index.d.ts",
+        "basic-components/*/register.js",
+        "basic-components/*/register.d.ts"
     ],
     "keywords": [
         "alert",
@@ -69,7 +78,10 @@
         "vanilla-js",
         "web-components"
     ],
-    "license": "ISC",
+    "license": "MIT",
+    "engines": {
+        "node": ">=24.0.0"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/lmfaole/basics.git"
@@ -80,6 +92,9 @@
     "homepage": "https://github.com/lmfaole/basics",
     "scripts": {
         "changeset": "changeset",
+        "check:breaking-change-codemods": "node scripts/check-breaking-change-codemods.mjs",
+        "check:generated-files": "node scripts/generate-palette-tokens.mjs --check",
+        "check:package": "node scripts/check-package-exports.mjs",
         "version-packages": "changeset version",
         "release": "pnpm test && changeset publish",
         "storybook": "storybook dev -p 6006 --no-open",

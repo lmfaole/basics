@@ -40,6 +40,8 @@ Individual token and component files are also exported:
 
 The core components remain unstyled by default. The `basic-styling` subpath is optional and meant as a very simple token-based baseline that focuses on spacing, padding, and margins first. The shared token sources live under `basic-styling/tokens/`, while the component-specific styles live under `basic-styling/components/`. `base.css` defines the non-color primitives, `palette.css` holds the computed color tokens and alternate palettes that the global layer consumes, and `palette.tokens.json` exposes the same palette data in W3C design-token format.
 
+Component entrypoints are exported under `@lmfaole/basics/basic-components/...`. The older `@lmfaole/basics/components/...` subpaths remain as compatibility aliases.
+
 ## Storybook
 
 ```sh
@@ -75,32 +77,19 @@ GitHub Actions now splits Storybook automation by purpose:
 - `Storybook Pages` deploys the built Storybook from `main` to GitHub Pages.
 - `Chromatic` publishes Storybook builds on branch pushes when the `CHROMATIC_PROJECT_TOKEN` repository secret is configured.
 
-## Changesets
+## Contributing
 
-For changes that affect the published package, run:
+Contributor workflow, release notes, codemod policy, and local setup now live in [CONTRIBUTING.md](./CONTRIBUTING.md). Security reporting details live in [SECURITY.md](./SECURITY.md).
 
-```sh
-pnpm changeset
-```
+## Browser Support
 
-Commit the generated Markdown file under `.changeset/` with the rest of your work. If a change is repo-only and does not affect the published package, no changeset file is needed.
+The package targets modern evergreen browsers with Custom Elements support.
 
-## Releasing
-
-Merging changesets into `main` causes the `Release` workflow to open or update a `chore: release` pull request. Merging that release pull request will:
-
-1. run `pnpm release`
-2. publish the package to npm with trusted publishing from GitHub Actions
-3. create the matching `vX.Y.Z` git tag and GitHub Release
-4. attach the packed tarball to the GitHub Release
-
-Trusted publishing must be configured on npm for `@lmfaole/basics` against the GitHub Actions workflow file `.github/workflows/release.yml` in the `lmfaole/basics` repository. No `NPM_TOKEN` repository secret is needed once trusted publishing is active.
-
-If a release needs to be retried after the workflow changes land, use the `Release` workflow's `publish_current_version` manual input to publish the current `package.json` version from `main` when it is still unpublished.
-
-## Commits
-
-Use Conventional Commits for commit messages and pull request titles. The GitHub workflow accepts `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, and `test`, with an optional scope such as `feat(tabs): add keyboard support`.
+- `basic-alert`, `basic-accordion`, `basic-table`, `basic-summary-table`, `basic-tabs`, and `basic-toc` only depend on standard modern DOM APIs.
+- `basic-dialog` requires the HTML `dialog` element and `showModal()`. Without that platform support, the custom element does not provide a modal fallback on its own.
+- `basic-popover` requires the Popover API to open its managed panel. The optional `data-anchor-trigger` placement is progressive enhancement on top of that and depends on support for anchor-positioning properties such as `position-area`.
+- `basic-toast` works without the Popover API, but when Popover is available it uses the top layer for viewport placement. Without Popover, it falls back to normal DOM visibility with `hidden`.
+- The optional `basic-styling` layer targets browsers that support CSS custom properties, `oklch()`, and `light-dark()`. Manual `color-scheme` overrides are shown in the `Techniques/Color` stories in Storybook.
 
 ## Basic Alert
 
@@ -112,7 +101,7 @@ Use Conventional Commits for commit messages and pull request titles. The GitHub
 </basic-alert>
 
 <script type="module">
-  import "@lmfaole/basics/components/basic-alert/register";
+  import "@lmfaole/basics/basic-components/basic-alert/register";
 </script>
 ```
 
@@ -151,7 +140,7 @@ The element upgrades inline content into a named live-region alert without addin
 </basic-toast>
 
 <script type="module">
-  import "@lmfaole/basics/components/basic-toast/register";
+  import "@lmfaole/basics/basic-components/basic-toast/register";
 </script>
 ```
 
@@ -196,7 +185,7 @@ The element upgrades trigger-and-panel markup into a toast notification flow wit
 </basic-popover>
 
 <script type="module">
-  import "@lmfaole/basics/components/basic-popover/register";
+  import "@lmfaole/basics/basic-components/basic-popover/register";
 </script>
 ```
 
@@ -244,7 +233,7 @@ The element upgrades popover trigger-and-panel markup into an accessible non-mod
 </basic-dialog>
 
 <script type="module">
-  import "@lmfaole/basics/components/basic-dialog/register";
+  import "@lmfaole/basics/basic-components/basic-dialog/register";
 </script>
 ```
 
@@ -285,7 +274,7 @@ The element upgrades native `<dialog>` markup into an accessible modal flow with
 </basic-accordion>
 
 <script type="module">
-  import "@lmfaole/basics/components/basic-accordion/register";
+  import "@lmfaole/basics/basic-components/basic-accordion/register";
 </script>
 ```
 
@@ -333,7 +322,7 @@ The element coordinates direct child `details` items into an accordion without a
 </basic-tabs>
 
 <script type="module">
-  import "@lmfaole/basics/components/basic-tabs/register";
+  import "@lmfaole/basics/basic-components/basic-tabs/register";
 </script>
 ```
 
@@ -413,7 +402,7 @@ The element upgrades existing markup into an accessible tab interface without ad
 </basic-table>
 
 <script type="module">
-  import "@lmfaole/basics/components/basic-table/register";
+  import "@lmfaole/basics/basic-components/basic-table/register";
 </script>
 ```
 
@@ -495,7 +484,7 @@ The element upgrades a regular table with stronger accessible naming and header 
 </basic-summary-table>
 
 <script type="module">
-  import "@lmfaole/basics/components/basic-summary-table/register";
+  import "@lmfaole/basics/basic-components/basic-summary-table/register";
 </script>
 ```
 
@@ -535,7 +524,7 @@ The element upgrades a calculation-heavy table with an automatically maintained 
 </basic-toc>
 
 <script type="module">
-  import "@lmfaole/basics/components/basic-toc/register";
+  import "@lmfaole/basics/basic-components/basic-toc/register";
 </script>
 ```
 

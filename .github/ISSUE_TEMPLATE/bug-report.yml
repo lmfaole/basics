@@ -1,0 +1,63 @@
+name: Bug report
+description: Report a defect in a component, Storybook example, packaging, or release flow.
+title: "fix: "
+labels:
+  - bug
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the project is affected?
+      options:
+        - basic-alert
+        - basic-accordion
+        - basic-dialog
+        - basic-popover
+        - basic-table
+        - basic-summary-table
+        - basic-tabs
+        - basic-toast
+        - basic-toc
+        - basic-styling
+        - Storybook
+        - package / release
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      description: Which released version are you using?
+      placeholder: 0.4.0
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include HTML, JS, or a minimal example that reproduces the problem.
+      placeholder: |
+        1. Render ...
+        2. Click ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser / environment
+      description: Include browser version or any relevant runtime details.
+      placeholder: Chrome 135 on macOS 15
