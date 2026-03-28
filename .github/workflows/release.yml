@@ -198,6 +198,32 @@ jobs:
         if: steps.release_commit.outputs.is_release_commit == 'true'
         run: pnpm pack
 
+      - name: Extract release notes from changelog
+        id: release_notes
+        if: steps.release_commit.outputs.is_release_commit == 'true'
+        shell: bash
+        env:
+          PACKAGE_VERSION: ${{ steps.package.outputs.version }}
+        run: |
+          awk -v version="${PACKAGE_VERSION}" '
+            $0 == "## " version {
+              capture = 1
+            }
+            capture && /^## / && $0 != "## " version {
+              exit
+            }
+            capture {
+              print
+            }
+          ' CHANGELOG.md > /tmp/release-notes.md
+
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "::error::Could not extract release notes for version ${PACKAGE_VERSION} from CHANGELOG.md"
+            exit 1
+          fi
+
+          echo "path=/tmp/release-notes.md" >> "$GITHUB_OUTPUT"
+
       - name: Ensure git tag exists
         if: steps.release_commit.outputs.is_release_commit == 'true'
         env:
@@ -215,16 +241,20 @@ jobs:
           git tag "${RELEASE_TAG}" "${GITHUB_SHA}"
           git push origin "refs/tags/${RELEASE_TAG}"
 
-      - name: Upload tarball to GitHub Release
+      - name: Create or update GitHub Release
         if: steps.release_commit.outputs.is_release_commit == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ steps.package.outputs.tag }}
+          RELEASE_NOTES_FILE: ${{ steps.release_notes.outputs.path }}
         run: |
           if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            gh release edit "${RELEASE_TAG}" \
+              --title "${RELEASE_TAG}" \
+              --notes-file "${RELEASE_NOTES_FILE}"
             gh release upload "${RELEASE_TAG}" ./*.tgz --clobber
           else
             gh release create "${RELEASE_TAG}" ./*.tgz \
               --title "${RELEASE_TAG}" \
-              --generate-notes
+              --notes-file "${RELEASE_NOTES_FILE}"
           fi
