@@ -34,7 +34,7 @@ function createStory({ selectedIndex = 0, disableImplementation = false } = {}) 
 }
 
 export default {
-    title: "Testing/Interaction/Tabs",
+    title: "Testing/Tabs",
     tags: ["!autodocs"],
     parameters: {
         docs: {

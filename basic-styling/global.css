@@ -1,0 +1,61 @@
+@import "./tokens/base.css";
+@import "./tokens/palette.css";
+
+html {
+    color-scheme: light dark;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--basic-color-background);
+    color: var(--basic-color-text);
+    font-family: var(--basic-font-family);
+    font-size: var(--basic-font-size);
+    line-height: var(--basic-line-height);
+}
+
+img,
+svg,
+video {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+a {
+    color: inherit;
+    text-underline-offset: 0.16em;
+}
+
+a:hover {
+    color: inherit;
+}
+
+:focus-visible {
+    outline: 3px solid var(--basic-color-focus);
+    outline-offset: 2px;
+}
+
+dialog {
+    color: inherit;
+}
+
+dialog::backdrop {
+    background: var(--basic-color-overlay);
+}
+
+[hidden] {
+    display: none !important;
+}

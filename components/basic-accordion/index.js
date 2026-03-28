@@ -1,22 +1,49 @@
 const ElementBase = globalThis.Element ?? class {};
 const HTMLElementBase = globalThis.HTMLElement ?? class {};
-const HTMLButtonElementBase = globalThis.HTMLButtonElement ?? class {};
+const HTMLDetailsElementBase = globalThis.HTMLDetailsElement ?? class {};
 
 export const ACCORDION_TAG_NAME = "basic-accordion";
 
-const TRIGGER_SELECTOR = "[data-accordion-trigger]";
-const PANEL_SELECTOR = "[data-accordion-panel]";
+const SUMMARY_TAG_NAME = "SUMMARY";
 
-let nextAccordionInstanceId = 1;
-
-function collectOwnedElements(root, scope, selector) {
-    return Array.from(scope.querySelectorAll(selector)).filter(
-        (element) => element instanceof HTMLElementBase && element.closest(ACCORDION_TAG_NAME) === root,
-    );
+function findDirectAccordionSummary(details) {
+    return Array.from(details.children).find(
+        (child) => child instanceof HTMLElementBase && child.tagName === SUMMARY_TAG_NAME,
+    ) ?? null;
 }
 
-function isAccordionItemDisabled(trigger) {
-    return trigger.hasAttribute("disabled") || trigger.getAttribute("aria-disabled") === "true";
+function collectOwnedAccordionItems(root) {
+    return Array.from(root.children).flatMap((child) => {
+        if (!(child instanceof HTMLDetailsElementBase)) {
+            return [];
+        }
+
+        const summary = findDirectAccordionSummary(child);
+
+        if (!(summary instanceof HTMLElementBase)) {
+            return [];
+        }
+
+        return [{ details: child, summary }];
+    });
+}
+
+function isAccordionItemDisabled(details) {
+    return details.hasAttribute("data-disabled")
+        || details.hasAttribute("disabled")
+        || details.getAttribute("aria-disabled") === "true";
+}
+
+function getOpenAccordionIndexes(itemStates) {
+    const openIndexes = [];
+
+    for (let index = 0; index < itemStates.length; index += 1) {
+        if (itemStates[index]?.open && !itemStates[index]?.disabled) {
+            openIndexes.push(index);
+        }
+    }
+
+    return openIndexes;
 }
 
 function findFirstEnabledAccordionIndex(itemStates) {
@@ -97,12 +124,9 @@ export function findNextEnabledAccordionIndex(itemStates, startIndex, direction)
 export class AccordionElement extends HTMLElementBase {
     static observedAttributes = ["data-collapsible", "data-multiple"];
 
-    #instanceId = `${ACCORDION_TAG_NAME}-${nextAccordionInstanceId++}`;
-    #triggers = [];
-    #panels = [];
-    #openIndexes = new Set();
-    #focusIndex = -1;
+    #items = [];
     #eventsBound = false;
+    #isSyncingState = false;
 
     connectedCallback() {
         if (!this.#eventsBound) {
@@ -115,13 +139,17 @@ export class AccordionElement extends HTMLElementBase {
     }
 
     disconnectedCallback() {
-        if (!this.#eventsBound) {
-            return;
+        if (this.#eventsBound) {
+            this.removeEventListener("click", this.#handleClick);
+            this.removeEventListener("keydown", this.#handleKeyDown);
+            this.#eventsBound = false;
         }
 
-        this.removeEventListener("click", this.#handleClick);
-        this.removeEventListener("keydown", this.#handleKeyDown);
-        this.#eventsBound = false;
+        for (const { details } of this.#items) {
+            details.removeEventListener("toggle", this.#handleToggle);
+        }
+
+        this.#items = [];
     }
 
     attributeChangedCallback() {
@@ -133,22 +161,28 @@ export class AccordionElement extends HTMLElementBase {
             return;
         }
 
-        const trigger = event.target.closest(TRIGGER_SELECTOR);
+        const summary = event.target.closest("summary");
+        const summaryIndex = this.#findSummaryIndex(summary);
+
+        if (summaryIndex === -1) {
+            return;
+        }
+
+        const itemStates = this.#getItemStates();
+
+        if (itemStates[summaryIndex]?.disabled) {
+            event.preventDefault();
+            return;
+        }
 
         if (
-            !(trigger instanceof HTMLElementBase)
-            || trigger.closest(ACCORDION_TAG_NAME) !== this
+            !this.#isMultiple()
+            && !this.#isCollapsible()
+            && itemStates[summaryIndex]?.open
+            && getOpenAccordionIndexes(itemStates).length === 1
         ) {
-            return;
+            event.preventDefault();
         }
-
-        const triggerIndex = this.#triggers.indexOf(trigger);
-
-        if (triggerIndex === -1) {
-            return;
-        }
-
-        this.#toggleIndex(triggerIndex, { focus: true });
     };
 
     #handleKeyDown = (event) => {
@@ -156,17 +190,9 @@ export class AccordionElement extends HTMLElementBase {
             return;
         }
 
-        const currentTrigger = event.target.closest(TRIGGER_SELECTOR);
-
-        if (
-            !(currentTrigger instanceof HTMLElementBase)
-            || currentTrigger.closest(ACCORDION_TAG_NAME) !== this
-        ) {
-            return;
-        }
-
+        const currentSummary = event.target.closest("summary");
+        const currentIndex = this.#findSummaryIndex(currentSummary);
         const itemStates = this.#getItemStates();
-        const currentIndex = this.#triggers.indexOf(currentTrigger);
         let nextIndex = -1;
 
         if (currentIndex === -1 || currentIndex >= itemStates.length) {
@@ -189,7 +215,21 @@ export class AccordionElement extends HTMLElementBase {
             case " ":
             case "Enter":
                 event.preventDefault();
-                this.#toggleIndex(currentIndex, { focus: true });
+
+                if (itemStates[currentIndex]?.disabled) {
+                    return;
+                }
+
+                if (
+                    !this.#isMultiple()
+                    && !this.#isCollapsible()
+                    && itemStates[currentIndex]?.open
+                    && getOpenAccordionIndexes(itemStates).length === 1
+                ) {
+                    return;
+                }
+
+                this.#items[currentIndex].details.open = !this.#items[currentIndex].details.open;
                 return;
             default:
                 return;
@@ -200,19 +240,30 @@ export class AccordionElement extends HTMLElementBase {
         }
 
         event.preventDefault();
-        this.#focusIndex = nextIndex;
-        this.#applyState({ focus: true });
+        this.#items[nextIndex]?.summary.focus();
     };
 
-    #getItemStates() {
-        const pairCount = Math.min(this.#triggers.length, this.#panels.length);
+    #handleToggle = (event) => {
+        if (this.#isSyncingState) {
+            return;
+        }
 
-        return this.#triggers.slice(0, pairCount).map((trigger, index) => ({
-            disabled: isAccordionItemDisabled(trigger),
-            open: trigger.hasAttribute("data-open")
-                || trigger.getAttribute("aria-expanded") === "true"
-                || this.#panels[index]?.hasAttribute("data-open"),
-        }));
+        const details = event.currentTarget;
+        const preferredIndex = this.#items.findIndex((item) => item.details === details);
+
+        if (preferredIndex === -1) {
+            return;
+        }
+
+        this.#sync({ preferredIndex });
+    };
+
+    #findSummaryIndex(summary) {
+        if (!(summary instanceof HTMLElementBase)) {
+            return -1;
+        }
+
+        return this.#items.findIndex((item) => item.summary === summary);
     }
 
     #isCollapsible() {
@@ -223,154 +274,107 @@ export class AccordionElement extends HTMLElementBase {
         return this.hasAttribute("data-multiple");
     }
 
-    #getNextFocusableIndex(itemStates) {
-        for (const openIndex of this.#openIndexes) {
-            if (!itemStates[openIndex]?.disabled) {
-                return openIndex;
-            }
-        }
-
-        return findFirstEnabledAccordionIndex(itemStates);
+    #getItemStates({ includeDataOpen = false } = {}) {
+        return this.#items.map(({ details }) => ({
+            disabled: isAccordionItemDisabled(details),
+            open: details.hasAttribute("open")
+                || (includeDataOpen && details.hasAttribute("data-open")),
+        }));
     }
 
-    #sync({ resetOpen = false } = {}) {
-        this.#triggers = collectOwnedElements(this, this, TRIGGER_SELECTOR);
-        this.#panels = collectOwnedElements(this, this, PANEL_SELECTOR);
+    #sync({ resetOpen = false, preferredIndex = -1 } = {}) {
+        const previousDetails = this.#items.map((item) => item.details);
+        const nextItems = collectOwnedAccordionItems(this);
+        const nextDetails = nextItems.map((item) => item.details);
 
-        const itemStates = this.#getItemStates();
-
-        if (resetOpen) {
-            this.#openIndexes = new Set(
-                getInitialOpenAccordionIndexes(itemStates, {
-                    multiple: this.#isMultiple(),
-                    collapsible: this.#isCollapsible(),
-                }),
-            );
-        } else {
-            const nextOpenIndexes = Array.from(this.#openIndexes).filter(
-                (index) => index >= 0 && index < itemStates.length && !itemStates[index]?.disabled,
-            );
-
-            if (!this.#isMultiple() && nextOpenIndexes.length > 1) {
-                nextOpenIndexes.splice(1);
+        for (const details of previousDetails) {
+            if (!nextDetails.includes(details)) {
+                details.removeEventListener("toggle", this.#handleToggle);
             }
-
-            if (
-                !this.#isMultiple()
-                && nextOpenIndexes.length === 0
-                && !this.#isCollapsible()
-            ) {
-                const fallbackIndex = findFirstEnabledAccordionIndex(itemStates);
-
-                if (fallbackIndex !== -1) {
-                    nextOpenIndexes.push(fallbackIndex);
-                }
-            }
-
-            this.#openIndexes = new Set(nextOpenIndexes);
         }
 
-        if (resetOpen || itemStates[this.#focusIndex]?.disabled || this.#focusIndex >= itemStates.length) {
-            this.#focusIndex = this.#getNextFocusableIndex(itemStates);
+        for (const details of nextDetails) {
+            if (!previousDetails.includes(details)) {
+                details.addEventListener("toggle", this.#handleToggle);
+            }
         }
 
+        this.#items = nextItems;
+        this.#normalizeOpenState({
+            itemStates: this.#getItemStates({ includeDataOpen: resetOpen }),
+            resetOpen,
+            preferredIndex,
+        });
         this.#applyState();
     }
 
-    #applyState({ focus = false } = {}) {
-        const pairCount = Math.min(this.#triggers.length, this.#panels.length);
-        const baseId = this.id || this.#instanceId;
+    #normalizeOpenState({ itemStates, resetOpen = false, preferredIndex = -1 }) {
+        let openIndexes = [];
 
-        for (let index = 0; index < this.#triggers.length; index += 1) {
-            const trigger = this.#triggers[index];
-            const panel = index < pairCount ? this.#panels[index] : null;
-            const disabled = index >= pairCount || isAccordionItemDisabled(trigger);
-            const open = !disabled && this.#openIndexes.has(index);
-            const focusable = !disabled && index === this.#focusIndex;
+        if (resetOpen) {
+            openIndexes = getInitialOpenAccordionIndexes(itemStates, {
+                multiple: this.#isMultiple(),
+                collapsible: this.#isCollapsible(),
+            });
+        } else if (this.#isMultiple()) {
+            openIndexes = getOpenAccordionIndexes(itemStates);
+        } else {
+            openIndexes = getOpenAccordionIndexes(itemStates);
 
-            if (!trigger.id) {
-                trigger.id = `${baseId}-trigger-${index + 1}`;
-            }
+            if (
+                preferredIndex !== -1
+                && openIndexes.includes(preferredIndex)
+                && !itemStates[preferredIndex]?.disabled
+            ) {
+                openIndexes = [preferredIndex];
+            } else if (openIndexes.length > 0) {
+                openIndexes = [openIndexes[0]];
+            } else if (!this.#isCollapsible()) {
+                const fallbackIndex = findFirstEnabledAccordionIndex(itemStates);
 
-            if (trigger instanceof HTMLButtonElementBase && !trigger.hasAttribute("type")) {
-                trigger.type = "button";
-            }
-
-            trigger.setAttribute("aria-expanded", String(open));
-            trigger.tabIndex = focusable ? 0 : -1;
-            trigger.toggleAttribute("data-open", open);
-
-            if (panel) {
-                if (!panel.id) {
-                    panel.id = `${baseId}-panel-${index + 1}`;
+                if (fallbackIndex !== -1) {
+                    openIndexes = [fallbackIndex];
                 }
-
-                trigger.setAttribute("aria-controls", panel.id);
-            } else {
-                trigger.removeAttribute("aria-controls");
             }
         }
 
-        for (let index = 0; index < this.#panels.length; index += 1) {
-            const panel = this.#panels[index];
-            const trigger = this.#triggers[index];
-            const open = index < pairCount
-                && !isAccordionItemDisabled(trigger)
-                && this.#openIndexes.has(index);
+        const openIndexSet = new Set(openIndexes);
 
-            if (!panel.id) {
-                panel.id = `${baseId}-panel-${index + 1}`;
+        this.#isSyncingState = true;
+
+        try {
+            for (let index = 0; index < this.#items.length; index += 1) {
+                const details = this.#items[index].details;
+                const open = !itemStates[index]?.disabled && openIndexSet.has(index);
+
+                if (details.open !== open) {
+                    details.open = open;
+                }
             }
-
-            panel.setAttribute("role", "region");
-
-            if (trigger?.id) {
-                panel.setAttribute("aria-labelledby", trigger.id);
-            } else {
-                panel.removeAttribute("aria-labelledby");
-            }
-
-            panel.hidden = !open;
-            panel.toggleAttribute("data-open", open);
-        }
-
-        if (focus && this.#focusIndex !== -1) {
-            this.#triggers[this.#focusIndex]?.focus();
+        } finally {
+            this.#isSyncingState = false;
         }
     }
 
-    #toggleIndex(index, { focus = false } = {}) {
-        const itemStates = this.#getItemStates();
+    #applyState() {
+        for (const { details, summary } of this.#items) {
+            const disabled = isAccordionItemDisabled(details);
+            const open = !disabled && details.open;
 
-        if (index < 0 || index >= itemStates.length || itemStates[index]?.disabled) {
-            return;
-        }
+            if (disabled && details.open) {
+                details.open = false;
+            }
 
-        const nextOpenIndexes = new Set(this.#openIndexes);
-        const isOpen = nextOpenIndexes.has(index);
+            details.toggleAttribute("data-open", open);
 
-        if (this.#isMultiple()) {
-            if (isOpen) {
-                nextOpenIndexes.delete(index);
+            if (disabled) {
+                summary.setAttribute("aria-disabled", "true");
+                summary.tabIndex = -1;
             } else {
-                nextOpenIndexes.add(index);
+                summary.removeAttribute("aria-disabled");
+                summary.tabIndex = 0;
             }
-        } else if (isOpen) {
-            if (!this.#isCollapsible()) {
-                this.#focusIndex = index;
-                this.#applyState({ focus });
-                return;
-            }
-
-            nextOpenIndexes.clear();
-        } else {
-            nextOpenIndexes.clear();
-            nextOpenIndexes.add(index);
         }
-
-        this.#openIndexes = nextOpenIndexes;
-        this.#focusIndex = index;
-        this.#applyState({ focus });
     }
 }
 

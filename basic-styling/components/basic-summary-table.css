@@ -1,0 +1,76 @@
+basic-summary-table {
+    --basic-summary-table-caption-gap: var(--basic-flow-space);
+    --basic-summary-table-cell-padding-block: var(--basic-space-3);
+    --basic-summary-table-cell-padding-inline: var(--basic-space-4);
+
+    display: block;
+    overflow-x: auto;
+}
+
+basic-summary-table table {
+    width: 100%;
+    min-width: var(--basic-summary-table-min-width, 32rem);
+    border-collapse: collapse;
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    background: var(--basic-color-surface);
+}
+
+basic-summary-table caption {
+    margin-bottom: var(--basic-summary-table-caption-gap);
+    color: var(--basic-color-text);
+    font-weight: 700;
+    text-align: left;
+}
+
+basic-summary-table tr {
+    text-align: right;
+
+    *:first-child {
+        text-align: left;
+    }
+}
+
+basic-summary-table th,
+basic-summary-table td {
+    padding: var(--basic-summary-table-cell-padding-block) var(--basic-summary-table-cell-padding-inline);
+    border-block-end: var(--basic-border-width) solid var(--basic-color-border);
+    vertical-align: top;
+}
+
+basic-summary-table td {
+    font-variant-numeric: tabular-nums;
+}
+
+basic-summary-table thead th {
+    background: var(--basic-color-surface-muted);
+    font-weight: 700;
+}
+
+basic-summary-table tbody tr:last-child th,
+basic-summary-table tbody tr:last-child td {
+    border-block-end: 0;
+}
+
+basic-summary-table tbody th {
+    font-weight: 600;
+}
+
+basic-summary-table tbody td {
+    color: var(--basic-color-text-muted);
+}
+
+basic-summary-table tfoot th,
+basic-summary-table tfoot td {
+    border-block-start: calc(var(--basic-border-width) * 2) solid var(--basic-color-border);
+    border-block-end: 0;
+    background: var(--basic-color-surface-muted);
+    font-weight: 700;
+}
+
+basic-summary-table tfoot td[data-summary-empty] {
+    color: var(--basic-color-text-muted);
+}
+
+basic-summary-table tfoot td[data-summary-total] {
+    color: inherit;
+}

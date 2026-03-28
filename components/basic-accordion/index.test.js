@@ -32,7 +32,7 @@ describe("@lmfaole/basics basic-accordion", () => {
         ], { collapsible: true })).toEqual([]);
     });
 
-    it("wraps keyboard navigation and skips disabled triggers", () => {
+    it("wraps keyboard navigation and skips disabled items", () => {
         const items = [
             { disabled: false },
             { disabled: true },

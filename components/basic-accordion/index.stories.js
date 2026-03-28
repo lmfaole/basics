@@ -1,10 +1,10 @@
 import "./register.js";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 /**
  * @typedef {object} AccordionStoryArgs
- * @property {boolean} multiple Allows multiple panels to stay open.
- * @property {boolean} collapsible Allows the last open panel in single mode to close.
+ * @property {boolean} multiple Allows multiple items to stay open.
+ * @property {boolean} collapsible Allows the last open item in single mode to close.
  * @property {boolean} openFirst Marks the first item as initially open.
  * @property {boolean} openSecond Marks the second item as initially open.
  * @property {boolean} openThird Marks the third item as initially open.
@@ -48,56 +48,55 @@ function createStory({
     const openStates = [openFirst, openSecond, openThird];
 
     for (const [index, item] of ACCORDION_ITEMS.entries()) {
-        const heading = document.createElement("h3");
-        const trigger = document.createElement("button");
-        trigger.type = "button";
-        trigger.dataset.accordionTrigger = "";
-        trigger.textContent = item.label;
+        const details = document.createElement("details");
+        const summary = document.createElement("summary");
+        summary.textContent = item.label;
 
         if (openStates[index]) {
-            trigger.dataset.open = "";
+            details.open = true;
         }
-
-        heading.append(trigger);
-
-        const panel = document.createElement("section");
-        panel.dataset.accordionPanel = "";
 
         const paragraph = document.createElement("p");
         paragraph.textContent = item.body;
-        panel.append(paragraph);
+        details.append(summary, paragraph);
 
-        accordion.append(heading, panel);
+        accordion.append(details);
     }
 
     return accordion;
 }
 
 export default {
-    title: "Components/Disclosure/Accordion",
+    title: "Components/Accordion",
+    tags: ["accordion", "details", "disclosure", "expand-collapse", "basic-accordion"],
     parameters: {
         layout: "fullscreen",
         docs: {
             description: {
                 component: `
-Unstyled custom element that upgrades existing trigger-and-panel markup into an accessible accordion.
+Unstyled custom element that coordinates direct child \`<details>\` items into a simple accordion.
 
-Use it when the page already owns its heading structure and styling, but still needs stable aria wiring and predictable keyboard support:
+Use it when the page already owns the content and styling, but still needs predictable single-open behavior and arrow-key movement:
 
-- provide matching \`[data-accordion-trigger]\` and \`[data-accordion-panel]\` descendants in the same order
-- prefer real \`<button>\` elements for triggers, usually inside your own heading elements
+- provide direct child \`<details>\` elements, each with a first-child \`<summary>\`
+- optionally author \`open\` on any item for the initial state
+- optionally add \`data-disabled\` on a \`<details>\` item to remove it from toggle and keyboard interaction
 - optionally add \`data-multiple\` and \`data-collapsible\` on the root element
 
-The component assigns missing ids, syncs \`aria-expanded\`, and supports \`ArrowUp\`, \`ArrowDown\`, \`Home\`, \`End\`, \`Enter\`, and \`Space\`.
+The component leaves the native \`details\` and \`summary\` semantics intact, keeps open state consistent with the root rules, and supports \`ArrowUp\`, \`ArrowDown\`, \`Home\`, and \`End\` between enabled summaries.
                 `,
             },
             source: {
                 code: `<basic-accordion>
-  <h3><button type="button" data-accordion-trigger>Oversikt</button></h3>
-  <section data-accordion-panel>...</section>
+  <details open>
+    <summary>Oversikt</summary>
+    <p>...</p>
+  </details>
 
-  <h3><button type="button" data-accordion-trigger>Implementasjon</button></h3>
-  <section data-accordion-panel>...</section>
+  <details>
+    <summary>Implementasjon</summary>
+    <p>...</p>
+  </details>
 </basic-accordion>`,
             },
         },
@@ -113,14 +112,14 @@ The component assigns missing ids, syncs \`aria-expanded\`, and supports \`Arrow
     argTypes: {
         multiple: {
             control: "boolean",
-            description: "Maps to `data-multiple` and allows more than one panel to stay open.",
+            description: "Maps to `data-multiple` and allows more than one item to stay open.",
             table: {
                 category: "Attributes",
             },
         },
         collapsible: {
             control: "boolean",
-            description: "Maps to `data-collapsible` and allows the last open panel in single mode to close.",
+            description: "Maps to `data-collapsible` and allows the last open item in single mode to close.",
             table: {
                 category: "Attributes",
             },
@@ -153,25 +152,34 @@ export const Default = {
     parameters: {
         docs: {
             description: {
-                story: "Accessibility test proving that the default accordion wires trigger and panel semantics, roving tab focus, and hidden state correctly.",
+                story: "Simple configurable accordion example using one `basic-accordion` element with three items.",
+            },
+        },
+    },
+};
+
+export const Semantics = {
+    parameters: {
+        docs: {
+            description: {
+                story: "Semantics test proving that the accordion preserves native `details` markup while normalizing initial single-open state.",
             },
         },
     },
     play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const overviewTrigger = canvas.getByRole("button", { name: "Oversikt" });
-        const overviewPanel = canvas.getByRole("region", { name: "Oversikt" });
-        const implementationTrigger = canvas.getByRole("button", { name: "Implementasjon" });
-        const implementationPanel = canvasElement.querySelectorAll("[data-accordion-panel]")[1];
+        const detailsItems = canvasElement.querySelectorAll("basic-accordion > details");
+        const summaries = canvasElement.querySelectorAll("basic-accordion > details > summary");
 
         await waitFor(() => {
-            expect(overviewTrigger).toHaveAttribute("aria-expanded", "true");
-            expect(overviewTrigger).toHaveAttribute("aria-controls", overviewPanel.id);
-            expect(overviewPanel).toHaveAttribute("aria-labelledby", overviewTrigger.id);
-            expect(overviewTrigger).toHaveAttribute("tabindex", "0");
-            expect(implementationTrigger).toHaveAttribute("tabindex", "-1");
-            expect(implementationPanel).toHaveAttribute("aria-labelledby", implementationTrigger.id);
-            expect(implementationPanel).toHaveProperty("hidden", true);
+            expect(detailsItems).toHaveLength(3);
+            expect(summaries).toHaveLength(3);
+            expect(detailsItems[0]).toHaveAttribute("open");
+            expect(detailsItems[0]).toHaveAttribute("data-open");
+            expect(detailsItems[1]).not.toHaveAttribute("open");
+            expect(detailsItems[1]).not.toHaveAttribute("data-open");
+            expect(summaries[0]).toHaveTextContent("Oversikt");
+            expect(summaries[1]).toHaveTextContent("Implementasjon");
+            expect(summaries[0]).toHaveAttribute("tabindex", "0");
         });
     },
 };
@@ -184,29 +192,27 @@ export const Collapsible = {
     parameters: {
         docs: {
             description: {
-                story: "Interaction test proving that single mode can close its last open panel when `data-collapsible` is set.",
+                story: "Interaction test proving that single mode can close its last open item when `data-collapsible` is set.",
             },
         },
     },
     play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const overviewTrigger = canvas.getByRole("button", { name: "Oversikt" });
+        const overviewSummary = canvasElement.querySelector("basic-accordion > details > summary");
 
         await waitFor(() => {
-            expect(overviewTrigger).toHaveAttribute("aria-expanded", "true");
-            expect(canvas.getByRole("region", { name: "Oversikt" })).toBeInTheDocument();
+            expect(overviewSummary).not.toBeNull();
+            expect(canvasElement.querySelectorAll("basic-accordion > details[open]")).toHaveLength(1);
         });
 
-        await userEvent.click(overviewTrigger);
+        await userEvent.click(overviewSummary);
 
         await waitFor(() => {
-            expect(overviewTrigger).toHaveAttribute("aria-expanded", "false");
-            expect(canvas.queryByRole("region", { name: "Oversikt" })).not.toBeInTheDocument();
+            expect(canvasElement.querySelectorAll("basic-accordion > details[open]")).toHaveLength(0);
         });
     },
 };
 
-export const MultipleRegions = {
+export const MultipleOpen = {
     args: {
         multiple: true,
         openFirst: true,
@@ -215,20 +221,17 @@ export const MultipleRegions = {
     parameters: {
         docs: {
             description: {
-                story: "Accessibility test proving that multiple open items are each exposed as their own named region when multi-open mode is enabled.",
+                story: "Semantics test proving that `data-multiple` allows more than one `details` item to stay open.",
             },
         },
     },
     play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-
         await waitFor(() => {
-            const overviewRegion = canvas.getByRole("region", { name: "Oversikt" });
-            const implementationRegion = canvas.getByRole("region", { name: "Implementasjon" });
+            const openItems = canvasElement.querySelectorAll("basic-accordion > details[open]");
 
-            expect(overviewRegion).toBeInTheDocument();
-            expect(implementationRegion).toBeInTheDocument();
-            expect(canvas.queryByRole("region", { name: "Tilgjengelighet" })).not.toBeInTheDocument();
+            expect(openItems).toHaveLength(2);
+            expect(openItems[0].querySelector("summary")).toHaveTextContent("Oversikt");
+            expect(openItems[1].querySelector("summary")).toHaveTextContent("Implementasjon");
         });
     },
 };

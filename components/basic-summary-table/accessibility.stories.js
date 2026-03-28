@@ -59,7 +59,7 @@ function createStory() {
 }
 
 export default {
-    title: "Testing/Accessibility/Summary Table",
+    title: "Testing/Summary Table",
     tags: ["!autodocs"],
     parameters: {
         docs: {

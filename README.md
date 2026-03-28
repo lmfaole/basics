@@ -1,12 +1,44 @@
 # `@lmfaole/basics`
 
-Simple unstyled custom elements and DOM helpers.
+Simple custom elements and DOM helpers, with optional starter styles.
 
 ## Install
 
 ```sh
 pnpm add @lmfaole/basics
 ```
+
+## Optional Styling
+
+Import the full starter layer:
+
+```css
+@import "@lmfaole/basics/basic-styling";
+```
+
+Or split it into the global layer and component styles:
+
+```css
+@import "@lmfaole/basics/basic-styling/global.css";
+@import "@lmfaole/basics/basic-styling/components.css";
+```
+
+Individual token and component files are also exported:
+
+- `@lmfaole/basics/basic-styling/tokens/base.css`
+- `@lmfaole/basics/basic-styling/tokens/palette.css`
+- `@lmfaole/basics/basic-styling/tokens/palette.tokens.json`
+- `@lmfaole/basics/basic-styling/components/basic-alert.css`
+- `@lmfaole/basics/basic-styling/components/basic-accordion.css`
+- `@lmfaole/basics/basic-styling/components/basic-dialog.css`
+- `@lmfaole/basics/basic-styling/components/basic-popover.css`
+- `@lmfaole/basics/basic-styling/components/basic-summary-table.css`
+- `@lmfaole/basics/basic-styling/components/basic-table.css`
+- `@lmfaole/basics/basic-styling/components/basic-tabs.css`
+- `@lmfaole/basics/basic-styling/components/basic-toc.css`
+- `@lmfaole/basics/basic-styling/components/basic-toast.css`
+
+The core components remain unstyled by default. The `basic-styling` subpath is optional and meant as a very simple token-based baseline that focuses on spacing, padding, and margins first. The shared token sources live under `basic-styling/tokens/`, while the component-specific styles live under `basic-styling/components/`. `base.css` defines the non-color primitives, `palette.css` holds the computed color tokens and alternate palettes that the global layer consumes, and `palette.tokens.json` exposes the same palette data in W3C design-token format.
 
 ## Storybook
 
@@ -27,6 +59,11 @@ pnpm test:storybook:coverage
 ```
 
 Autodocs is enabled globally for the package stories, and the Docs page includes Storybook's built-in Code panel for rendered examples.
+Use the `Styling` toolbar control in Storybook to toggle the optional `basic-styling` layer on or off across all stories.
+Use the `Theme` toolbar control to preview the starter styling in light, dark, or system mode through the CSS `light-dark()` tokens.
+Use the `Palette` toolbar control to swap the computed starter palettes between `slate`, `sand`, `ocean`, and `berry`.
+The `Techniques/Color` stories show how to force a local `color-scheme`, scope a different palette with `data-basic-palette`, and override the semantic `--basic-color-*` tokens for one section.
+The `Overview/Palette Tokens` docs page renders the exported token values with Storybook's built-in `ColorPalette` and `ColorItem` blocks.
 Storybook Test coverage is enabled through the Vitest addon. In the Storybook UI, turn coverage on in the testing panel to see the summary and open the full report at `/coverage/index.html`. From the CLI, `test:storybook:coverage` writes reports to `coverage/storybook/`.
 
 The Visual Tests panel is provided by `@chromatic-com/storybook`. To run cloud visual checks, connect the addon to a Chromatic project from the Storybook UI.
@@ -64,6 +101,86 @@ If a release needs to be retried after the workflow changes land, use the `Relea
 ## Commits
 
 Use Conventional Commits for commit messages and pull request titles. The GitHub workflow accepts `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style`, and `test`, with an optional scope such as `feat(tabs): add keyboard support`.
+
+## Basic Alert
+
+```html
+<basic-alert data-label="Lagring fullfort" data-live="polite">
+  <h2 data-alert-title>Endringer lagret</h2>
+  <p>Meldingen ble lagret uten feil.</p>
+  <button type="button" data-alert-close>Dismiss</button>
+</basic-alert>
+
+<script type="module">
+  import "@lmfaole/basics/components/basic-alert/register";
+</script>
+```
+
+The element upgrades inline content into a named live-region alert without adding any styles of its own.
+
+### Attributes
+
+- `data-label`: fallback accessible name when the alert has no `aria-label`, `aria-labelledby`, or `[data-alert-title]`.
+- `data-live`: chooses the live-region mode. Use `assertive` for `role="alert"` or `polite` for `role="status"`.
+
+### Behavior
+
+- Applies the matching live-region role, `aria-live`, and `aria-atomic="true"` on the root element.
+- Uses `[data-alert-title]` as the accessible name when present, otherwise falls back to `data-label`.
+- `[data-alert-close]` controls hide the alert and remove its managed `data-open` state.
+- `show()` and `hide()` methods can be used for programmatic visibility changes.
+
+### Markup Contract
+
+- Put the content directly inside `<basic-alert>`.
+- Use `[data-alert-title]` when the alert should have a visible accessible name.
+- Use `[data-alert-close]` when the alert should be dismissible.
+- Keep layout and styling outside the package; the component only manages semantics and simple dismissal behavior.
+
+## Basic Toast
+
+```html
+<basic-toast data-label="Lagring fullfort" data-duration="5000">
+  <button type="button" data-toast-open>Show toast</button>
+
+  <section data-toast-panel>
+    <h2 data-toast-title>Lagret</h2>
+    <p>Meldingen ble lagret uten feil.</p>
+    <button type="button" data-toast-close>Dismiss</button>
+  </section>
+</basic-toast>
+
+<script type="module">
+  import "@lmfaole/basics/components/basic-toast/register";
+</script>
+```
+
+The element upgrades trigger-and-panel markup into a toast notification flow without adding any styles of its own.
+
+### Attributes
+
+- `data-label`: fallback accessible name when the toast panel has no `aria-label`, `aria-labelledby`, or `[data-toast-title]`.
+- `data-live`: chooses the live-region mode. Use `polite` for `role="status"` or `assertive` for `role="alert"`.
+- `data-duration`: auto-dismiss timeout in milliseconds. Use `0` to disable auto-dismiss.
+- `data-open`: optional initial open state for the toast panel.
+
+### Behavior
+
+- Uses the Popover API in manual mode when available so the toast panel can render in the top layer.
+- Syncs the panel's open state, `hidden`, and `data-open` on the toast panel and root element.
+- Uses `[data-toast-title]` as the accessible name when present, otherwise falls back to `data-label`.
+- `[data-toast-open]` toggles the toast, while `[data-toast-close]` dismisses it.
+- Auto-dismisses after `data-duration` milliseconds unless the duration is `0`.
+- `show()`, `hide()`, and `toggle()` methods support programmatic control.
+
+### Markup Contract
+
+- Provide one descendant `[data-toast-panel]`.
+- Use `[data-toast-open]` on buttons that should show or toggle the toast.
+- Use `[data-toast-close]` when the toast should expose an explicit dismiss action.
+- Use `[data-toast-title]` when the toast should have a visible accessible name.
+- When using the optional starter styling, set `data-toast-position` to presets such as `top-right`, `bottom-center`, or `center` to move the top-layer toast around the viewport.
+- Keep layout and styling outside the package; the component only manages semantics, open state, and optional auto-dismiss behavior.
 
 ## Basic Popover
 
@@ -156,15 +273,15 @@ The element upgrades native `<dialog>` markup into an accessible modal flow with
 
 ```html
 <basic-accordion>
-  <h3><button type="button" data-accordion-trigger>Oversikt</button></h3>
-  <section data-accordion-panel>
+  <details open>
+    <summary>Oversikt</summary>
     <p>Viser en kort oppsummering.</p>
-  </section>
+  </details>
 
-  <h3><button type="button" data-accordion-trigger>Implementasjon</button></h3>
-  <section data-accordion-panel>
+  <details>
+    <summary>Implementasjon</summary>
     <p>Viser implementasjonsdetaljer.</p>
-  </section>
+  </details>
 </basic-accordion>
 
 <script type="module">
@@ -172,26 +289,27 @@ The element upgrades native `<dialog>` markup into an accessible modal flow with
 </script>
 ```
 
-The element upgrades existing trigger-and-panel markup into an accessible accordion without adding any styles of its own.
+The element coordinates direct child `details` items into an accordion without adding any styles of its own.
 
 ### Attributes
 
-- `data-multiple`: allows multiple panels to stay open at the same time.
-- `data-collapsible`: allows the last open panel in single mode to close.
-
-### Behavior
-
-- Missing trigger and panel ids are generated automatically.
-- `aria-expanded`, `aria-controls`, `aria-labelledby`, `hidden`, and `data-open` stay in sync with the current state.
-- `ArrowUp`, `ArrowDown`, `Home`, and `End` move focus between enabled triggers.
-- `Enter` and `Space` toggle the focused item.
-- Disabled triggers are skipped during keyboard navigation.
+- `data-multiple`: allows multiple items to stay open at the same time.
+- `data-collapsible`: allows the last open item in single mode to close.
 
 ### Markup Contract
 
-- Provide matching counts of `[data-accordion-trigger]` and `[data-accordion-panel]` descendants in the same order.
-- Prefer `<button>` elements for triggers, usually inside your own heading elements.
-- Keep layout and styling outside the package; the component only manages semantics, state, and keyboard behavior.
+- Provide direct child `<details>` items, each with a first-child `<summary>`.
+- Add `open` to any item that should start expanded.
+- Add `data-disabled` to a `<details>` item when it should be skipped by arrow-key navigation and blocked from toggling.
+- Keep layout and styling outside the package; the component only manages root-level open-state rules and keyboard behavior.
+
+### Behavior
+
+- Native `details` and `summary` semantics are preserved.
+- `data-open` stays in sync with the normalized open state for optional styling hooks.
+- `ArrowUp`, `ArrowDown`, `Home`, and `End` move focus between enabled summaries.
+- `Enter` and `Space` keep using the platform's native `summary` toggle behavior.
+- In single-open mode, the component keeps one enabled item open unless `data-collapsible` is set.
 
 ## Basic Tabs
 
@@ -257,6 +375,7 @@ The element upgrades existing markup into an accessible tab interface without ad
         <th>Statuskode</th>
         <th>Team</th>
         <th>Lokasjon</th>
+        <th>Sprint</th>
         <th>Ledige timer</th>
       </tr>
     </thead>
@@ -265,13 +384,29 @@ The element upgrades existing markup into an accessible tab interface without ad
         <td>A1</td>
         <td>Plattform</td>
         <td>Oslo</td>
+        <td>14</td>
         <td>18</td>
       </tr>
       <tr>
         <td>B4</td>
         <td>Designsystem</td>
         <td>Trondheim</td>
+        <td>14</td>
         <td>10</td>
+      </tr>
+      <tr>
+        <td>C2</td>
+        <td>Innsikt</td>
+        <td>Bergen</td>
+        <td>15</td>
+        <td>26</td>
+      </tr>
+      <tr>
+        <td>D7</td>
+        <td>Betaling</td>
+        <td>Stockholm</td>
+        <td>15</td>
+        <td>8</td>
       </tr>
     </tbody>
   </table>
@@ -314,33 +449,46 @@ The element upgrades a regular table with stronger accessible naming and header 
 
 ```html
 <basic-summary-table
-  data-caption="Prosjektsammendrag"
-  data-description="Viser timer og total kostnad for prosjektets leveranser."
+  data-caption="Månedlig kostnadsoversikt"
+  data-description="Viser antall og summerte beløp for faste kostnader."
   data-row-headers
   data-summary-columns="2,4"
   data-total-label="Totalt"
+  data-locale="nb-NO"
 >
   <table>
     <thead>
       <tr>
         <th>Post</th>
-        <th>Timer</th>
-        <th>Sats</th>
-        <th>Kostnad</th>
+        <th>Antall</th>
+        <th>Enhetspris</th>
+        <th>Beløp</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>Analyse</td>
-        <td>8</td>
-        <td>100</td>
-        <td>800</td>
+        <td>Basisabonnement</td>
+        <td>12</td>
+        <td>49,00 kr</td>
+        <td>588,00 kr</td>
       </tr>
       <tr>
-        <td>Implementasjon</td>
-        <td>12</td>
-        <td>120</td>
-        <td>1440</td>
+        <td>Supportavtale</td>
+        <td>1</td>
+        <td>299,00 kr</td>
+        <td>299,00 kr</td>
+      </tr>
+      <tr>
+        <td>Lagringstillegg</td>
+        <td>4</td>
+        <td>120,00 kr</td>
+        <td>480,00 kr</td>
+      </tr>
+      <tr>
+        <td>Opplæringsplasser</td>
+        <td>3</td>
+        <td>180,00 kr</td>
+        <td>540,00 kr</td>
       </tr>
     </tbody>
   </table>
@@ -369,6 +517,7 @@ The element upgrades a calculation-heavy table with an automatically maintained 
 - Inherits caption, description, row-header, and `headers` association behavior from `basic-table`.
 - Parses numbers from cell text and supports raw calculation values through `data-value` on individual body cells.
 - Generates or updates a totals row in `<tfoot>` without requiring consumers to author the footer manually.
+- Preserves a consistent displayed unit or currency affix such as `kr`, `%`, or `t` in generated footer totals.
 - Recalculates totals automatically when body rows or `data-value` attributes change.
 
 ### Markup Contract

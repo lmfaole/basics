@@ -1,0 +1,54 @@
+basic-popover {
+    --basic-popover-control-gap: var(--basic-space-2);
+    --basic-popover-panel-gap: var(--basic-flow-space);
+    --basic-popover-panel-padding: var(--basic-panel-padding);
+    display: inline-block;
+}
+
+basic-popover [data-popover-open],
+basic-popover [data-popover-close] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--basic-popover-control-gap);
+    padding: var(--basic-control-padding-block) var(--basic-control-padding-inline);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius-pill);
+    background: var(--basic-color-surface);
+    color: inherit;
+    cursor: pointer;
+}
+
+basic-popover [data-popover-open][aria-expanded="true"] {
+    background: var(--basic-color-surface-muted);
+}
+
+basic-popover [data-popover-panel] {
+    width: min(var(--basic-popover-width, 20rem), var(--basic-popover-max-width, calc(100vw - 2rem)));
+    max-width: var(--basic-popover-max-width, calc(100vw - 2rem));
+    padding: var(--basic-popover-panel-padding);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius);
+    background: var(--basic-color-surface);
+    color: inherit;
+}
+
+basic-popover [data-popover-panel] > :where(*) {
+    margin-block: 0;
+}
+
+basic-popover [data-popover-panel] > :where(* + *) {
+    margin-block-start: var(--basic-popover-panel-gap);
+}
+
+basic-popover [data-popover-panel] label {
+    display: flex;
+    align-items: center;
+    gap: var(--basic-space-2);
+    color: var(--basic-color-text-muted);
+}
+
+basic-popover [data-popover-title] {
+    font-size: var(--basic-font-size-title);
+    line-height: 1.2;
+}

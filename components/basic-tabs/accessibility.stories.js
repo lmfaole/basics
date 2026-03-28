@@ -35,7 +35,7 @@ function createStory() {
 }
 
 export default {
-    title: "Testing/Accessibility/Tabs",
+    title: "Testing/Tabs",
     tags: ["!autodocs"],
     parameters: {
         docs: {

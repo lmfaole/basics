@@ -1,0 +1,41 @@
+basic-dialog {
+    --basic-dialog-control-gap: var(--basic-space-2);
+    --basic-dialog-panel-gap: var(--basic-flow-space);
+    --basic-dialog-panel-padding: var(--basic-panel-padding);
+}
+
+basic-dialog [data-dialog-open],
+basic-dialog [data-dialog-close] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--basic-dialog-control-gap);
+    padding: var(--basic-control-padding-block) var(--basic-control-padding-inline);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius-pill);
+    background: var(--basic-color-surface);
+    color: inherit;
+    cursor: pointer;
+}
+
+basic-dialog [data-dialog-panel] {
+    width: min(var(--basic-dialog-width, 32rem), var(--basic-dialog-max-width, calc(100vw - 2rem)));
+    max-width: var(--basic-dialog-max-width, calc(100vw - 2rem));
+    padding: var(--basic-dialog-panel-padding);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius);
+    background: var(--basic-color-surface);
+}
+
+basic-dialog [data-dialog-panel] > :where(*) {
+    margin-block: 0;
+}
+
+basic-dialog [data-dialog-panel] > :where(* + *) {
+    margin-block-start: var(--basic-dialog-panel-gap);
+}
+
+basic-dialog [data-dialog-title] {
+    font-size: var(--basic-font-size-title);
+    line-height: 1.2;
+}

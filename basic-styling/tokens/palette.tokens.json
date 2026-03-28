@@ -1,0 +1,1019 @@
+{
+  "$schema": "https://www.designtokens.org/schemas/2025.10/format.json",
+  "basic": {
+    "palette": {
+      "slate": {
+        "$description": "Neutral slate palette used as the default starter styling theme.",
+        "base": {
+          "$type": "color",
+          "surface": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  98.6,
+                  0.004,
+                  255
+                ]
+              },
+              "$description": "slate base surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  27.8,
+                  0.033,
+                  256.848
+                ]
+              },
+              "$description": "slate base surface color for dark mode."
+            }
+          },
+          "text": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  21,
+                  0.034,
+                  264.665
+                ]
+              },
+              "$description": "slate base text color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  98.5,
+                  0.002,
+                  247.839
+                ]
+              },
+              "$description": "slate base text color for dark mode."
+            }
+          },
+          "accent": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  54.6,
+                  0.245,
+                  262.881
+                ]
+              },
+              "$description": "slate accent color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  70.7,
+                  0.165,
+                  254.624
+                ]
+              },
+              "$description": "slate accent color for dark mode."
+            }
+          }
+        },
+        "computed": {
+          "$type": "color",
+          "background": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  98.712,
+                  0.00368,
+                  255
+                ]
+              },
+              "$description": "slate computed background color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  22.796,
+                  0.02706,
+                  256.848
+                ]
+              },
+              "$description": "slate computed background color for dark mode."
+            }
+          },
+          "surface": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  98.656,
+                  0.00384,
+                  255
+                ]
+              },
+              "$description": "slate computed surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  26.132,
+                  0.03102,
+                  256.848
+                ]
+              },
+              "$description": "slate computed surface color for dark mode."
+            }
+          },
+          "surface-muted": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  94.2,
+                  0.0281,
+                  255.788
+                ]
+              },
+              "$description": "slate computed muted surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  35.522,
+                  0.05676,
+                  256.448
+                ]
+              },
+              "$description": "slate computed muted surface color for dark mode."
+            }
+          },
+          "text-muted": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  45.832,
+                  0.0244,
+                  261.572
+                ]
+              },
+              "$description": "slate computed muted text color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  82.946,
+                  0.00882,
+                  249.821
+                ]
+              },
+              "$description": "slate computed muted text color for dark mode."
+            }
+          },
+          "border": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  86.184,
+                  0.0088,
+                  256.546
+                ]
+              },
+              "$description": "slate computed border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  44.768,
+                  0.02556,
+                  254.686
+                ]
+              },
+              "$description": "slate computed border color for dark mode."
+            }
+          },
+          "overlay": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  5.04,
+                  0.00816,
+                  264.665
+                ],
+                "alpha": 0.24
+              },
+              "$description": "slate computed overlay color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  0,
+                  0,
+                  0
+                ],
+                "alpha": 0.56
+              },
+              "$description": "slate computed overlay color for dark mode."
+            }
+          },
+          "focus": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  15.288,
+                  0.0686,
+                  262.881
+                ],
+                "alpha": 0.28
+              },
+              "$description": "slate computed focus color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  26.866,
+                  0.0627,
+                  254.624
+                ],
+                "alpha": 0.38
+              },
+              "$description": "slate computed focus color for dark mode."
+            }
+          }
+        }
+      },
+      "sand": {
+        "$description": "Warm sand palette with muted earth tones and an amber accent.",
+        "base": {
+          "$type": "color",
+          "surface": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  97.8,
+                  0.012,
+                  85
+                ]
+              },
+              "$description": "sand base surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  30.5,
+                  0.022,
+                  75
+                ]
+              },
+              "$description": "sand base surface color for dark mode."
+            }
+          },
+          "text": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  29,
+                  0.028,
+                  65
+                ]
+              },
+              "$description": "sand base text color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  96.4,
+                  0.01,
+                  85
+                ]
+              },
+              "$description": "sand base text color for dark mode."
+            }
+          },
+          "accent": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  63,
+                  0.18,
+                  58
+                ]
+              },
+              "$description": "sand accent color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  76,
+                  0.14,
+                  72
+                ]
+              },
+              "$description": "sand accent color for dark mode."
+            }
+          }
+        },
+        "computed": {
+          "$type": "color",
+          "background": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  97.976,
+                  0.01104,
+                  85
+                ]
+              },
+              "$description": "sand computed background color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  25.01,
+                  0.01804,
+                  75
+                ]
+              },
+              "$description": "sand computed background color for dark mode."
+            }
+          },
+          "surface": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  97.888,
+                  0.01152,
+                  85
+                ]
+              },
+              "$description": "sand computed surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  28.67,
+                  0.02068,
+                  75
+                ]
+              },
+              "$description": "sand computed surface color for dark mode."
+            }
+          },
+          "surface-muted": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  94.32,
+                  0.0288,
+                  82.3
+                ]
+              },
+              "$description": "sand computed muted surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  38.69,
+                  0.04324,
+                  74.46
+                ]
+              },
+              "$description": "sand computed muted surface color for dark mode."
+            }
+          },
+          "text-muted": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  51.016,
+                  0.02288,
+                  71.4
+                ]
+              },
+              "$description": "sand computed muted text color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  81.902,
+                  0.01264,
+                  82.8
+                ]
+              },
+              "$description": "sand computed muted text color for dark mode."
+            }
+          },
+          "border": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  86.792,
+                  0.01456,
+                  81.8
+                ]
+              },
+              "$description": "sand computed border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  46.316,
+                  0.01912,
+                  77.4
+                ]
+              },
+              "$description": "sand computed border color for dark mode."
+            }
+          },
+          "overlay": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  6.96,
+                  0.00672,
+                  65
+                ],
+                "alpha": 0.24
+              },
+              "$description": "sand computed overlay color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  0,
+                  0,
+                  0
+                ],
+                "alpha": 0.56
+              },
+              "$description": "sand computed overlay color for dark mode."
+            }
+          },
+          "focus": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  17.64,
+                  0.0504,
+                  58
+                ],
+                "alpha": 0.28
+              },
+              "$description": "sand computed focus color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  28.88,
+                  0.0532,
+                  72
+                ],
+                "alpha": 0.38
+              },
+              "$description": "sand computed focus color for dark mode."
+            }
+          }
+        }
+      },
+      "ocean": {
+        "$description": "Cool ocean palette with blue surfaces and a brighter cyan-blue accent.",
+        "base": {
+          "$type": "color",
+          "surface": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  97.4,
+                  0.01,
+                  225
+                ]
+              },
+              "$description": "ocean base surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  30,
+                  0.04,
+                  245
+                ]
+              },
+              "$description": "ocean base surface color for dark mode."
+            }
+          },
+          "text": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  28,
+                  0.05,
+                  250
+                ]
+              },
+              "$description": "ocean base text color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  95.2,
+                  0.01,
+                  225
+                ]
+              },
+              "$description": "ocean base text color for dark mode."
+            }
+          },
+          "accent": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  62,
+                  0.14,
+                  222
+                ]
+              },
+              "$description": "ocean accent color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  77,
+                  0.11,
+                  210
+                ]
+              },
+              "$description": "ocean accent color for dark mode."
+            }
+          }
+        },
+        "computed": {
+          "$type": "color",
+          "background": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  97.608,
+                  0.0092,
+                  225
+                ]
+              },
+              "$description": "ocean computed background color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  24.6,
+                  0.0328,
+                  245
+                ]
+              },
+              "$description": "ocean computed background color for dark mode."
+            }
+          },
+          "surface": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  97.504,
+                  0.0096,
+                  225
+                ]
+              },
+              "$description": "ocean computed surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  28.2,
+                  0.0376,
+                  245
+                ]
+              },
+              "$description": "ocean computed surface color for dark mode."
+            }
+          },
+          "surface-muted": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  93.86,
+                  0.023,
+                  224.7
+                ]
+              },
+              "$description": "ocean computed muted surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  38.46,
+                  0.0526,
+                  238.7
+                ]
+              },
+              "$description": "ocean computed muted surface color for dark mode."
+            }
+          },
+          "text-muted": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  50.208,
+                  0.0372,
+                  242
+                ]
+              },
+              "$description": "ocean computed muted text color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  80.856,
+                  0.0166,
+                  229.4
+                ]
+              },
+              "$description": "ocean computed muted text color for dark mode."
+            }
+          },
+          "border": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  86.296,
+                  0.0164,
+                  229
+                ]
+              },
+              "$description": "ocean computed border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  45.648,
+                  0.0328,
+                  240.2
+                ]
+              },
+              "$description": "ocean computed border color for dark mode."
+            }
+          },
+          "overlay": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  6.72,
+                  0.012,
+                  250
+                ],
+                "alpha": 0.24
+              },
+              "$description": "ocean computed overlay color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  0,
+                  0,
+                  0
+                ],
+                "alpha": 0.56
+              },
+              "$description": "ocean computed overlay color for dark mode."
+            }
+          },
+          "focus": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  17.36,
+                  0.0392,
+                  222
+                ],
+                "alpha": 0.28
+              },
+              "$description": "ocean computed focus color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  29.26,
+                  0.0418,
+                  210
+                ],
+                "alpha": 0.38
+              },
+              "$description": "ocean computed focus color for dark mode."
+            }
+          }
+        }
+      },
+      "berry": {
+        "$description": "Berry palette with red-violet undertones and a saturated berry accent.",
+        "base": {
+          "$type": "color",
+          "surface": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  97.2,
+                  0.012,
+                  10
+                ]
+              },
+              "$description": "berry base surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  30.2,
+                  0.05,
+                  5
+                ]
+              },
+              "$description": "berry base surface color for dark mode."
+            }
+          },
+          "text": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  27.5,
+                  0.06,
+                  8
+                ]
+              },
+              "$description": "berry base text color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  95.8,
+                  0.012,
+                  8
+                ]
+              },
+              "$description": "berry base text color for dark mode."
+            }
+          },
+          "accent": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  60,
+                  0.2,
+                  12
+                ]
+              },
+              "$description": "berry accent color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  73,
+                  0.16,
+                  8
+                ]
+              },
+              "$description": "berry accent color for dark mode."
+            }
+          }
+        },
+        "computed": {
+          "$type": "color",
+          "background": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  97.424,
+                  0.01104,
+                  10
+                ]
+              },
+              "$description": "berry computed background color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  24.764,
+                  0.041,
+                  5
+                ]
+              },
+              "$description": "berry computed background color for dark mode."
+            }
+          },
+          "surface": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  97.312,
+                  0.01152,
+                  10
+                ]
+              },
+              "$description": "berry computed surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  28.388,
+                  0.047,
+                  5
+                ]
+              },
+              "$description": "berry computed surface color for dark mode."
+            }
+          },
+          "surface-muted": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  93.48,
+                  0.0308,
+                  10.2
+                ]
+              },
+              "$description": "berry computed muted surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  37.904,
+                  0.0698,
+                  5.54
+                ]
+              },
+              "$description": "berry computed muted surface color for dark mode."
+            }
+          },
+          "text-muted": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  49.804,
+                  0.04464,
+                  8.64
+                ]
+              },
+              "$description": "berry computed muted text color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  81.368,
+                  0.02036,
+                  7.34
+                ]
+              },
+              "$description": "berry computed muted text color for dark mode."
+            }
+          },
+          "border": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  86.048,
+                  0.01968,
+                  9.68
+                ]
+              },
+              "$description": "berry computed border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  45.944,
+                  0.04088,
+                  5.72
+                ]
+              },
+              "$description": "berry computed border color for dark mode."
+            }
+          },
+          "overlay": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  6.6,
+                  0.0144,
+                  8
+                ],
+                "alpha": 0.24
+              },
+              "$description": "berry computed overlay color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  0,
+                  0,
+                  0
+                ],
+                "alpha": 0.56
+              },
+              "$description": "berry computed overlay color for dark mode."
+            }
+          },
+          "focus": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  16.8,
+                  0.056,
+                  12
+                ],
+                "alpha": 0.28
+              },
+              "$description": "berry computed focus color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  27.74,
+                  0.0608,
+                  8
+                ],
+                "alpha": 0.38
+              },
+              "$description": "berry computed focus color for dark mode."
+            }
+          }
+        }
+      }
+    }
+  }
+}

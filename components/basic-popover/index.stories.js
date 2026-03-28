@@ -105,7 +105,8 @@ function createStory({
 }
 
 export default {
-    title: "Components/Overlay/Popover",
+    title: "Components/Popover",
+    tags: ["popover", "overlay", "anchored", "basic-popover"],
     parameters: {
         layout: "centered",
         docs: {
@@ -228,32 +229,12 @@ The component uses the native Popover API in auto mode, syncs \`aria-expanded\`,
 };
 
 export const Default = {
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const opener = canvas.getByRole("button", { name: "Toggle popover" });
-
-        opener.focus();
-        await userEvent.click(opener);
-
-        await waitFor(() => {
-            const panel = canvas.getByRole("dialog", { name: "Filtre" });
-            const title = within(panel).getByRole("heading", { name: "Filtre" });
-
-            expect(opener).toHaveAttribute("aria-expanded", "true");
-            expect(opener).toHaveAttribute("aria-haspopup", "dialog");
-            expect(opener).toHaveAttribute("aria-controls", panel.id);
-            expect(panel).toHaveAttribute("aria-modal", "false");
-            expect(panel).toHaveAttribute("aria-labelledby", title.id);
-            expect(panel).not.toHaveAttribute("aria-label");
-            expect(within(panel).getByRole("checkbox", { name: "Bare aktive elementer" })).toBeInTheDocument();
-        });
-
-        await userEvent.click(canvas.getByRole("button", { name: "Close" }));
-
-        await waitFor(() => {
-            expect(canvas.queryByRole("dialog", { name: "Filtre" })).not.toBeInTheDocument();
-            expect(opener).toHaveFocus();
-        });
+    parameters: {
+        docs: {
+            description: {
+                story: "Simple configurable popover example with one trigger and one panel.",
+            },
+        },
     },
 };
 

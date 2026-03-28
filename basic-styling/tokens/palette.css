@@ -1,0 +1,117 @@
+:root {
+    --basic-palette-surface-light: oklch(98.6% 0.004 255);
+    --basic-palette-surface-dark: oklch(27.8% 0.033 256.848);
+    --basic-palette-text-light: oklch(21% 0.034 264.665);
+    --basic-palette-text-dark: oklch(98.5% 0.002 247.839);
+    --basic-palette-accent-light: oklch(54.6% 0.245 262.881);
+    --basic-palette-accent-dark: oklch(70.7% 0.165 254.624);
+}
+
+[data-basic-palette="sand"] {
+    --basic-palette-surface-light: oklch(97.8% 0.012 85);
+    --basic-palette-surface-dark: oklch(30.5% 0.022 75);
+    --basic-palette-text-light: oklch(29% 0.028 65);
+    --basic-palette-text-dark: oklch(96.4% 0.01 85);
+    --basic-palette-accent-light: oklch(63% 0.18 58);
+    --basic-palette-accent-dark: oklch(76% 0.14 72);
+}
+
+[data-basic-palette="ocean"] {
+    --basic-palette-surface-light: oklch(97.4% 0.01 225);
+    --basic-palette-surface-dark: oklch(30% 0.04 245);
+    --basic-palette-text-light: oklch(28% 0.05 250);
+    --basic-palette-text-dark: oklch(95.2% 0.01 225);
+    --basic-palette-accent-light: oklch(62% 0.14 222);
+    --basic-palette-accent-dark: oklch(77% 0.11 210);
+}
+
+[data-basic-palette="berry"] {
+    --basic-palette-surface-light: oklch(97.2% 0.012 10);
+    --basic-palette-surface-dark: oklch(30.2% 0.05 5);
+    --basic-palette-text-light: oklch(27.5% 0.06 8);
+    --basic-palette-text-dark: oklch(95.8% 0.012 8);
+    --basic-palette-accent-light: oklch(60% 0.2 12);
+    --basic-palette-accent-dark: oklch(73% 0.16 8);
+}
+
+:root,
+[data-basic-palette] {
+    --basic-palette-background-light: color-mix(in oklch, var(--basic-palette-surface-light) 92%, oklch(100% 0 0));
+    --basic-palette-background-dark: color-mix(in oklch, var(--basic-palette-surface-dark) 82%, oklch(0% 0 0));
+    --basic-palette-surface-light-computed: color-mix(
+        in oklch,
+        var(--basic-palette-surface-light) 96%,
+        oklch(100% 0 0)
+    );
+    --basic-palette-surface-dark-computed: color-mix(
+        in oklch,
+        var(--basic-palette-surface-dark) 94%,
+        oklch(0% 0 0)
+    );
+    --basic-palette-surface-muted-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 10%,
+        var(--basic-palette-surface-light)
+    );
+    --basic-palette-surface-muted-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 18%,
+        var(--basic-palette-surface-dark)
+    );
+    --basic-palette-text-muted-light: color-mix(
+        in oklch,
+        var(--basic-palette-text-light) 68%,
+        var(--basic-palette-surface-light)
+    );
+    --basic-palette-text-muted-dark: color-mix(
+        in oklch,
+        var(--basic-palette-text-dark) 78%,
+        var(--basic-palette-surface-dark)
+    );
+    --basic-palette-border-light: color-mix(
+        in oklch,
+        var(--basic-palette-text-light) 16%,
+        var(--basic-palette-surface-light)
+    );
+    --basic-palette-border-dark: color-mix(
+        in oklch,
+        var(--basic-palette-text-dark) 24%,
+        var(--basic-palette-surface-dark)
+    );
+    --basic-palette-overlay-light: color-mix(
+        in oklch,
+        var(--basic-palette-text-light) 24%,
+        oklch(0% 0 0 / 0)
+    );
+    --basic-palette-overlay-dark: color-mix(in oklch, oklch(0% 0 0) 56%, oklch(0% 0 0 / 0));
+    --basic-palette-focus-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 28%,
+        oklch(0% 0 0 / 0)
+    );
+    --basic-palette-focus-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 38%,
+        oklch(0% 0 0 / 0)
+    );
+    --basic-color-background: light-dark(
+        var(--basic-palette-background-light),
+        var(--basic-palette-background-dark)
+    );
+    --basic-color-surface: light-dark(
+        var(--basic-palette-surface-light-computed),
+        var(--basic-palette-surface-dark-computed)
+    );
+    --basic-color-surface-muted: light-dark(
+        var(--basic-palette-surface-muted-light),
+        var(--basic-palette-surface-muted-dark)
+    );
+    --basic-color-text: light-dark(var(--basic-palette-text-light), var(--basic-palette-text-dark));
+    --basic-color-text-muted: light-dark(
+        var(--basic-palette-text-muted-light),
+        var(--basic-palette-text-muted-dark)
+    );
+    --basic-color-border: light-dark(var(--basic-palette-border-light), var(--basic-palette-border-dark));
+    --basic-color-overlay: light-dark(var(--basic-palette-overlay-light), var(--basic-palette-overlay-dark));
+    --basic-color-focus: light-dark(var(--basic-palette-focus-light), var(--basic-palette-focus-dark));
+}

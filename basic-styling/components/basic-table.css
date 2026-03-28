@@ -1,0 +1,48 @@
+basic-table {
+    --basic-table-caption-gap: var(--basic-flow-space);
+    --basic-table-cell-padding-block: var(--basic-space-3);
+    --basic-table-cell-padding-inline: var(--basic-space-4);
+    display: block;
+    overflow-x: auto;
+}
+
+basic-table table {
+    width: 100%;
+    min-width: var(--basic-table-min-width, 32rem);
+    border-collapse: collapse;
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    background: var(--basic-color-surface);
+}
+
+basic-table caption {
+    margin-bottom: var(--basic-table-caption-gap);
+    color: var(--basic-color-text);
+    font-weight: 700;
+    text-align: left;
+}
+
+basic-table th,
+basic-table td {
+    padding: var(--basic-table-cell-padding-block) var(--basic-table-cell-padding-inline);
+    border-block-end: var(--basic-border-width) solid var(--basic-color-border);
+    vertical-align: top;
+    text-align: left;
+}
+
+basic-table thead th {
+    background: var(--basic-color-surface-muted);
+    font-weight: 700;
+}
+
+basic-table tbody tr:last-child th,
+basic-table tbody tr:last-child td {
+    border-block-end: 0;
+}
+
+basic-table tbody th {
+    font-weight: 600;
+}
+
+basic-table tbody td {
+    color: var(--basic-color-text-muted);
+}

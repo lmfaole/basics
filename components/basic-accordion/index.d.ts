@@ -21,7 +21,7 @@ export function getInitialOpenAccordionIndexes(
 ): number[];
 
 /**
- * Returns the next enabled accordion trigger index, wrapping around the list
+ * Returns the next enabled accordion item index, wrapping around the list
  * when needed.
  */
 export function findNextEnabledAccordionIndex(
@@ -31,12 +31,12 @@ export function findNextEnabledAccordionIndex(
 ): number;
 
 /**
- * Custom element that upgrades existing trigger-and-panel markup into an
- * accessible accordion interface.
+ * Custom element that coordinates direct child `details` items into an
+ * accordion interface.
  *
  * Attributes:
- * - `data-multiple`: allows multiple panels to stay open
- * - `data-collapsible`: allows the last open panel in single mode to close
+ * - `data-multiple`: allows multiple items to stay open
+ * - `data-collapsible`: allows the last open item in single mode to close
  */
 export class AccordionElement extends HTMLElement {
     static observedAttributes: string[];

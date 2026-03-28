@@ -37,7 +37,7 @@ function createStory() {
 }
 
 export default {
-    title: "Testing/Accessibility/Popover",
+    title: "Testing/Popover",
     tags: ["!autodocs"],
     parameters: {
         docs: {

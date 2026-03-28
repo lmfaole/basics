@@ -1,5 +1,4 @@
 import "./register.js";
-import { expect, waitFor, within } from "storybook/test";
 
 /**
  * @typedef {object} TableOfContentsStoryArgs
@@ -71,7 +70,8 @@ function createStory({ title, headingSelector, includeAppendix }) {
 }
 
 export default {
-    title: "Components/Navigation/Table of Contents",
+    title: "Components/Table of Contents",
+    tags: ["table-of-contents", "toc", "navigation", "headings", "basic-toc"],
     parameters: {
         layout: "fullscreen",
         docs: {
@@ -136,26 +136,8 @@ export const Default = {
     parameters: {
         docs: {
             description: {
-                story: "Accessibility test proving that the generated navigation has the configured name and points to stable heading ids in the article.",
+                story: "Simple configurable table of contents example that indexes one nearby article.",
             },
         },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-
-        await waitFor(() => {
-            const toc = canvas.getByRole("navigation", { name: "Innhold" });
-            const overviewLink = within(toc).getByRole("link", { name: "Overview" });
-            const usageLink = within(toc).getByRole("link", { name: "Usage" });
-            const tocItems = within(toc).getAllByRole("listitem");
-            const tocLinks = within(toc).getAllByRole("link");
-
-            expect(overviewLink).toHaveAttribute("href", "#overview");
-            expect(usageLink).toHaveAttribute("href", "#usage");
-            expect(tocItems).toHaveLength(6);
-            expect(tocLinks).toHaveLength(6);
-            expect(canvasElement.querySelector("#overview")).toBeTruthy();
-            expect(canvasElement.querySelector("#usage")).toBeTruthy();
-        });
     },
 };

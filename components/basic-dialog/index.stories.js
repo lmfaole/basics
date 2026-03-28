@@ -62,7 +62,8 @@ function createStory({ label, backdropClose, includeTitle, includeSecondaryActio
 }
 
 export default {
-    title: "Components/Overlay/Dialog",
+    title: "Components/Dialog",
+    tags: ["dialog", "modal", "overlay", "basic-dialog"],
     parameters: {
         layout: "fullscreen",
         docs: {
@@ -136,34 +137,12 @@ The component opens the dialog with \`showModal()\`, restores focus to the opene
 };
 
 export const Default = {
-    args: {
-        includeSecondaryAction: true,
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const opener = canvas.getByRole("button", { name: "Open dialog" });
-
-        opener.focus();
-        await userEvent.click(opener);
-
-        await waitFor(() => {
-            const dialog = canvas.getByRole("dialog", { name: "Bekreft handling" });
-            const title = within(dialog).getByRole("heading", { name: "Bekreft handling" });
-
-            expect(dialog).toHaveAttribute("open");
-            expect(dialog).toHaveAttribute("aria-modal", "true");
-            expect(dialog).toHaveAttribute("aria-labelledby", title.id);
-            expect(dialog).not.toHaveAttribute("aria-label");
-            expect(within(dialog).getByRole("button", { name: "Cancel" })).toBeInTheDocument();
-            expect(within(dialog).getByRole("button", { name: "Confirm" })).toBeInTheDocument();
-        });
-
-        await userEvent.click(canvas.getByRole("button", { name: "Cancel" }));
-
-        await waitFor(() => {
-            expect(canvas.queryByRole("dialog", { name: "Bekreft handling" })).not.toBeInTheDocument();
-            expect(opener).toHaveFocus();
-        });
+    parameters: {
+        docs: {
+            description: {
+                story: "Simple configurable dialog example with one opener, one panel, and a minimal action set.",
+            },
+        },
     },
 };
 

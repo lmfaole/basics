@@ -1,5 +1,5 @@
 import "./register.js";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 function createStory() {
     const accordion = document.createElement("basic-accordion");
@@ -11,30 +11,26 @@ function createStory() {
     ];
 
     for (const [index, item] of items.entries()) {
-        const heading = document.createElement("h3");
-        const trigger = document.createElement("button");
-        trigger.type = "button";
-        trigger.dataset.accordionTrigger = "";
-        trigger.textContent = item.label;
+        const details = document.createElement("details");
+        const summary = document.createElement("summary");
+        summary.textContent = item.label;
 
         if (index === 1) {
-            trigger.disabled = true;
+            details.dataset.disabled = "";
         }
 
-        heading.append(trigger);
+        const paragraph = document.createElement("p");
+        paragraph.textContent = item.body;
+        details.append(summary, paragraph);
 
-        const panel = document.createElement("section");
-        panel.dataset.accordionPanel = "";
-        panel.textContent = item.body;
-
-        accordion.append(heading, panel);
+        accordion.append(details);
     }
 
     return accordion;
 }
 
 export default {
-    title: "Testing/Interaction/Accordion",
+    title: "Testing/Accordion",
     tags: ["!autodocs"],
     parameters: {
         docs: {
@@ -47,31 +43,31 @@ export default {
 
 export const KeyboardNavigation = {
     play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const overviewTrigger = canvas.getByRole("button", { name: "Oversikt" });
+        const summaries = canvasElement.querySelectorAll("basic-accordion > details > summary");
+        const overviewSummary = summaries[0];
 
-        overviewTrigger.focus();
+        overviewSummary.focus();
 
         await waitFor(() => {
-            expect(overviewTrigger).toHaveFocus();
-            expect(overviewTrigger).toHaveAttribute("aria-expanded", "true");
+            expect(overviewSummary).toHaveFocus();
+            expect(canvasElement.querySelectorAll("basic-accordion > details[open]")).toHaveLength(1);
+            expect(canvasElement.querySelector("basic-accordion > details[open] > summary")).toHaveTextContent("Oversikt");
         });
 
         await userEvent.keyboard("{ArrowDown}");
 
         await waitFor(() => {
-            const accessibilityTrigger = canvas.getByRole("button", { name: "Tilgjengelighet" });
-            expect(accessibilityTrigger).toHaveFocus();
-            expect(accessibilityTrigger).toHaveAttribute("aria-expanded", "false");
-            expect(canvas.getByRole("region", { name: "Oversikt" })).toBeInTheDocument();
+            const accessibilitySummary = canvasElement.querySelectorAll("basic-accordion > details > summary")[2];
+            expect(accessibilitySummary).toHaveFocus();
+            expect(canvasElement.querySelector("basic-accordion > details[open] > summary")).toHaveTextContent("Oversikt");
         });
 
         await userEvent.keyboard("{Enter}");
 
         await waitFor(() => {
-            const accessibilityTrigger = canvas.getByRole("button", { name: "Tilgjengelighet" });
-            expect(accessibilityTrigger).toHaveAttribute("aria-expanded", "true");
-            expect(canvas.getByRole("region", { name: "Tilgjengelighet" })).toBeInTheDocument();
+            const openItems = canvasElement.querySelectorAll("basic-accordion > details[open]");
+            expect(openItems).toHaveLength(1);
+            expect(openItems[0].querySelector("summary")).toHaveTextContent("Tilgjengelighet");
         });
     },
 };

@@ -21,6 +21,9 @@ describe("@lmfaole/basics basic-summary-table", () => {
 
         expect(parseSummaryNumber("$1,200.50")).toBe(1200.5);
         expect(parseSummaryNumber("1 200,50")).toBe(1200.5);
+        expect(parseSummaryNumber("1 200,50 kr")).toBe(1200.5);
+        expect(parseSummaryNumber("kr 1 200,50")).toBe(1200.5);
+        expect(parseSummaryNumber("8,5 t")).toBe(8.5);
         expect(parseSummaryNumber("1,200")).toBe(1200);
         expect(parseSummaryNumber("")).toBeNull();
         expect(formatSummaryNumber(1200.5, { locale: "en-US", fractionDigits: 2 })).toBe("1,200.50");

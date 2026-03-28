@@ -1,0 +1,65 @@
+basic-accordion {
+    --basic-accordion-padding: var(--basic-panel-padding);
+    display: grid;
+}
+
+basic-accordion > details {
+    margin: 0;
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius);
+    background: var(--basic-color-surface);
+}
+
+basic-accordion > details > summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--basic-control-padding-block) var(--basic-control-padding-inline);
+    color: inherit;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+basic-accordion > details > summary::-webkit-details-marker {
+    display: none;
+}
+
+basic-accordion > details > summary::after {
+    content: "+";
+    flex: none;
+    color: var(--basic-color-text-muted);
+    font-size: var(--basic-font-size-title);
+    line-height: 1;
+}
+
+basic-accordion > details[open] > summary {
+    background: var(--basic-color-surface-muted);
+    margin-block-end: var(--basic-flow-space);
+}
+
+basic-accordion > details[open] > summary::after {
+    content: "-";
+    color: inherit;
+}
+
+basic-accordion > details[open] {
+    padding-block-end: var(--basic-accordion-padding);
+}
+
+basic-accordion > details > :where(:not(summary)) {
+    margin-block: 0;
+    margin-inline: var(--basic-accordion-padding);
+}
+
+basic-accordion > details > :not(summary) + :not(summary) {
+    margin-block-start: var(--basic-flow-space);
+}
+
+basic-accordion > details[data-disabled] > summary,
+basic-accordion > details[disabled] > summary,
+basic-accordion > details[aria-disabled="true"] > summary {
+    color: var(--basic-color-text-muted);
+    cursor: default;
+}

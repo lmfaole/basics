@@ -1,10 +1,27 @@
 import "./register.js";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
+function waitForAnimationFrames(count = 2) {
+    return new Promise((resolve) => {
+        const step = () => {
+            if (count <= 0) {
+                resolve();
+                return;
+            }
+
+            count -= 1;
+            requestAnimationFrame(step);
+        };
+
+        requestAnimationFrame(step);
+    });
+}
+
 function createStory() {
     const wrapper = document.createElement("div");
     const root = document.createElement("basic-summary-table");
     root.dataset.caption = "Prosjektsammendrag";
+    root.dataset.locale = "nb-NO";
     root.dataset.rowHeaders = "true";
     root.dataset.summaryColumns = "2,4";
 
@@ -21,21 +38,21 @@ function createStory() {
         <tbody>
           <tr>
             <td>Analyse</td>
-            <td>8</td>
-            <td>100</td>
-            <td>800</td>
+            <td>8 t</td>
+            <td>100 kr</td>
+            <td>800 kr</td>
           </tr>
           <tr>
             <td>Implementasjon</td>
-            <td>12</td>
-            <td>120</td>
-            <td>1440</td>
+            <td>12 t</td>
+            <td>120 kr</td>
+            <td>1 440 kr</td>
           </tr>
           <tr>
             <td>QA</td>
-            <td>6</td>
-            <td>90</td>
-            <td>540</td>
+            <td>6 t</td>
+            <td>90 kr</td>
+            <td>540 kr</td>
           </tr>
         </tbody>
     `;
@@ -49,9 +66,9 @@ function createStory() {
             `
                 <tr>
                     <td>Support</td>
-                    <td>4</td>
-                    <td>90</td>
-                    <td>360</td>
+                    <td>4 t</td>
+                    <td>90 kr</td>
+                    <td>360 kr</td>
                 </tr>
             `,
         );
@@ -63,7 +80,7 @@ function createStory() {
 }
 
 export default {
-    title: "Testing/Interaction/Summary Table",
+    title: "Testing/Summary Table",
     tags: ["!autodocs"],
     parameters: {
         docs: {
@@ -90,9 +107,31 @@ export const UpdatesAfterMutation = {
             const hoursHeaderIds = hoursTotal?.getAttribute("headers")?.split(/\s+/) ?? [];
 
             expect(supportRowHeader).toHaveAttribute("scope", "row");
-            expect(hoursTotal).toHaveTextContent("30");
+            expect(hoursTotal).toHaveTextContent("30 t");
             expect(costTotal.getAttribute("data-value")).toBe("3140");
+            expect(costTotal?.textContent ?? "").toMatch(/3(?:\s|\u00a0)140 kr/);
             expect(hoursHeaderIds).toEqual(expect.arrayContaining([totalRowHeader.id, hoursHeader.id]));
         });
+    },
+};
+
+export const StaysStableAtRest = {
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const table = canvas.getByRole("table", { name: "Prosjektsammendrag" });
+
+        await waitFor(() => {
+            expect(table.tFoot?.rows[0]).toBeTruthy();
+        });
+
+        const initialRowHeader = table.tBodies[0]?.rows[0]?.cells[0];
+        const initialBodyCell = table.tBodies[0]?.rows[0]?.cells[3];
+        const initialFooterCell = table.tFoot?.rows[0]?.cells[3];
+
+        await waitForAnimationFrames(3);
+
+        expect(table.tBodies[0]?.rows[0]?.cells[0]).toBe(initialRowHeader);
+        expect(table.tBodies[0]?.rows[0]?.cells[3]).toBe(initialBodyCell);
+        expect(table.tFoot?.rows[0]?.cells[3]).toBe(initialFooterCell);
     },
 };

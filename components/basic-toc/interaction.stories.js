@@ -46,7 +46,7 @@ function createStory({ headingSelector = "", allowMutation = false } = {}) {
 }
 
 export default {
-    title: "Testing/Interaction/Table of Contents",
+    title: "Testing/Table of Contents",
     tags: ["!autodocs"],
     parameters: {
         docs: {

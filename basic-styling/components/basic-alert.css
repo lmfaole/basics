@@ -1,0 +1,27 @@
+basic-alert {
+    display: block;
+    padding: var(--basic-panel-padding);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius);
+    background: var(--basic-color-surface-muted);
+}
+
+basic-alert > :where(*) {
+    margin-block: 0;
+}
+
+basic-alert > :where(* + *) {
+    margin-block-start: var(--basic-flow-space);
+}
+
+basic-alert [data-alert-close] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--basic-control-padding-block) var(--basic-control-padding-inline);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius-pill);
+    background: var(--basic-color-surface);
+    color: inherit;
+    cursor: pointer;
+}

@@ -65,17 +65,44 @@ function createStory({
               <tr>
                 <td>Team</td>
                 <td>Lokasjon</td>
+                <td>Sprint</td>
                 <td>Ledige timer</td>
+                <td>Fokus</td>
               </tr>
               <tr>
                 <td>Plattform</td>
                 <td>Oslo</td>
+                <td>14</td>
                 <td>18</td>
+                <td>Lansering</td>
               </tr>
               <tr>
                 <td>Designsystem</td>
                 <td>Trondheim</td>
+                <td>14</td>
                 <td>10</td>
+                <td>Migrering</td>
+              </tr>
+              <tr>
+                <td>Innsikt</td>
+                <td>Bergen</td>
+                <td>15</td>
+                <td>26</td>
+                <td>Tilgjengelighet</td>
+              </tr>
+              <tr>
+                <td>Betaling</td>
+                <td>Stockholm</td>
+                <td>15</td>
+                <td>8</td>
+                <td>Fakturering</td>
+              </tr>
+              <tr>
+                <td>Mobil</td>
+                <td>Copenhagen</td>
+                <td>16</td>
+                <td>12</td>
+                <td>QA</td>
               </tr>
             </tbody>
         `
@@ -85,6 +112,7 @@ function createStory({
                 <th scope="col">Statuskode</th>
                 <th scope="col">Team</th>
                 <th scope="col">Lokasjon</th>
+                <th scope="col">Sprint</th>
                 <th scope="col">Ledige timer</th>
               </tr>
             </thead>
@@ -93,13 +121,36 @@ function createStory({
                 <td>A1</td>
                 <td>Plattform</td>
                 <td>Oslo</td>
+                <td>14</td>
                 <td>18</td>
               </tr>
               <tr>
                 <td>B4</td>
                 <td>Designsystem</td>
                 <td>Trondheim</td>
+                <td>14</td>
                 <td>10</td>
+              </tr>
+              <tr>
+                <td>C2</td>
+                <td>Innsikt</td>
+                <td>Bergen</td>
+                <td>15</td>
+                <td>26</td>
+              </tr>
+              <tr>
+                <td>D7</td>
+                <td>Betaling</td>
+                <td>Stockholm</td>
+                <td>15</td>
+                <td>8</td>
+              </tr>
+              <tr>
+                <td>E3</td>
+                <td>Mobil</td>
+                <td>Copenhagen</td>
+                <td>16</td>
+                <td>12</td>
               </tr>
             </tbody>
         `;
@@ -111,7 +162,8 @@ function createStory({
 }
 
 export default {
-    title: "Components/Data Display/Table",
+    title: "Components/Table",
+    tags: ["table", "data-display", "basic-table"],
     parameters: {
         layout: "fullscreen",
         docs: {
@@ -142,6 +194,7 @@ The component preserves author-provided captions, assigns missing header ids, in
         <th>Statuskode</th>
         <th>Team</th>
         <th>Lokasjon</th>
+        <th>Sprint</th>
         <th>Ledige timer</th>
       </tr>
     </thead>
@@ -150,7 +203,29 @@ The component preserves author-provided captions, assigns missing header ids, in
         <td>A1</td>
         <td>Plattform</td>
         <td>Oslo</td>
+        <td>14</td>
         <td>18</td>
+      </tr>
+      <tr>
+        <td>B4</td>
+        <td>Designsystem</td>
+        <td>Trondheim</td>
+        <td>14</td>
+        <td>10</td>
+      </tr>
+      <tr>
+        <td>C2</td>
+        <td>Innsikt</td>
+        <td>Bergen</td>
+        <td>15</td>
+        <td>26</td>
+      </tr>
+      <tr>
+        <td>D7</td>
+        <td>Betaling</td>
+        <td>Stockholm</td>
+        <td>15</td>
+        <td>8</td>
       </tr>
     </tbody>
   </table>
@@ -209,7 +284,7 @@ The component preserves author-provided captions, assigns missing header ids, in
             },
         },
         rowHeaderColumn: {
-            control: { type: "number", min: 1, max: 4, step: 1 },
+            control: { type: "number", min: 1, max: 5, step: 1 },
             description: "Maps to `data-row-header-column` and picks which one-based column should act as the row header.",
             table: {
                 category: "Attributes",
@@ -236,37 +311,9 @@ export const Default = {
     parameters: {
         docs: {
             description: {
-                story: "Accessibility test proving that the generated caption, row headers, and `headers` associations are wired automatically for a standard data table.",
+                story: "Configurable table example showing a fuller staffing view with generated row-header relationships.",
             },
         },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-
-        await waitFor(() => {
-            const table = canvas.getByRole("table", { name: "Bemanning per sprint" });
-            const caption = table.querySelector("caption");
-            const statusCodeHeader = within(table).getByRole("columnheader", { name: "Statuskode" });
-            const teamHeader = within(table).getByRole("columnheader", { name: "Team" });
-            const locationHeader = within(table).getByRole("columnheader", { name: "Lokasjon" });
-            const hoursHeader = within(table).getByRole("columnheader", { name: "Ledige timer" });
-            const platformRowHeader = within(table).getByRole("rowheader", { name: "Plattform" });
-            const osloCell = table.tBodies[0]?.rows[0]?.cells[2];
-            const availableCell = table.tBodies[0]?.rows[0]?.cells[3];
-            const osloHeaderIds = osloCell?.getAttribute("headers")?.split(/\s+/) ?? [];
-            const availableHeaderIds = availableCell?.getAttribute("headers")?.split(/\s+/) ?? [];
-
-            expect(caption).toHaveTextContent("Bemanning per sprint");
-            expect(table).not.toHaveAttribute("aria-label");
-            expect(statusCodeHeader).toHaveAttribute("scope", "col");
-            expect(teamHeader).toHaveAttribute("scope", "col");
-            expect(locationHeader).toHaveAttribute("scope", "col");
-            expect(hoursHeader).toHaveAttribute("scope", "col");
-            expect(platformRowHeader.tagName).toBe("TH");
-            expect(platformRowHeader).toHaveAttribute("scope", "row");
-            expect(osloHeaderIds).toEqual(expect.arrayContaining([platformRowHeader.id, locationHeader.id]));
-            expect(availableHeaderIds).toEqual(expect.arrayContaining([platformRowHeader.id, hoursHeader.id]));
-        });
     },
 };
 

@@ -32,7 +32,7 @@ function createStory() {
 }
 
 export default {
-    title: "Testing/Accessibility/Table of Contents",
+    title: "Testing/Table of Contents",
     tags: ["!autodocs"],
     parameters: {
         docs: {

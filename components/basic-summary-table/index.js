@@ -12,6 +12,11 @@ const DEFAULT_TOTAL_LABEL = "Totalt";
 const GENERATED_SUMMARY_ROW_ATTRIBUTE = "data-basic-summary-table-generated-row";
 const GENERATED_SUMMARY_CELL_ATTRIBUTE = "data-basic-summary-table-generated-cell";
 const GENERATED_SUMMARY_LABEL_ATTRIBUTE = "data-basic-summary-table-generated-label";
+const SUMMARY_OBSERVER_OPTIONS = {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["data-value"],
+};
 
 export function normalizeSummaryColumns(value) {
     if (!value?.trim()) {
@@ -36,8 +41,30 @@ export function normalizeSummaryLocale(value) {
     return value?.trim() || undefined;
 }
 
+function findSummaryNumberMatch(value) {
+    const text = String(value ?? "").trim();
+
+    if (!text) {
+        return null;
+    }
+
+    const match = text.match(/(?:-\s*)?\d(?:[\d\s.,]*\d)?/);
+
+    if (!match || typeof match.index !== "number") {
+        return null;
+    }
+
+    return {
+        text,
+        numberText: match[0],
+        start: match.index,
+        end: match.index + match[0].length,
+    };
+}
+
 function getDecimalSeparator(value) {
-    const text = value.trim();
+    const numberMatch = findSummaryNumberMatch(value);
+    const text = numberMatch?.numberText.trim() ?? String(value ?? "").trim();
     const lastComma = text.lastIndexOf(",");
     const lastDot = text.lastIndexOf(".");
 
@@ -59,7 +86,8 @@ function getDecimalSeparator(value) {
 }
 
 function countFractionDigits(value) {
-    const text = String(value ?? "").trim();
+    const numberMatch = findSummaryNumberMatch(value);
+    const text = numberMatch?.numberText.trim() ?? String(value ?? "").trim();
 
     if (!text) {
         return 0;
@@ -75,7 +103,8 @@ function countFractionDigits(value) {
 }
 
 export function parseSummaryNumber(value) {
-    const text = String(value ?? "").trim();
+    const numberMatch = findSummaryNumberMatch(value);
+    const text = numberMatch?.numberText.trim() ?? String(value ?? "").trim();
 
     if (!text) {
         return null;
@@ -107,6 +136,28 @@ export function formatSummaryNumber(value, { locale, fractionDigits = 0 } = {}) 
     }).format(value);
 }
 
+function getSummaryAffixes(value) {
+    const numberMatch = findSummaryNumberMatch(value);
+
+    if (!numberMatch) {
+        return null;
+    }
+
+    return {
+        prefix: numberMatch.text.slice(0, numberMatch.start),
+        suffix: numberMatch.text.slice(numberMatch.end),
+    };
+}
+
+function formatSummaryValue(value, {
+    locale,
+    fractionDigits = 0,
+    prefix = "",
+    suffix = "",
+} = {}) {
+    return `${prefix}${formatSummaryNumber(value, { locale, fractionDigits })}${suffix}`;
+}
+
 function findCellAtColumnIndex(row, targetColumnIndex) {
     let columnIndex = 0;
 
@@ -134,6 +185,10 @@ function getLogicalColumnCount(table) {
     let maxColumns = 0;
 
     for (const row of Array.from(table.rows)) {
+        if (row.hasAttribute(GENERATED_SUMMARY_ROW_ATTRIBUTE)) {
+            continue;
+        }
+
         let columnCount = 0;
 
         for (const cell of Array.from(row.cells)) {
@@ -192,6 +247,10 @@ function calculateSummaryTotals(table, summaryColumns) {
         totals.set(columnIndex, {
             total: 0,
             fractionDigits: 0,
+            prefix: "",
+            suffix: "",
+            affixInitialized: false,
+            affixConsistent: true,
         });
     }
 
@@ -213,6 +272,25 @@ function calculateSummaryTotals(table, summaryColumns) {
 
             current.total += parsedValue;
             current.fractionDigits = Math.max(current.fractionDigits, countFractionDigits(rawValue));
+
+            const affixes = getSummaryAffixes(cell?.textContent ?? "");
+
+            if (!affixes) {
+                continue;
+            }
+
+            if (!current.affixInitialized) {
+                current.prefix = affixes.prefix;
+                current.suffix = affixes.suffix;
+                current.affixInitialized = true;
+                continue;
+            }
+
+            if (current.prefix !== affixes.prefix || current.suffix !== affixes.suffix) {
+                current.affixConsistent = false;
+                current.prefix = "";
+                current.suffix = "";
+            }
         }
     }
 
@@ -238,6 +316,31 @@ function ensureGeneratedSummaryRow(table) {
     return row;
 }
 
+function ensureSummaryRowCell(row, columnIndex, tagName) {
+    const expectedTagName = tagName.toUpperCase();
+    const existingCell = row.cells[columnIndex] ?? null;
+
+    if (existingCell?.tagName === expectedTagName) {
+        return existingCell;
+    }
+
+    const replacement = document.createElement(tagName);
+
+    if (existingCell) {
+        row.replaceChild(replacement, existingCell);
+        return replacement;
+    }
+
+    row.append(replacement);
+    return replacement;
+}
+
+function syncSummaryCellText(cell, text) {
+    if (cell.textContent !== text) {
+        cell.textContent = text;
+    }
+}
+
 function removeGeneratedSummaryRow(table) {
     table.querySelector(`tr[${GENERATED_SUMMARY_ROW_ATTRIBUTE}]`)?.remove();
 }
@@ -259,34 +362,58 @@ function syncSummaryFooter(table, {
     const summaryColumnSet = new Set(summaryColumns.filter((column) => column < logicalColumnCount));
     const row = ensureGeneratedSummaryRow(table);
 
-    row.replaceChildren();
-
     for (let columnIndex = 0; columnIndex < logicalColumnCount; columnIndex += 1) {
         if (columnIndex === effectiveLabelColumnIndex) {
-            const labelCell = document.createElement("th");
-            labelCell.scope = "row";
-            labelCell.textContent = totalLabel;
+            const labelCell = ensureSummaryRowCell(row, columnIndex, "th");
+
+            if (labelCell.getAttribute("scope") !== "row") {
+                labelCell.setAttribute("scope", "row");
+            }
+
             labelCell.setAttribute(GENERATED_SUMMARY_LABEL_ATTRIBUTE, "");
-            row.append(labelCell);
+            labelCell.removeAttribute(GENERATED_SUMMARY_CELL_ATTRIBUTE);
+            labelCell.removeAttribute("data-summary-total");
+            labelCell.removeAttribute("data-summary-empty");
+            delete labelCell.dataset.value;
+            syncSummaryCellText(labelCell, totalLabel);
             continue;
         }
 
-        const valueCell = document.createElement("td");
+        const valueCell = ensureSummaryRowCell(row, columnIndex, "td");
         valueCell.setAttribute(GENERATED_SUMMARY_CELL_ATTRIBUTE, "");
+        valueCell.removeAttribute(GENERATED_SUMMARY_LABEL_ATTRIBUTE);
+        valueCell.removeAttribute("scope");
 
         if (summaryColumnSet.has(columnIndex)) {
-            const summary = totals.get(columnIndex) ?? { total: 0, fractionDigits: 0 };
-            valueCell.textContent = formatSummaryNumber(summary.total, {
+            const summary = totals.get(columnIndex) ?? {
+                total: 0,
+                fractionDigits: 0,
+                prefix: "",
+                suffix: "",
+                affixInitialized: false,
+                affixConsistent: true,
+            };
+            const formattedValue = formatSummaryValue(summary.total, {
                 locale,
                 fractionDigits: summary.fractionDigits,
+                prefix: summary.affixConsistent ? summary.prefix : "",
+                suffix: summary.affixConsistent ? summary.suffix : "",
             });
+
+            syncSummaryCellText(valueCell, formattedValue);
             valueCell.dataset.value = String(summary.total);
             valueCell.dataset.summaryTotal = "";
+            valueCell.removeAttribute("data-summary-empty");
         } else {
+            syncSummaryCellText(valueCell, "");
+            delete valueCell.dataset.value;
+            valueCell.removeAttribute("data-summary-total");
             valueCell.dataset.summaryEmpty = "";
         }
+    }
 
-        row.append(valueCell);
+    while (row.cells.length > logicalColumnCount) {
+        row.deleteCell(-1);
     }
 
     return true;
@@ -301,6 +428,7 @@ export class SummaryTableElement extends TableElement {
     ];
 
     #summaryObserver = null;
+    #summaryObserving = false;
     #scheduledFrame = 0;
 
     connectedCallback() {
@@ -310,7 +438,7 @@ export class SummaryTableElement extends TableElement {
 
     disconnectedCallback() {
         super.disconnectedCallback();
-        this.#summaryObserver?.disconnect();
+        this.#stopSummaryObserving();
         this.#summaryObserver = null;
 
         if (this.#scheduledFrame !== 0 && typeof window !== "undefined") {
@@ -320,33 +448,37 @@ export class SummaryTableElement extends TableElement {
     }
 
     refresh() {
-        super.refresh();
+        this.#stopSummaryObserving();
 
-        const table = getTable(this);
+        try {
+            const table = getTable(this);
 
-        if (!(table instanceof HTMLTableElementBase)) {
-            return;
+            if (!(table instanceof HTMLTableElementBase)) {
+                return;
+            }
+
+            const labelColumnIndex = normalizeTableRowHeaderColumn(
+                this.getAttribute("data-row-header-column"),
+            ) - 1;
+            const summaryColumns = collectSummaryColumns(
+                table,
+                normalizeSummaryColumns(this.getAttribute("data-summary-columns")),
+                labelColumnIndex,
+            );
+            const totals = calculateSummaryTotals(table, summaryColumns);
+
+            syncSummaryFooter(table, {
+                labelColumnIndex,
+                locale: normalizeSummaryLocale(this.getAttribute("data-locale")),
+                summaryColumns,
+                totalLabel: normalizeSummaryTotalLabel(this.getAttribute("data-total-label")),
+                totals,
+            });
+
+            super.refresh();
+        } finally {
+            this.#startSummaryObserving();
         }
-
-        const labelColumnIndex = normalizeTableRowHeaderColumn(
-            this.getAttribute("data-row-header-column"),
-        ) - 1;
-        const summaryColumns = collectSummaryColumns(
-            table,
-            normalizeSummaryColumns(this.getAttribute("data-summary-columns")),
-            labelColumnIndex,
-        );
-        const totals = calculateSummaryTotals(table, summaryColumns);
-
-        syncSummaryFooter(table, {
-            labelColumnIndex,
-            locale: normalizeSummaryLocale(this.getAttribute("data-locale")),
-            summaryColumns,
-            totalLabel: normalizeSummaryTotalLabel(this.getAttribute("data-total-label")),
-            totals,
-        });
-
-        super.refresh();
     }
 
     #scheduleRefresh() {
@@ -369,11 +501,25 @@ export class SummaryTableElement extends TableElement {
             this.#scheduleRefresh();
         });
 
-        this.#summaryObserver.observe(this, {
-            subtree: true,
-            attributes: true,
-            attributeFilter: ["data-value"],
-        });
+        this.#startSummaryObserving();
+    }
+
+    #startSummaryObserving() {
+        if (!this.#summaryObserver || this.#summaryObserving) {
+            return;
+        }
+
+        this.#summaryObserver.observe(this, SUMMARY_OBSERVER_OPTIONS);
+        this.#summaryObserving = true;
+    }
+
+    #stopSummaryObserving() {
+        if (!this.#summaryObserver || !this.#summaryObserving) {
+            return;
+        }
+
+        this.#summaryObserver.disconnect();
+        this.#summaryObserving = false;
     }
 }
 

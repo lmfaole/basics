@@ -47,7 +47,7 @@ function createStory({ backdropClose = false, includeSecondaryAction = false } =
 }
 
 export default {
-    title: "Testing/Interaction/Dialog",
+    title: "Testing/Dialog",
     tags: ["!autodocs"],
     parameters: {
         docs: {

@@ -12,6 +12,22 @@ const GENERATED_ROW_HEADER_ATTRIBUTE = "data-basic-table-generated-row-header";
 const GENERATED_DESCRIPTION_ATTRIBUTE = "data-basic-table-generated-description";
 const MANAGED_HEADERS_ATTRIBUTE = "data-basic-table-managed-headers";
 const MANAGED_LABEL_ATTRIBUTE = "data-basic-table-managed-label";
+const TABLE_OBSERVER_OPTIONS = {
+    childList: true,
+    subtree: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: [
+        "aria-describedby",
+        "aria-label",
+        "aria-labelledby",
+        "colspan",
+        "headers",
+        "id",
+        "rowspan",
+        "scope",
+    ],
+};
 
 let nextTableInstanceId = 1;
 
@@ -198,6 +214,21 @@ function replaceCellTag(cell, tagName, generatedAttributeName) {
     return replacement;
 }
 
+function demoteManagedHeaderCell(cell, generatedAttributeName) {
+    const replacement = document.createElement("td");
+
+    for (const attribute of Array.from(cell.attributes)) {
+        if (attribute.name === generatedAttributeName || attribute.name === "scope") {
+            continue;
+        }
+
+        replacement.setAttribute(attribute.name, attribute.value);
+    }
+
+    replacement.replaceChildren(...Array.from(cell.childNodes));
+    cell.parentElement?.replaceChild(replacement, cell);
+}
+
 function promoteFirstRowCellsToHeaders(table) {
     const firstRow = table.rows[0];
 
@@ -214,10 +245,34 @@ function promoteFirstRowCellsToHeaders(table) {
     }
 }
 
-function promoteBodyCellsToRowHeaders(table, rowHeaderColumnIndex) {
+function demoteManagedHeaders(table, generatedAttributeName) {
+    for (const cell of Array.from(table.querySelectorAll(`th[${generatedAttributeName}]`))) {
+        if (!(cell instanceof HTMLTableCellElementBase)) {
+            continue;
+        }
+
+        demoteManagedHeaderCell(cell, generatedAttributeName);
+    }
+}
+
+function syncBodyRowHeaders(table, rowHeaderColumnIndex, rowHeadersEnabled) {
     for (const section of Array.from(table.tBodies)) {
         for (const row of Array.from(section.rows)) {
-            const targetCell = findCellAtColumnIndex(row, rowHeaderColumnIndex);
+            const targetCell = rowHeadersEnabled
+                ? findCellAtColumnIndex(row, rowHeaderColumnIndex)
+                : null;
+
+            for (const cell of Array.from(row.cells)) {
+                if (
+                    !(cell instanceof HTMLTableCellElementBase)
+                    || !cell.hasAttribute(GENERATED_ROW_HEADER_ATTRIBUTE)
+                    || cell === targetCell
+                ) {
+                    continue;
+                }
+
+                demoteManagedHeaderCell(cell, GENERATED_ROW_HEADER_ATTRIBUTE);
+            }
 
             if (!(targetCell instanceof HTMLTableCellElementBase) || targetCell.tagName === "TH") {
                 continue;
@@ -228,32 +283,17 @@ function promoteBodyCellsToRowHeaders(table, rowHeaderColumnIndex) {
     }
 }
 
-function demoteManagedHeaders(table, generatedAttributeName) {
-    for (const cell of Array.from(table.querySelectorAll(`th[${generatedAttributeName}]`))) {
-        if (!(cell instanceof HTMLTableCellElementBase)) {
-            continue;
-        }
-
-        const replacement = document.createElement("td");
-
-        for (const attribute of Array.from(cell.attributes)) {
-            if (attribute.name === generatedAttributeName || attribute.name === "scope") {
-                continue;
-            }
-
-            replacement.setAttribute(attribute.name, attribute.value);
-        }
-
-        replacement.replaceChildren(...Array.from(cell.childNodes));
-        cell.parentElement?.replaceChild(replacement, cell);
-    }
-}
-
 function createGeneratedCaption(table) {
     const caption = document.createElement("caption");
     caption.setAttribute(GENERATED_CAPTION_ATTRIBUTE, "");
     table.insertBefore(caption, table.firstChild);
     return caption;
+}
+
+function syncTextContent(node, text) {
+    if (node.textContent !== text) {
+        node.textContent = text;
+    }
 }
 
 function syncTableCaption(table, captionText) {
@@ -272,18 +312,12 @@ function syncTableCaption(table, captionText) {
     }
 
     const caption = generatedCaption ?? createGeneratedCaption(table);
-    caption.textContent = captionText;
+    syncTextContent(caption, captionText);
 }
 
 function syncFallbackAccessibleName(table, label) {
     const hasCaption = Boolean(table.caption);
-    let hasManagedLabel = table.hasAttribute(MANAGED_LABEL_ATTRIBUTE);
-
-    if (hasManagedLabel && table.getAttribute("aria-label") !== label) {
-        table.removeAttribute(MANAGED_LABEL_ATTRIBUTE);
-        hasManagedLabel = false;
-    }
-
+    const hasManagedLabel = table.hasAttribute(MANAGED_LABEL_ATTRIBUTE);
     const hasOwnAriaLabel = table.hasAttribute("aria-label") && !hasManagedLabel;
     const hasOwnLabelledBy = table.hasAttribute("aria-labelledby");
 
@@ -296,8 +330,13 @@ function syncFallbackAccessibleName(table, label) {
         return;
     }
 
-    table.setAttribute("aria-label", label);
-    table.setAttribute(MANAGED_LABEL_ATTRIBUTE, "");
+    if (table.getAttribute("aria-label") !== label) {
+        table.setAttribute("aria-label", label);
+    }
+
+    if (!hasManagedLabel) {
+        table.setAttribute(MANAGED_LABEL_ATTRIBUTE, "");
+    }
 }
 
 function getGeneratedDescription(root) {
@@ -321,7 +360,11 @@ function syncTableDescription(root, table, descriptionText, baseId) {
             );
 
             if (tokens.length > 0) {
-                table.setAttribute("aria-describedby", tokens.join(" "));
+                const nextValue = tokens.join(" ");
+
+                if (table.getAttribute("aria-describedby") !== nextValue) {
+                    table.setAttribute("aria-describedby", nextValue);
+                }
             } else {
                 table.removeAttribute("aria-describedby");
             }
@@ -343,13 +386,17 @@ function syncTableDescription(root, table, descriptionText, baseId) {
         description.id = `${baseId}-description`;
     }
 
-    description.textContent = descriptionText;
+    syncTextContent(description, descriptionText);
 
     const tokens = getAriaReferenceTokens(table.getAttribute("aria-describedby")).filter(
         (token) => token !== description.id,
     );
     tokens.push(description.id);
-    table.setAttribute("aria-describedby", tokens.join(" "));
+    const nextValue = tokens.join(" ");
+
+    if (table.getAttribute("aria-describedby") !== nextValue) {
+        table.setAttribute("aria-describedby", nextValue);
+    }
 }
 
 export class TableElement extends HTMLElementBase {
@@ -364,6 +411,7 @@ export class TableElement extends HTMLElementBase {
 
     #instanceId = `${TABLE_TAG_NAME}-${nextTableInstanceId++}`;
     #observer = null;
+    #observing = false;
     #scheduledFrame = 0;
 
     connectedCallback() {
@@ -372,7 +420,7 @@ export class TableElement extends HTMLElementBase {
     }
 
     disconnectedCallback() {
-        this.#observer?.disconnect();
+        this.#stopObserving();
         this.#observer = null;
 
         if (this.#scheduledFrame !== 0 && typeof window !== "undefined") {
@@ -386,119 +434,126 @@ export class TableElement extends HTMLElementBase {
     }
 
     refresh() {
-        const table = collectOwnedTables(this)[0] ?? null;
+        this.#stopObserving();
 
-        if (!(table instanceof HTMLTableElementBase)) {
-            return;
-        }
+        try {
+            const table = collectOwnedTables(this)[0] ?? null;
 
-        const label = normalizeTableLabel(this.getAttribute("data-label"));
-        const caption = normalizeTableCaption(this.getAttribute("data-caption"));
-        const description = normalizeTableDescription(this.getAttribute("data-description"));
-        const columnHeadersEnabled = normalizeTableColumnHeaders(
-            this.getAttribute("data-column-headers") ?? this.hasAttribute("data-column-headers"),
-        );
-        const rowHeaderColumnIndex = normalizeTableRowHeaderColumn(
-            this.getAttribute("data-row-header-column"),
-        ) - 1;
-        const rowHeadersEnabled = normalizeTableRowHeaders(
-            this.getAttribute("data-row-headers") ?? this.hasAttribute("data-row-header-column"),
-        );
-        const baseId = this.id || this.#instanceId;
-
-        syncTableCaption(table, caption);
-        syncFallbackAccessibleName(table, label);
-        syncTableDescription(this, table, description, baseId);
-
-        if (columnHeadersEnabled) {
-            promoteFirstRowCellsToHeaders(table);
-        } else {
-            demoteManagedHeaders(table, GENERATED_COLUMN_HEADER_ATTRIBUTE);
-        }
-
-        if (rowHeadersEnabled) {
-            demoteManagedHeaders(table, GENERATED_ROW_HEADER_ATTRIBUTE);
-            promoteBodyCellsToRowHeaders(table, rowHeaderColumnIndex);
-        } else {
-            demoteManagedHeaders(table, GENERATED_ROW_HEADER_ATTRIBUTE);
-        }
-
-        const placements = buildTablePlacements(table);
-        const headerPlacements = [];
-        let nextHeaderIndex = 1;
-
-        for (const placement of placements) {
-            if (placement.cell.tagName !== "TH") {
-                continue;
+            if (!(table instanceof HTMLTableElementBase)) {
+                return;
             }
 
-            const scope = inferHeaderScope(placement.cell, placement, {
-                columnHeadersEnabled,
-                rowHeadersEnabled,
-                rowHeaderColumnIndex,
-            });
-
-            if (scope) {
-                placement.cell.setAttribute("scope", scope);
-            }
-
-            headerPlacements.push({
-                ...placement,
-                scope,
-                id: ensureHeaderId(placement.cell, this.id || this.#instanceId, nextHeaderIndex),
-            });
-            nextHeaderIndex += 1;
-        }
-
-        headerPlacements.sort(sortPlacementsInDocumentOrder);
-
-        for (const placement of placements) {
-            if (placement.cell.tagName !== "TD") {
-                continue;
-            }
-
-            const associatedHeaders = headerPlacements.filter((header) => {
-                switch (header.scope) {
-                    case "col":
-                    case "colgroup":
-                        return (
-                            header.rowIndex < placement.rowIndex
-                            && header.columnIndex < placement.columnIndex + placement.colSpan
-                            && header.columnIndex + header.colSpan > placement.columnIndex
-                        );
-                    case "row":
-                    case "rowgroup":
-                        return (
-                            header.columnIndex < placement.columnIndex
-                            && header.rowIndex < placement.rowIndex + placement.rowSpan
-                            && header.rowIndex + header.rowSpan > placement.rowIndex
-                        );
-                    default:
-                        return false;
-                }
-            });
-
-            if (associatedHeaders.length === 0) {
-                if (placement.cell.hasAttribute(MANAGED_HEADERS_ATTRIBUTE)) {
-                    placement.cell.removeAttribute("headers");
-                    placement.cell.removeAttribute(MANAGED_HEADERS_ATTRIBUTE);
-                }
-
-                continue;
-            }
-
-            if (
-                placement.cell.hasAttribute("headers")
-                && !placement.cell.hasAttribute(MANAGED_HEADERS_ATTRIBUTE)
-            ) {
-                continue;
-            }
-
-            placement.cell.setAttribute(
-                "headers",
-                associatedHeaders.map((header) => header.id).join(" "),
+            const label = normalizeTableLabel(this.getAttribute("data-label"));
+            const caption = normalizeTableCaption(this.getAttribute("data-caption"));
+            const description = normalizeTableDescription(this.getAttribute("data-description"));
+            const columnHeadersEnabled = normalizeTableColumnHeaders(
+                this.getAttribute("data-column-headers") ?? this.hasAttribute("data-column-headers"),
             );
-            placement.cell.setAttribute(MANAGED_HEADERS_ATTRIBUTE, "");
+            const rowHeaderColumnIndex = normalizeTableRowHeaderColumn(
+                this.getAttribute("data-row-header-column"),
+            ) - 1;
+            const rowHeadersEnabled = normalizeTableRowHeaders(
+                this.getAttribute("data-row-headers") ?? this.hasAttribute("data-row-header-column"),
+            );
+            const baseId = this.id || this.#instanceId;
+
+            syncTableCaption(table, caption);
+            syncFallbackAccessibleName(table, label);
+            syncTableDescription(this, table, description, baseId);
+
+            if (columnHeadersEnabled) {
+                promoteFirstRowCellsToHeaders(table);
+            } else {
+                demoteManagedHeaders(table, GENERATED_COLUMN_HEADER_ATTRIBUTE);
+            }
+
+            syncBodyRowHeaders(table, rowHeaderColumnIndex, rowHeadersEnabled);
+
+            const placements = buildTablePlacements(table);
+            const headerPlacements = [];
+            let nextHeaderIndex = 1;
+
+            for (const placement of placements) {
+                if (placement.cell.tagName !== "TH") {
+                    continue;
+                }
+
+                const scope = inferHeaderScope(placement.cell, placement, {
+                    columnHeadersEnabled,
+                    rowHeadersEnabled,
+                    rowHeaderColumnIndex,
+                });
+
+                if (scope) {
+                    if (placement.cell.getAttribute("scope") !== scope) {
+                        placement.cell.setAttribute("scope", scope);
+                    }
+                }
+
+                headerPlacements.push({
+                    ...placement,
+                    scope,
+                    id: ensureHeaderId(placement.cell, this.id || this.#instanceId, nextHeaderIndex),
+                });
+                nextHeaderIndex += 1;
+            }
+
+            headerPlacements.sort(sortPlacementsInDocumentOrder);
+
+            for (const placement of placements) {
+                if (placement.cell.tagName !== "TD") {
+                    continue;
+                }
+
+                const associatedHeaders = headerPlacements.filter((header) => {
+                    switch (header.scope) {
+                        case "col":
+                        case "colgroup":
+                            return (
+                                header.rowIndex < placement.rowIndex
+                                && header.columnIndex < placement.columnIndex + placement.colSpan
+                                && header.columnIndex + header.colSpan > placement.columnIndex
+                            );
+                        case "row":
+                        case "rowgroup":
+                            return (
+                                header.columnIndex < placement.columnIndex
+                                && header.rowIndex < placement.rowIndex + placement.rowSpan
+                                && header.rowIndex + header.rowSpan > placement.rowIndex
+                            );
+                        default:
+                            return false;
+                    }
+                });
+
+                if (associatedHeaders.length === 0) {
+                    if (placement.cell.hasAttribute(MANAGED_HEADERS_ATTRIBUTE)) {
+                        placement.cell.removeAttribute("headers");
+                        placement.cell.removeAttribute(MANAGED_HEADERS_ATTRIBUTE);
+                    }
+
+                    continue;
+                }
+
+                if (
+                    placement.cell.hasAttribute("headers")
+                    && !placement.cell.hasAttribute(MANAGED_HEADERS_ATTRIBUTE)
+                ) {
+                    continue;
+                }
+
+                const nextHeaders = associatedHeaders.map((header) => header.id).join(" ");
+
+                if (placement.cell.getAttribute("headers") !== nextHeaders) {
+                    placement.cell.setAttribute("headers", nextHeaders);
+                }
+
+                if (!placement.cell.hasAttribute(MANAGED_HEADERS_ATTRIBUTE)) {
+                    placement.cell.setAttribute(MANAGED_HEADERS_ATTRIBUTE, "");
+                }
+            }
+        } finally {
+            this.#startObserving();
         }
     }
 
@@ -522,22 +577,25 @@ export class TableElement extends HTMLElementBase {
             this.#scheduleRefresh();
         });
 
-        this.#observer.observe(this, {
-            childList: true,
-            subtree: true,
-            characterData: true,
-            attributes: true,
-            attributeFilter: [
-                "aria-describedby",
-                "aria-label",
-                "aria-labelledby",
-                "colspan",
-                "headers",
-                "id",
-                "rowspan",
-                "scope",
-            ],
-        });
+        this.#startObserving();
+    }
+
+    #startObserving() {
+        if (!this.#observer || this.#observing) {
+            return;
+        }
+
+        this.#observer.observe(this, TABLE_OBSERVER_OPTIONS);
+        this.#observing = true;
+    }
+
+    #stopObserving() {
+        if (!this.#observer || !this.#observing) {
+            return;
+        }
+
+        this.#observer.disconnect();
+        this.#observing = false;
     }
 }
 

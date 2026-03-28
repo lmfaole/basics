@@ -49,19 +49,29 @@ function createStory({
               <tr>
                 <th scope="col">Post</th>
                 <th scope="col">Timer</th>
-                <th scope="col">Kostnad</th>
+                <th scope="col">Beløp</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Analyse</td>
-                <td data-value="8.5">8.5</td>
-                <td data-value="1250.50">$1,250.50</td>
+                <td>Rådgivning</td>
+                <td data-value="8.5">8,5 t</td>
+                <td data-value="1250.50">1 250,50 kr</td>
               </tr>
               <tr>
-                <td>Implementasjon</td>
-                <td data-value="14.25">14.25</td>
-                <td data-value="2140.00">$2,140.00</td>
+                <td>Implementering</td>
+                <td data-value="14.25">14,25 t</td>
+                <td data-value="2140.00">2 140,00 kr</td>
+              </tr>
+              <tr>
+                <td>QA</td>
+                <td data-value="6.75">6,75 t</td>
+                <td data-value="810.00">810,00 kr</td>
+              </tr>
+              <tr>
+                <td>Support</td>
+                <td data-value="3.25">3,25 t</td>
+                <td data-value="420.00">420,00 kr</td>
               </tr>
             </tbody>
         `
@@ -69,29 +79,41 @@ function createStory({
             <thead>
               <tr>
                 <th scope="col">Post</th>
-                <th scope="col">Timer</th>
-                <th scope="col">Sats</th>
-                <th scope="col">Kostnad</th>
+                <th scope="col">Antall</th>
+                <th scope="col">Enhetspris</th>
+                <th scope="col">Beløp</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Analyse</td>
-                <td>8</td>
-                <td>100</td>
-                <td>800</td>
-              </tr>
-              <tr>
-                <td>Implementasjon</td>
+                <td>Basisabonnement</td>
                 <td>12</td>
-                <td>120</td>
-                <td>1440</td>
+                <td>49,00 kr</td>
+                <td>588,00 kr</td>
               </tr>
               <tr>
-                <td>QA</td>
-                <td>6</td>
-                <td>90</td>
-                <td>540</td>
+                <td>Supportavtale</td>
+                <td>1</td>
+                <td>299,00 kr</td>
+                <td>299,00 kr</td>
+              </tr>
+              <tr>
+                <td>Lagringstillegg</td>
+                <td>4</td>
+                <td>120,00 kr</td>
+                <td>480,00 kr</td>
+              </tr>
+              <tr>
+                <td>Opplæringsplasser</td>
+                <td>3</td>
+                <td>180,00 kr</td>
+                <td>540,00 kr</td>
+              </tr>
+              <tr>
+                <td>Levering</td>
+                <td>1</td>
+                <td>95,00 kr</td>
+                <td>95,00 kr</td>
               </tr>
             </tbody>
         `;
@@ -103,7 +125,8 @@ function createStory({
 }
 
 export default {
-    title: "Components/Data Display/Summary Table",
+    title: "Components/Summary Table",
+    tags: ["summary-table", "table", "totals", "data-display", "basic-summary-table"],
     parameters: {
         layout: "fullscreen",
         docs: {
@@ -122,27 +145,46 @@ The component inherits the accessible naming and row-header behavior from \`basi
             },
             source: {
                 code: `<basic-summary-table
-  data-caption="Prosjektsammendrag"
-  data-description="Viser timer og total kostnad for prosjektets leveranser."
+  data-caption="Månedlig kostnadsoversikt"
+  data-description="Viser antall og summerte beløp for faste kostnader."
   data-row-headers
   data-summary-columns="2,4"
   data-total-label="Totalt"
+  data-locale="nb-NO"
 >
   <table>
     <thead>
       <tr>
         <th>Post</th>
-        <th>Timer</th>
-        <th>Sats</th>
-        <th>Kostnad</th>
+        <th>Antall</th>
+        <th>Enhetspris</th>
+        <th>Beløp</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>Analyse</td>
-        <td>8</td>
-        <td>100</td>
-        <td>800</td>
+        <td>Basisabonnement</td>
+        <td>12</td>
+        <td>49,00 kr</td>
+        <td>588,00 kr</td>
+      </tr>
+      <tr>
+        <td>Supportavtale</td>
+        <td>1</td>
+        <td>299,00 kr</td>
+        <td>299,00 kr</td>
+      </tr>
+      <tr>
+        <td>Lagringstillegg</td>
+        <td>4</td>
+        <td>120,00 kr</td>
+        <td>480,00 kr</td>
+      </tr>
+      <tr>
+        <td>Opplæringsplasser</td>
+        <td>3</td>
+        <td>180,00 kr</td>
+        <td>540,00 kr</td>
       </tr>
     </tbody>
   </table>
@@ -152,11 +194,11 @@ The component inherits the accessible naming and row-header behavior from \`basi
     },
     render: createStory,
     args: {
-        caption: "Prosjektsammendrag",
+        caption: "Månedlig kostnadsoversikt",
         description: "",
         summaryColumns: "2,4",
         totalLabel: "Totalt",
-        locale: "",
+        locale: "nb-NO",
         useDataValues: false,
     },
     argTypes: {
@@ -165,6 +207,9 @@ The component inherits the accessible naming and row-header behavior from \`basi
             description: "Maps to `data-caption` and generates a visible caption when the table does not already define one.",
             table: {
                 category: "Attributes",
+                defaultValue: {
+                    summary: "none",
+                },
             },
         },
         description: {
@@ -172,6 +217,9 @@ The component inherits the accessible naming and row-header behavior from \`basi
             description: "Maps to `data-description` and generates hidden helper text connected through `aria-describedby`.",
             table: {
                 category: "Attributes",
+                defaultValue: {
+                    summary: "none",
+                },
             },
         },
         summaryColumns: {
@@ -179,6 +227,9 @@ The component inherits the accessible naming and row-header behavior from \`basi
             description: "Maps to `data-summary-columns` and selects which one-based columns are totalled in the footer.",
             table: {
                 category: "Attributes",
+                defaultValue: {
+                    summary: "infer numeric columns",
+                },
             },
         },
         totalLabel: {
@@ -196,6 +247,9 @@ The component inherits the accessible naming and row-header behavior from \`basi
             description: "Maps to `data-locale` and controls `Intl.NumberFormat` output in the footer.",
             table: {
                 category: "Attributes",
+                defaultValue: {
+                    summary: "browser default",
+                },
             },
         },
         useDataValues: {
@@ -203,6 +257,9 @@ The component inherits the accessible naming and row-header behavior from \`basi
             description: "Story-only toggle that uses formatted currency text backed by raw `data-value` attributes.",
             table: {
                 category: "Story Controls",
+                defaultValue: {
+                    summary: "false",
+                },
             },
         },
     },
@@ -212,47 +269,19 @@ export const Default = {
     parameters: {
         docs: {
             description: {
-                story: "Accessibility test proving that a generated footer row exposes totals in `tfoot` and keeps the footer label as a row header.",
+                story: "Configurable summary table example with Norwegian defaults, kroner-formatted values, and generated totals.",
             },
         },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-
-        await waitFor(() => {
-            const table = canvas.getByRole("table", { name: "Prosjektsammendrag" });
-            const footerRow = table.tFoot?.rows[0];
-            const footerLabel = footerRow?.cells[0];
-            const totalRowHeader = within(table).getByRole("rowheader", { name: "Totalt" });
-            const analysisRowHeader = within(table).getByRole("rowheader", { name: "Analyse" });
-            const hoursHeader = within(table).getByRole("columnheader", { name: "Timer" });
-            const costHeader = within(table).getByRole("columnheader", { name: "Kostnad" });
-            const hoursTotal = footerRow?.cells[1];
-            const costTotal = footerRow?.cells[3];
-            const hoursHeaderIds = hoursTotal?.getAttribute("headers")?.split(/\s+/) ?? [];
-            const costHeaderIds = costTotal?.getAttribute("headers")?.split(/\s+/) ?? [];
-
-            expect(footerLabel.tagName).toBe("TH");
-            expect(table).not.toHaveAttribute("aria-label");
-            expect(footerLabel).toHaveAttribute("scope", "row");
-            expect(footerLabel).toHaveTextContent("Totalt");
-            expect(totalRowHeader).toBe(footerLabel);
-            expect(analysisRowHeader).toHaveAttribute("scope", "row");
-            expect(hoursTotal).toHaveTextContent("26");
-            expect(costTotal.getAttribute("data-value")).toBe("2780");
-            expect(hoursHeaderIds).toEqual(expect.arrayContaining([footerLabel.id, hoursHeader.id]));
-            expect(costHeaderIds).toEqual(expect.arrayContaining([footerLabel.id, costHeader.id]));
-        });
     },
 };
 
 export const UsesDataValueOverrides = {
     args: {
         caption: "Fakturagrunnlag",
-        description: "Viser summerte timer og kostnader med formatterte visningsverdier.",
-        locale: "en-US",
+        description: "Viser summerte timer og beløp med formatterte visningsverdier.",
+        locale: "nb-NO",
         summaryColumns: "2,3",
-        totalLabel: "Grand total",
+        totalLabel: "Totalt",
         useDataValues: true,
     },
     parameters: {
@@ -268,17 +297,17 @@ export const UsesDataValueOverrides = {
         await waitFor(() => {
             const table = canvas.getByRole("table", { name: "Fakturagrunnlag" });
             const footerRow = table.tFoot?.rows[0];
-            const totalRowHeader = within(table).getByRole("rowheader", { name: "Grand total" });
-            const costHeader = within(table).getByRole("columnheader", { name: "Kostnad" });
+            const totalRowHeader = within(table).getByRole("rowheader", { name: "Totalt" });
+            const costHeader = within(table).getByRole("columnheader", { name: "Beløp" });
             const hoursTotal = footerRow?.cells[1];
             const costTotal = footerRow?.cells[2];
             const description = canvasElement.querySelector("[data-basic-table-generated-description]");
             const costHeaderIds = costTotal?.getAttribute("headers")?.split(/\s+/) ?? [];
 
-            expect(hoursTotal).toHaveTextContent("22.75");
-            expect(costTotal).toHaveTextContent("3,390.50");
-            expect(costTotal.getAttribute("data-value")).toBe("3390.5");
-            expect(description).toHaveTextContent("Viser summerte timer og kostnader med formatterte visningsverdier.");
+            expect(hoursTotal).toHaveTextContent("32,75 t");
+            expect(costTotal?.textContent ?? "").toMatch(/4(?:\s|\u00a0)620,50 kr/);
+            expect(costTotal.getAttribute("data-value")).toBe("4620.5");
+            expect(description).toHaveTextContent("Viser summerte timer og beløp med formatterte visningsverdier.");
             expect(description).toHaveAttribute("hidden");
             expect(table.getAttribute("aria-describedby")).toContain(description.id);
             expect(costHeaderIds).toEqual(expect.arrayContaining([totalRowHeader.id, costHeader.id]));

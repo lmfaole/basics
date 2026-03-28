@@ -1,92 +1,57 @@
 {
     "name": "@lmfaole/basics",
     "version": "0.3.0",
-    "description": "Simple unstyled custom elements and DOM helpers.",
+    "description": "Simple custom elements and DOM helpers with optional starter styles.",
     "type": "module",
     "sideEffects": [
+        "./basic-styling/**/*.css",
+        "./components/basic-alert/register.js",
         "./components/basic-accordion/register.js",
         "./components/basic-dialog/register.js",
         "./components/basic-popover/register.js",
         "./components/basic-summary-table/register.js",
         "./components/basic-table/register.js",
         "./components/basic-toc/register.js",
-        "./components/basic-tabs/register.js"
+        "./components/basic-tabs/register.js",
+        "./components/basic-toast/register.js"
     ],
     "exports": {
         ".": {
             "types": "./index.d.ts",
             "import": "./index.js"
         },
-        "./components/basic-accordion": {
-            "types": "./components/basic-accordion/index.d.ts",
-            "import": "./components/basic-accordion/index.js"
+        "./basic-styling": "./basic-styling/index.css",
+        "./basic-styling/*.css": "./basic-styling/*.css",
+        "./basic-styling/components/*.css": "./basic-styling/components/*.css",
+        "./basic-styling/tokens/*.css": "./basic-styling/tokens/*.css",
+        "./basic-styling/tokens/*.json": "./basic-styling/tokens/*.json",
+        "./components/*/register": {
+            "types": "./components/*/register.d.ts",
+            "import": "./components/*/register.js"
         },
-        "./components/basic-accordion/register": {
-            "types": "./components/basic-accordion/register.d.ts",
-            "import": "./components/basic-accordion/register.js"
-        },
-        "./components/basic-dialog": {
-            "types": "./components/basic-dialog/index.d.ts",
-            "import": "./components/basic-dialog/index.js"
-        },
-        "./components/basic-dialog/register": {
-            "types": "./components/basic-dialog/register.d.ts",
-            "import": "./components/basic-dialog/register.js"
-        },
-        "./components/basic-popover": {
-            "types": "./components/basic-popover/index.d.ts",
-            "import": "./components/basic-popover/index.js"
-        },
-        "./components/basic-popover/register": {
-            "types": "./components/basic-popover/register.d.ts",
-            "import": "./components/basic-popover/register.js"
-        },
-        "./components/basic-summary-table": {
-            "types": "./components/basic-summary-table/index.d.ts",
-            "import": "./components/basic-summary-table/index.js"
-        },
-        "./components/basic-summary-table/register": {
-            "types": "./components/basic-summary-table/register.d.ts",
-            "import": "./components/basic-summary-table/register.js"
-        },
-        "./components/basic-table": {
-            "types": "./components/basic-table/index.d.ts",
-            "import": "./components/basic-table/index.js"
-        },
-        "./components/basic-table/register": {
-            "types": "./components/basic-table/register.d.ts",
-            "import": "./components/basic-table/register.js"
-        },
-        "./components/basic-toc": {
-            "types": "./components/basic-toc/index.d.ts",
-            "import": "./components/basic-toc/index.js"
-        },
-        "./components/basic-toc/register": {
-            "types": "./components/basic-toc/register.d.ts",
-            "import": "./components/basic-toc/register.js"
-        },
-        "./components/basic-tabs": {
-            "types": "./components/basic-tabs/index.d.ts",
-            "import": "./components/basic-tabs/index.js"
-        },
-        "./components/basic-tabs/register": {
-            "types": "./components/basic-tabs/register.d.ts",
-            "import": "./components/basic-tabs/register.js"
+        "./components/*": {
+            "types": "./components/*/index.d.ts",
+            "import": "./components/*/index.js"
         }
     },
     "files": [
         "README.md",
         "index.js",
         "index.d.ts",
+        "basic-styling/**/*.css",
+        "basic-styling/**/*.json",
         "components/*/index.js",
         "components/*/index.d.ts",
         "components/*/register.js",
         "components/*/register.d.ts"
     ],
     "keywords": [
+        "alert",
         "accordion",
         "custom-element",
         "dialog",
+        "toast",
+        "notification",
         "basic-summary-table",
         "basic-tabs",
         "basic-table",

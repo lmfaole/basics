@@ -1,0 +1,30 @@
+basic-toc {
+    --basic-toc-panel-padding: var(--basic-panel-padding);
+    display: block;
+}
+
+basic-toc [data-page-toc-nav] {
+    padding: var(--basic-toc-panel-padding);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius);
+    background: var(--basic-color-surface);
+}
+
+basic-toc [data-page-toc-nav] ol {
+    margin: 0;
+    padding-left: var(--basic-toc-list-indent, 1.25rem);
+}
+
+basic-toc [data-page-toc-nav] li + li {
+    margin-top: var(--basic-space-2);
+}
+
+basic-toc [data-page-toc-nav] ol ol {
+    margin-top: var(--basic-space-2);
+    padding-left: var(--basic-space-4);
+    border-left: var(--basic-border-width) solid var(--basic-color-border);
+}
+
+basic-toc [data-page-toc-nav] a {
+    color: inherit;
+}

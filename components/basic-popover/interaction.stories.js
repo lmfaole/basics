@@ -41,7 +41,7 @@ function createStory({ includeOutsideTarget = false } = {}) {
 }
 
 export default {
-    title: "Testing/Interaction/Popover",
+    title: "Testing/Popover",
     tags: ["!autodocs"],
     parameters: {
         docs: {
