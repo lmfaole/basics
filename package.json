@@ -112,8 +112,8 @@
         "@storybook/addon-docs": "10.3.3",
         "@storybook/addon-vitest": "10.3.3",
         "@storybook/web-components-vite": "^10.3.3",
-        "@vitest/browser-playwright": "4.1.0",
-        "@vitest/coverage-v8": "4.1.0",
+        "@vitest/browser-playwright": "4.1.2",
+        "@vitest/coverage-v8": "4.1.2",
         "playwright": "^1.58.2",
         "storybook": "^10.3.3",
         "vitest": "^4.1.0"
