@@ -5,7 +5,7 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
  * @typedef {object} DialogStoryArgs
  * @property {string} label Fallback accessible name when the dialog has no title element.
  * @property {boolean} backdropClose Allows dialog backdrop clicks to close the modal.
- * @property {boolean} includeTitle Renders a heading that becomes the dialog name.
+ * @property {boolean} includeTitle Renders a title that becomes the dialog name.
  * @property {boolean} includeSecondaryAction Adds a second close button with a return value.
  */
 
@@ -27,26 +27,26 @@ function createStory({ label, backdropClose, includeTitle, includeSecondaryActio
 
     const dialog = document.createElement("dialog");
     dialog.dataset.dialogPanel = "";
-    dialog.style.width = "24rem";
-    dialog.style.minHeight = "12rem";
-    dialog.style.padding = "3rem";
+    dialog.style.inlineSize = "24rem";
+    dialog.style.minBlockSize = "12rem";
+    dialog.style.padding = "2rem";
 
     if (includeTitle) {
         const title = document.createElement("h2");
         title.dataset.dialogTitle = "";
-        title.textContent = "Bekreft handling";
+        title.textContent = "Confirm action";
         dialog.append(title);
     }
 
     const body = document.createElement("p");
-    body.textContent = "Dialogen styrer fokus og lukking, men eier ikke layout eller stil.";
+    body.textContent = "The component coordinates open and close behavior while leaving layout and content to the page.";
     dialog.append(body);
 
-    const closeButton = document.createElement("button");
-    closeButton.type = "button";
-    closeButton.dataset.dialogClose = "";
-    closeButton.textContent = "Cancel";
-    dialog.append(closeButton);
+    const cancelButton = document.createElement("button");
+    cancelButton.type = "button";
+    cancelButton.dataset.dialogClose = "";
+    cancelButton.textContent = "Cancel";
+    dialog.append(cancelButton);
 
     if (includeSecondaryAction) {
         const confirmButton = document.createElement("button");
@@ -62,7 +62,7 @@ function createStory({ label, backdropClose, includeTitle, includeSecondaryActio
 }
 
 export default {
-    title: "Components/Dialog",
+    title: "Custom Elements/Dialog",
     tags: ["dialog", "modal", "overlay", "basic-dialog"],
     parameters: {
         layout: "fullscreen",
@@ -77,16 +77,14 @@ Use it when the page already owns visual design and layout, but still needs pred
 - use \`[data-dialog-open]\` on buttons that should open the modal
 - use \`[data-dialog-close]\` on buttons inside the dialog that should close it
 - optionally add \`[data-dialog-title]\` for the accessible name and \`data-backdrop-close\` on the root
-
-The component opens the dialog with \`showModal()\`, restores focus to the opener on close, and lets the platform handle modal focus behavior and \`Esc\`.
                 `,
             },
             source: {
-                code: `<basic-dialog data-label="Bekreft handling">
+                code: `<basic-dialog data-label="Confirm action">
   <button type="button" data-dialog-open>Open dialog</button>
 
   <dialog data-dialog-panel>
-    <h2 data-dialog-title>Bekreft handling</h2>
+    <h2 data-dialog-title>Confirm action</h2>
     <p>Dialog body.</p>
     <button type="button" data-dialog-close>Cancel</button>
   </dialog>
@@ -96,7 +94,7 @@ The component opens the dialog with \`showModal()\`, restores focus to the opene
     },
     render: createStory,
     args: {
-        label: "Bekreft handling",
+        label: "Confirm action",
         backdropClose: false,
         includeTitle: true,
         includeSecondaryAction: false,
@@ -104,17 +102,14 @@ The component opens the dialog with \`showModal()\`, restores focus to the opene
     argTypes: {
         label: {
             control: "text",
-            description: "Maps to the root `data-label` attribute and is used when the dialog has no own title.",
+            description: "Maps to `data-label` and is used when the dialog has no own title.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "Bekreft handling",
-                },
             },
         },
         backdropClose: {
             control: "boolean",
-            description: "Maps to `data-backdrop-close` and allows clicks on the dialog backdrop to close it.",
+            description: "Maps to `data-backdrop-close` and allows backdrop clicks to close the dialog.",
             table: {
                 category: "Attributes",
             },
@@ -136,38 +131,30 @@ The component opens the dialog with \`showModal()\`, restores focus to the opene
     },
 };
 
-export const Default = {
-    parameters: {
-        docs: {
-            description: {
-                story: "Simple configurable dialog example with one opener, one panel, and a minimal action set.",
-            },
-        },
-    },
-};
+export const Default = {};
 
 export const LabelFallback = {
     args: {
         includeTitle: false,
-        label: "Bekreft sletting",
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Shows how the root `data-label` becomes the accessible name when the dialog has no title element.",
-            },
-        },
+        label: "Delete item",
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+
         await userEvent.click(canvas.getByRole("button", { name: "Open dialog" }));
 
         await waitFor(() => {
-            const dialog = canvas.getByRole("dialog", { name: "Bekreft sletting" });
+            const dialog = canvas.getByRole("dialog", { name: "Delete item" });
 
             expect(dialog).toHaveAttribute("aria-modal", "true");
-            expect(dialog).toHaveAttribute("aria-label", "Bekreft sletting");
+            expect(dialog).toHaveAttribute("aria-label", "Delete item");
             expect(dialog).not.toHaveAttribute("aria-labelledby");
         });
+    },
+};
+
+export const WithSecondaryAction = {
+    args: {
+        includeSecondaryAction: true,
     },
 };

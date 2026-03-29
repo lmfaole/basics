@@ -1,0 +1,90 @@
+:where(
+    basic-alert [data-alert-close],
+    basic-dialog :is([data-dialog-open], [data-dialog-close]),
+    basic-popover :is([data-popover-open], [data-popover-close]),
+    basic-toast :is([data-toast-open], [data-toast-close]),
+    basic-tabs [data-tab],
+    basic-accordion > details > summary
+) {
+    --basic-interaction-state: rest;
+    --basic-interaction-surface-rest: var(--basic-color-surface);
+    --basic-interaction-surface-hover: var(--basic-color-surface-hover);
+    --basic-interaction-surface-active: var(--basic-color-surface-active);
+    --basic-interaction-surface-selected: var(--basic-color-surface-selected);
+    --basic-interaction-surface-checked: var(--basic-color-surface-checked);
+    --basic-interaction-border-rest: var(--basic-color-border);
+    --basic-interaction-border-hover: var(--basic-color-border-hover);
+    --basic-interaction-border-active: var(--basic-color-border-active);
+    --basic-interaction-border-selected: var(--basic-color-border-selected);
+    --basic-interaction-border-checked: var(--basic-color-border-checked);
+    --basic-interaction-text-rest: inherit;
+    --basic-interaction-text-hover: var(--basic-interaction-text-rest);
+    --basic-interaction-text-active: var(--basic-interaction-text-hover);
+    --basic-interaction-text-selected: var(--basic-interaction-text-rest);
+    --basic-interaction-text-checked: var(--basic-interaction-text-rest);
+
+    position: relative;
+    isolation: isolate;
+    container-type: normal;
+    background: transparent;
+    border-color: transparent;
+    color: var(--basic-interaction-text-rest);
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        background: var(--basic-interaction-surface-rest);
+        box-shadow: 0 0 0 var(--basic-border-width) var(--basic-interaction-border-rest);
+        pointer-events: none;
+    }
+
+    &:where(:hover, :focus-visible) {
+        --basic-interaction-state: hover;
+        color: var(--basic-interaction-text-hover);
+    }
+
+    &:active {
+        --basic-interaction-state: active;
+        color: var(--basic-interaction-text-active);
+    }
+
+    @container style(--basic-interaction-state: hover) {
+        &::before {
+            background: var(--basic-interaction-surface-hover);
+            box-shadow: 0 0 0 var(--basic-border-width) var(--basic-interaction-border-hover);
+        }
+    }
+
+    @container style(--basic-interaction-state: active) {
+        &::before {
+            background: var(--basic-interaction-surface-active);
+            box-shadow: 0 0 0 var(--basic-border-width) var(--basic-interaction-border-active);
+        }
+    }
+
+    @container style(--basic-interaction-state: selected) {
+        &::before {
+            background: var(--basic-interaction-surface-selected);
+            box-shadow: 0 0 0 var(--basic-border-width) var(--basic-interaction-border-selected);
+        }
+    }
+
+    @container style(--basic-interaction-state: checked) {
+        &::before {
+            background: var(--basic-interaction-surface-checked);
+            box-shadow: 0 0 0 var(--basic-border-width) var(--basic-interaction-border-checked);
+        }
+    }
+}
+
+:where(
+    basic-accordion > details[open] > summary,
+    basic-popover [data-popover-open][aria-expanded="true"],
+    basic-tabs [data-tab][aria-selected="true"]
+) {
+    --basic-interaction-state: selected;
+    color: var(--basic-interaction-text-selected);
+}

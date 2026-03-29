@@ -1,10 +1,11 @@
 import "./register.js";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 /**
  * @typedef {object} AlertStoryArgs
  * @property {string} label Fallback accessible name when the alert has no title element.
  * @property {"assertive" | "polite"} live Controls whether the alert announces as `alert` or `status`.
- * @property {boolean} includeTitle Renders a heading that becomes the alert name.
+ * @property {boolean} includeTitle Renders a title that becomes the alert name.
  * @property {boolean} dismissible Adds a dismiss button inside the alert.
  */
 
@@ -19,12 +20,12 @@ function createStory({ label, live, includeTitle, dismissible }) {
     if (includeTitle) {
         const title = document.createElement("h2");
         title.dataset.alertTitle = "";
-        title.textContent = "Endringer lagret";
+        title.textContent = "Changes saved";
         alert.append(title);
     }
 
     const body = document.createElement("p");
-    body.textContent = "Varslet gir en enkel live region rundt innhold som allerede eies av siden.";
+    body.textContent = "Inline content stays owned by the page while the component manages live-region semantics.";
     alert.append(body);
 
     if (dismissible) {
@@ -39,7 +40,7 @@ function createStory({ label, live, includeTitle, dismissible }) {
 }
 
 export default {
-    title: "Components/Alert",
+    title: "Custom Elements/Alert",
     tags: ["alert", "status", "live-region", "feedback", "basic-alert"],
     parameters: {
         layout: "fullscreen",
@@ -54,14 +55,12 @@ Use it when the page already owns the content and layout, but still needs predic
 - optionally add \`[data-alert-title]\` when the alert should have a visible accessible name
 - optionally add \`[data-alert-close]\` for a built-in dismiss action
 - optionally set \`data-live="polite"\` when the message should behave like a status instead of an assertive alert
-
-The component keeps the live-region role and accessible name in sync without taking over the content structure.
                 `,
             },
             source: {
-                code: `<basic-alert data-label="Lagring fullfort">
-  <h2 data-alert-title>Endringer lagret</h2>
-  <p>Meldingen ble lagret uten feil.</p>
+                code: `<basic-alert data-label="Save complete">
+  <h2 data-alert-title>Changes saved</h2>
+  <p>Your changes were saved successfully.</p>
   <button type="button" data-alert-close>Dismiss</button>
 </basic-alert>`,
             },
@@ -69,7 +68,7 @@ The component keeps the live-region role and accessible name in sync without tak
     },
     render: createStory,
     args: {
-        label: "Lagring fullfort",
+        label: "Save complete",
         live: "assertive",
         includeTitle: true,
         dismissible: false,
@@ -80,9 +79,6 @@ The component keeps the live-region role and accessible name in sync without tak
             description: "Maps to `data-label` and becomes the fallback accessible name when no title is present.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "Lagring fullfort",
-                },
             },
         },
         live: {
@@ -91,9 +87,6 @@ The component keeps the live-region role and accessible name in sync without tak
             description: "Maps to `data-live` and switches between `alert` and `status` semantics.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "assertive",
-                },
             },
         },
         includeTitle: {
@@ -113,25 +106,39 @@ The component keeps the live-region role and accessible name in sync without tak
     },
 };
 
-export const Default = {
-    parameters: {
-        docs: {
-            description: {
-                story: "Simple configurable alert example using one `basic-alert` element with inline content.",
-            },
-        },
-    },
-};
+export const Default = {};
 
 export const PoliteStatus = {
     args: {
         live: "polite",
     },
-    parameters: {
-        docs: {
-            description: {
-                story: "Use `data-live=\"polite\"` when the message should behave like a status update instead of an assertive alert.",
-            },
-        },
+};
+
+export const Dismissible = {
+    args: {
+        dismissible: true,
+    },
+    play: async ({ canvasElement }) => {
+        const closeButton = canvasElement.querySelector("[data-alert-close]");
+        const alert = canvasElement.querySelector("basic-alert");
+
+        await waitFor(() => {
+            expect(closeButton).not.toBeNull();
+            expect(alert).not.toHaveAttribute("hidden");
+        });
+
+        await userEvent.click(closeButton);
+
+        await waitFor(() => {
+            expect(alert).toHaveAttribute("hidden");
+            expect(alert).not.toHaveAttribute("data-open");
+        });
+
+        alert.show();
+
+        await waitFor(() => {
+            expect(alert).not.toHaveAttribute("hidden");
+            expect(alert).toHaveAttribute("data-open");
+        });
     },
 };

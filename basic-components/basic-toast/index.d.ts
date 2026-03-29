@@ -49,6 +49,9 @@ export function normalizeToastOpen(
  * Behavior:
  * - uses the Popover API in manual mode when available so the toast panel can
  *   render in the top layer
+ * - announces the current toast text through an internal live region whenever
+ *   the toast opens
+ * - expects `[data-toast-panel]` to contain non-interactive message content
  */
 export class ToastElement extends HTMLElement {
     static observedAttributes: string[];

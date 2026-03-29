@@ -1,5 +1,6 @@
 import "../../basic-components/basic-alert/register.js";
 import "../../basic-components/basic-tabs/register.js";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 function withFrame(innerMarkup) {
     return `<style>
@@ -126,16 +127,12 @@ const semanticOverrideSource = withFrame(`<section class="basic-color-technique-
 </section>`);
 
 const meta = {
-    title: "Techniques/Color",
+    title: "Native Elements/Color",
     tags: ["!autodocs"],
-    globals: {
-        starterStyling: "on",
-        starterTheme: "system",
-    },
     parameters: {
         docs: {
             description: {
-                component: "Practical ways to scope or override the starter color tokens without rewriting the component styles: force a color scheme, scope a palette to one subtree, or remap the semantic color tokens locally.",
+                component: "Practical ways to scope or override the starter color tokens without rewriting the component styles: force a color scheme, scope a palette to one subtree, remap the semantic color tokens locally, and let the shared interaction layer pick up those token changes for hover and selected surfaces automatically.",
             },
             source: {
                 language: "html",
@@ -157,6 +154,18 @@ export const ColorScheme = {
                 story: "Force `color-scheme: light` or `color-scheme: dark` on a subtree when a specific app shell or embedded area should stay in one mode.",
             },
         },
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const dismissButton = canvas.getAllByRole("button", { name: /dismiss/i })[0];
+        const idleBackground = getComputedStyle(dismissButton, "::before").backgroundColor;
+
+        await userEvent.tab();
+
+        await waitFor(() => {
+            expect(dismissButton).toHaveFocus();
+            expect(getComputedStyle(dismissButton, "::before").backgroundColor).not.toBe(idleBackground);
+        });
     },
 };
 
@@ -185,5 +194,23 @@ export const SemanticOverrides = {
                 story: "Override the semantic `--basic-color-*` tokens directly when a local section needs a custom treatment while the component CSS stays the same.",
             },
         },
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const overviewTab = canvas.getByRole("tab", { name: /overview/i });
+        const notesTab = canvas.getByRole("tab", { name: /notes/i });
+        const selectedBackground = getComputedStyle(overviewTab, "::before").backgroundColor;
+        const idleBackground = getComputedStyle(notesTab, "::before").backgroundColor;
+
+        await waitFor(() => {
+            expect(selectedBackground).not.toBe(idleBackground);
+        });
+
+        await userEvent.click(notesTab);
+
+        await waitFor(() => {
+            expect(notesTab).toHaveAttribute("aria-selected", "true");
+            expect(getComputedStyle(notesTab, "::before").backgroundColor).not.toBe(getComputedStyle(overviewTab, "::before").backgroundColor);
+        });
     },
 };

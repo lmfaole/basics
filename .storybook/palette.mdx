@@ -1,5 +1,5 @@
 import { ColorItem, ColorPalette, Meta } from "@storybook/addon-docs/blocks";
-import { paletteDocs } from "./palette-docs.js";
+import { paletteDocs } from "../basic-styling/tokens/palette-docs.js";
 
 <Meta title="Overview/Palette Tokens" />
 
@@ -7,6 +7,7 @@ import { paletteDocs } from "./palette-docs.js";
 
 The starter palette tokens are exported from `@lmfaole/basics/basic-styling/tokens/palette.tokens.json`.
 They follow the W3C Design Tokens Community Group format with `$schema`, nested groups, `$type`, `$description`, and `$value`.
+The computed set includes the base semantic colors plus interaction-state tokens for hover, active, selected, and checked surfaces and borders.
 
 {paletteDocs.map((palette) => (
   <div key={palette.id}>

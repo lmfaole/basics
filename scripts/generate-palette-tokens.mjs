@@ -136,6 +136,8 @@ function buildPaletteTokens(name, palette) {
     const textDark = { components: palette.text.dark, alpha: 1 };
     const accentLight = { components: palette.accent.light, alpha: 1 };
     const accentDark = { components: palette.accent.dark, alpha: 1 };
+    const borderLight = mix(textLight, 16, surfaceLight, 84);
+    const borderDark = mix(textDark, 24, surfaceDark, 76);
 
     return {
         $description: palette.description,
@@ -186,6 +188,46 @@ function buildPaletteTokens(name, palette) {
                     `${name} computed muted surface color for dark mode.`,
                 ),
             },
+            "surface-hover": {
+                light: createMixedColorToken(
+                    mix(accentLight, 12, surfaceLight, 88),
+                    `${name} computed hover surface color for light mode.`,
+                ),
+                dark: createMixedColorToken(
+                    mix(accentDark, 20, surfaceDark, 80),
+                    `${name} computed hover surface color for dark mode.`,
+                ),
+            },
+            "surface-active": {
+                light: createMixedColorToken(
+                    mix(accentLight, 16, surfaceLight, 84),
+                    `${name} computed active surface color for light mode.`,
+                ),
+                dark: createMixedColorToken(
+                    mix(accentDark, 26, surfaceDark, 74),
+                    `${name} computed active surface color for dark mode.`,
+                ),
+            },
+            "surface-selected": {
+                light: createMixedColorToken(
+                    mix(accentLight, 14, surfaceLight, 86),
+                    `${name} computed selected surface color for light mode.`,
+                ),
+                dark: createMixedColorToken(
+                    mix(accentDark, 24, surfaceDark, 76),
+                    `${name} computed selected surface color for dark mode.`,
+                ),
+            },
+            "surface-checked": {
+                light: createMixedColorToken(
+                    mix(accentLight, 18, surfaceLight, 82),
+                    `${name} computed checked surface color for light mode.`,
+                ),
+                dark: createMixedColorToken(
+                    mix(accentDark, 30, surfaceDark, 70),
+                    `${name} computed checked surface color for dark mode.`,
+                ),
+            },
             "text-muted": {
                 light: createMixedColorToken(
                     mix(textLight, 68, surfaceLight, 32),
@@ -198,12 +240,52 @@ function buildPaletteTokens(name, palette) {
             },
             border: {
                 light: createMixedColorToken(
-                    mix(textLight, 16, surfaceLight, 84),
+                    borderLight,
                     `${name} computed border color for light mode.`,
                 ),
                 dark: createMixedColorToken(
-                    mix(textDark, 24, surfaceDark, 76),
+                    borderDark,
                     `${name} computed border color for dark mode.`,
+                ),
+            },
+            "border-hover": {
+                light: createMixedColorToken(
+                    mix(accentLight, 18, borderLight, 82),
+                    `${name} computed hover border color for light mode.`,
+                ),
+                dark: createMixedColorToken(
+                    mix(accentDark, 28, borderDark, 72),
+                    `${name} computed hover border color for dark mode.`,
+                ),
+            },
+            "border-active": {
+                light: createMixedColorToken(
+                    mix(accentLight, 24, borderLight, 76),
+                    `${name} computed active border color for light mode.`,
+                ),
+                dark: createMixedColorToken(
+                    mix(accentDark, 36, borderDark, 64),
+                    `${name} computed active border color for dark mode.`,
+                ),
+            },
+            "border-selected": {
+                light: createMixedColorToken(
+                    mix(accentLight, 22, borderLight, 78),
+                    `${name} computed selected border color for light mode.`,
+                ),
+                dark: createMixedColorToken(
+                    mix(accentDark, 34, borderDark, 66),
+                    `${name} computed selected border color for dark mode.`,
+                ),
+            },
+            "border-checked": {
+                light: createMixedColorToken(
+                    mix(accentLight, 28, borderLight, 72),
+                    `${name} computed checked border color for light mode.`,
+                ),
+                dark: createMixedColorToken(
+                    mix(accentDark, 40, borderDark, 60),
+                    `${name} computed checked border color for dark mode.`,
                 ),
             },
             overlay: {

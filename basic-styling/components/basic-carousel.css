@@ -1,0 +1,183 @@
+basic-carousel {
+    --basic-carousel-gap: var(--basic-space-4);
+    --basic-carousel-controls-gap: var(--basic-space-3);
+    --basic-carousel-button-size: 2.75rem;
+    --basic-carousel-marker-size: 1.75rem;
+    --basic-carousel-item-width: 90%;
+    --basic-carousel-track-padding: var(--basic-space-1);
+    --basic-carousel-snap-align: center;
+    display: block;
+}
+
+basic-carousel[data-basic-carousel-snapping="start"] {
+    --basic-carousel-snap-align: start;
+}
+
+basic-carousel[data-basic-carousel-snapping="end"] {
+    --basic-carousel-snap-align: end;
+}
+
+basic-carousel [data-carousel-track] {
+    display: flex;
+    align-items: stretch;
+    gap: var(--basic-carousel-gap);
+    min-inline-size: 0;
+    margin: 0;
+    padding: var(--basic-carousel-track-padding);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+}
+
+basic-carousel :is(ol, ul)[data-carousel-track] {
+    list-style: none;
+    padding-inline-start: var(--basic-carousel-track-padding);
+}
+
+basic-carousel [data-carousel-track] > * {
+    box-sizing: border-box;
+    flex: 0 0 var(--basic-carousel-item-width);
+    inline-size: var(--basic-carousel-item-width);
+    min-inline-size: 0;
+    padding: var(--basic-panel-padding);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius);
+    background: var(--basic-color-surface);
+    scroll-snap-align: var(--basic-carousel-snap-align);
+    scroll-snap-stop: always;
+}
+
+basic-carousel [data-carousel-track] > * > :where(*) {
+    margin-block: 0;
+}
+
+basic-carousel [data-carousel-track] > * > :where(* + *) {
+    margin-block-start: var(--basic-flow-space);
+}
+
+basic-carousel [data-carousel-track] > * > p:first-child {
+    color: var(--basic-color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+basic-carousel [data-carousel-track] > * > a {
+    color: inherit;
+    font-weight: 600;
+}
+
+@supports (scroll-marker-group: after) {
+    basic-carousel {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-rows: minmax(0, auto) auto;
+        gap: var(--basic-carousel-controls-gap);
+        align-items: start;
+    }
+
+    basic-carousel:is([data-basic-carousel-controls="markers"], [data-basic-carousel-controls="none"]) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    basic-carousel [data-carousel-track] {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        scroll-marker-group: after;
+    }
+
+    basic-carousel:is([data-basic-carousel-controls="markers"], [data-basic-carousel-controls="none"]) [data-carousel-track] {
+        grid-column: 1;
+    }
+
+    basic-carousel:is([data-basic-carousel-controls="arrows"], [data-basic-carousel-controls="none"]) [data-carousel-track] {
+        scroll-marker-group: none;
+    }
+
+    basic-carousel [data-carousel-track]::scroll-button(inline-start),
+    basic-carousel [data-carousel-track]::scroll-button(inline-end) {
+        display: inline-flex;
+        align-items: center;
+        align-self: center;
+        justify-content: center;
+        inline-size: var(--basic-carousel-button-size);
+        block-size: var(--basic-carousel-button-size);
+        margin: 0;
+        padding: 0;
+        border: var(--basic-border-width) solid var(--basic-color-border);
+        border-radius: var(--basic-radius-pill);
+        background: var(--basic-color-surface);
+        color: inherit;
+        cursor: pointer;
+        grid-row: 2;
+    }
+
+    basic-carousel:is([data-basic-carousel-controls="markers"], [data-basic-carousel-controls="none"]) [data-carousel-track]::scroll-button(inline-start),
+    basic-carousel:is([data-basic-carousel-controls="markers"], [data-basic-carousel-controls="none"]) [data-carousel-track]::scroll-button(inline-end) {
+        display: none;
+    }
+
+    basic-carousel [data-carousel-track]::scroll-button(inline-start) {
+        content: "<" / "Previous slide";
+        grid-column: 1;
+        justify-self: end;
+    }
+
+    basic-carousel [data-carousel-track]::scroll-button(inline-end) {
+        content: ">" / "Next slide";
+        grid-column: 3;
+        justify-self: start;
+    }
+
+    basic-carousel [data-carousel-track]::scroll-button(*):disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    basic-carousel [data-carousel-track]::scroll-marker-group {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        align-self: center;
+        justify-content: center;
+        gap: var(--basic-space-2);
+        min-block-size: var(--basic-carousel-button-size);
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    basic-carousel[data-basic-carousel-controls="markers"] [data-carousel-track]::scroll-marker-group {
+        grid-column: 1;
+    }
+
+    basic-carousel:is([data-basic-carousel-controls="arrows"], [data-basic-carousel-controls="none"]) [data-carousel-track]::scroll-marker-group {
+        display: none;
+    }
+
+    basic-carousel [data-carousel-track] > *::scroll-marker {
+        content: attr(data-basic-carousel-marker) / attr(data-basic-carousel-marker-label);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-inline-size: var(--basic-carousel-marker-size);
+        block-size: var(--basic-carousel-marker-size);
+        padding-inline: var(--basic-space-2);
+        border: var(--basic-border-width) solid var(--basic-color-border);
+        border-radius: var(--basic-radius-pill);
+        background: var(--basic-color-surface);
+        color: inherit;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    basic-carousel:is([data-basic-carousel-controls="arrows"], [data-basic-carousel-controls="none"]) [data-carousel-track] > *::scroll-marker {
+        content: none;
+    }
+
+    basic-carousel [data-carousel-track] > *::scroll-marker:target-current {
+        border-color: var(--basic-color-border-selected);
+        background: var(--basic-color-surface-selected);
+    }
+}

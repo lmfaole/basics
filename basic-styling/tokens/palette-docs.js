@@ -2,7 +2,23 @@ import paletteTokens from "./palette.tokens.json";
 
 const PALETTE_ORDER = ["slate", "sand", "ocean", "berry"];
 const BASE_TOKEN_ORDER = ["surface", "text", "accent"];
-const COMPUTED_TOKEN_ORDER = ["background", "surface", "surface-muted", "text-muted", "border", "overlay", "focus"];
+const COMPUTED_TOKEN_ORDER = [
+    "background",
+    "surface",
+    "surface-muted",
+    "surface-hover",
+    "surface-active",
+    "surface-selected",
+    "surface-checked",
+    "text-muted",
+    "border",
+    "border-hover",
+    "border-active",
+    "border-selected",
+    "border-checked",
+    "overlay",
+    "focus",
+];
 
 function toTitleCase(value) {
     return value

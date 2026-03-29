@@ -175,13 +175,9 @@ export class AccordionElement extends HTMLElementBase {
             return;
         }
 
-        if (
-            !this.#isMultiple()
-            && !this.#isCollapsible()
-            && itemStates[summaryIndex]?.open
-            && getOpenAccordionIndexes(itemStates).length === 1
-        ) {
+        if (!this.#isMultiple()) {
             event.preventDefault();
+            this.#toggleItem(summaryIndex, itemStates);
         }
     };
 
@@ -215,21 +211,7 @@ export class AccordionElement extends HTMLElementBase {
             case " ":
             case "Enter":
                 event.preventDefault();
-
-                if (itemStates[currentIndex]?.disabled) {
-                    return;
-                }
-
-                if (
-                    !this.#isMultiple()
-                    && !this.#isCollapsible()
-                    && itemStates[currentIndex]?.open
-                    && getOpenAccordionIndexes(itemStates).length === 1
-                ) {
-                    return;
-                }
-
-                this.#items[currentIndex].details.open = !this.#items[currentIndex].details.open;
+                this.#toggleItem(currentIndex, itemStates);
                 return;
             default:
                 return;
@@ -338,22 +320,7 @@ export class AccordionElement extends HTMLElementBase {
             }
         }
 
-        const openIndexSet = new Set(openIndexes);
-
-        this.#isSyncingState = true;
-
-        try {
-            for (let index = 0; index < this.#items.length; index += 1) {
-                const details = this.#items[index].details;
-                const open = !itemStates[index]?.disabled && openIndexSet.has(index);
-
-                if (details.open !== open) {
-                    details.open = open;
-                }
-            }
-        } finally {
-            this.#isSyncingState = false;
-        }
+        this.#applyOpenState(openIndexes, itemStates);
     }
 
     #applyState() {
@@ -374,6 +341,61 @@ export class AccordionElement extends HTMLElementBase {
                 summary.removeAttribute("aria-disabled");
                 summary.tabIndex = 0;
             }
+        }
+    }
+
+    #toggleItem(index, itemStates = this.#getItemStates()) {
+        if (index < 0 || index >= this.#items.length || itemStates[index]?.disabled) {
+            return;
+        }
+
+        if (this.#isMultiple()) {
+            this.#items[index].details.open = !this.#items[index].details.open;
+            return;
+        }
+
+        const openIndexes = getOpenAccordionIndexes(itemStates);
+
+        if (itemStates[index]?.open) {
+            if (!this.#isCollapsible() && openIndexes.length === 1) {
+                return;
+            }
+
+            this.#applyOpenState([], itemStates);
+            this.#applyState();
+            return;
+        }
+
+        this.#applyOpenState([index], itemStates);
+        this.#applyState();
+    }
+
+    #applyOpenState(openIndexes, itemStates = this.#getItemStates()) {
+        const openIndexSet = new Set(openIndexes);
+
+        this.#isSyncingState = true;
+
+        try {
+            // Close panels first so single-open accordions do not briefly expose two bodies.
+            for (let index = 0; index < this.#items.length; index += 1) {
+                const details = this.#items[index].details;
+                const open = !itemStates[index]?.disabled && openIndexSet.has(index);
+
+                if (!open && details.open) {
+                    details.open = false;
+                }
+            }
+
+            for (let index = 0; index < this.#items.length; index += 1) {
+                const details = this.#items[index].details;
+                const open = !itemStates[index]?.disabled && openIndexSet.has(index);
+
+                if (open && !details.open) {
+                    details.open = true;
+                }
+            }
+        } finally {
+            this.#isSyncingState = false;
         }
     }
 }

@@ -1,5 +1,6 @@
 @import "./tokens/base.css";
 @import "./tokens/palette.css";
+@import "./forms.css";
 
 html {
     color-scheme: light dark;

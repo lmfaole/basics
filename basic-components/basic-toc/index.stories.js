@@ -1,14 +1,15 @@
 import "./register.js";
+import { expect, waitFor, within } from "storybook/test";
 
 /**
- * @typedef {object} TableOfContentsStoryArgs
+ * @typedef {object} TocStoryArgs
  * @property {string} title Accessible label copied to the generated nav.
  * @property {string} headingSelector CSS selector used to pick headings from the article.
  * @property {boolean} includeAppendix Adds an extra section to the example article.
  */
 
 /**
- * @param {TableOfContentsStoryArgs} args
+ * @param {TocStoryArgs} args
  */
 function createStory({ title, headingSelector, includeAppendix }) {
     const main = document.createElement("main");
@@ -19,10 +20,6 @@ function createStory({ title, headingSelector, includeAppendix }) {
     if (headingSelector) {
         toc.dataset.headingSelector = headingSelector;
     }
-
-    const nav = document.createElement("nav");
-    nav.dataset.pageTocNav = "";
-    toc.append(nav);
 
     const article = document.createElement("article");
     article.innerHTML = `
@@ -38,8 +35,8 @@ function createStory({ title, headingSelector, includeAppendix }) {
         </p>
         <h2>Usage</h2>
         <p>
-            Consumers provide the nav container, and the custom element keeps it in sync
-            with the document outline.
+            Consumers provide the shell and the custom element keeps it in sync with
+            the surrounding document outline.
         </p>
         <h3>Custom title</h3>
         <p>
@@ -70,7 +67,7 @@ function createStory({ title, headingSelector, includeAppendix }) {
 }
 
 export default {
-    title: "Components/Table of Contents",
+    title: "Custom Elements/Table of Contents",
     tags: ["table-of-contents", "toc", "navigation", "headings", "basic-toc"],
     parameters: {
         layout: "fullscreen",
@@ -81,35 +78,34 @@ Unstyled custom element that mirrors the heading structure of the nearest \`<mai
 
 Use it when the page already owns its visual design and you only want a stable outline generator:
 
-- provide a descendant \`[data-page-toc-nav]\` container
 - place the element inside the same \`<main>\` as the content it should index
-- optionally set \`data-title\` for the nav label and \`data-heading-selector\` to limit which headings are included
-
-The element assigns missing heading ids, keeps duplicate headings unique, and rebuilds automatically when the document outline changes.
+- optionally set \`data-title\` for the nav label
+- optionally set \`data-heading-selector\` to limit which headings are included
                 `,
             },
             source: {
-                code: `<basic-toc data-title="Innhold">
-  <nav aria-label="Innhold" data-page-toc-nav></nav>
-</basic-toc>`,
+                code: `<main>
+  <basic-toc data-title="Contents"></basic-toc>
+  <article>
+    <h1>Overview</h1>
+    <h2>Usage</h2>
+  </article>
+</main>`,
             },
         },
     },
     render: createStory,
     args: {
-        title: "Innhold",
+        title: "Contents",
         headingSelector: "",
         includeAppendix: true,
     },
     argTypes: {
         title: {
             control: "text",
-            description: "Maps to the `data-title` attribute and becomes the generated nav's aria-label.",
+            description: "Maps to `data-title` and becomes the generated nav label.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "Innhold",
-                },
             },
         },
         headingSelector: {
@@ -117,9 +113,6 @@ The element assigns missing heading ids, keeps duplicate headings unique, and re
             description: "Maps to `data-heading-selector` and limits which headings are collected.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "h1, h2, h3, h4, h5, h6",
-                },
             },
         },
         includeAppendix: {
@@ -132,12 +125,27 @@ The element assigns missing heading ids, keeps duplicate headings unique, and re
     },
 };
 
-export const Default = {
-    parameters: {
-        docs: {
-            description: {
-                story: "Simple configurable table of contents example that indexes one nearby article.",
-            },
-        },
+export const Default = {};
+
+export const FilteredHeadings = {
+    args: {
+        headingSelector: "h2, h3",
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        await waitFor(() => {
+            const nav = canvas.getByRole("navigation", { name: "Contents" });
+            const links = within(nav).getAllByRole("link");
+
+            expect(links.map((link) => link.textContent)).toEqual([
+                "Overview",
+                "Usage",
+                "Custom title",
+                "Heading filters",
+                "Appendix",
+            ]);
+            expect(within(nav).queryByRole("link", { name: "Table of contents" })).toBeNull();
+        });
     },
 };

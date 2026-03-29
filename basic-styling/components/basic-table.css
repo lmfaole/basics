@@ -2,6 +2,11 @@ basic-table {
     --basic-table-caption-gap: var(--basic-flow-space);
     --basic-table-cell-padding-block: var(--basic-space-3);
     --basic-table-cell-padding-inline: var(--basic-space-4);
+    --basic-table-row-background-zebra: color-mix(
+        in oklch,
+        var(--basic-color-surface-muted) 48%,
+        var(--basic-color-surface)
+    );
     display: block;
     overflow-x: auto;
 }
@@ -24,9 +29,18 @@ basic-table caption {
 basic-table th,
 basic-table td {
     padding: var(--basic-table-cell-padding-block) var(--basic-table-cell-padding-inline);
-    border-block-end: var(--basic-border-width) solid var(--basic-color-border);
+    border: 0 solid var(--basic-color-border);
     vertical-align: top;
     text-align: left;
+}
+
+basic-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) th,
+basic-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) td {
+    border-block-end-width: var(--basic-border-width);
+}
+
+basic-table:is([data-separators="columns"], [data-separators="both"]) tr > :is(th, td):not(:last-child) {
+    border-inline-end-width: var(--basic-border-width);
 }
 
 basic-table thead th {
@@ -34,13 +48,17 @@ basic-table thead th {
     font-weight: 700;
 }
 
-basic-table tbody tr:last-child th,
-basic-table tbody tr:last-child td {
-    border-block-end: 0;
+basic-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) tbody tr:last-child th,
+basic-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) tbody tr:last-child td {
+    border-block-end-width: 0;
 }
 
 basic-table tbody th {
     font-weight: 600;
+}
+
+basic-table[data-zebra] tbody tr:nth-child(even) > :is(th, td) {
+    background: var(--basic-table-row-background-zebra);
 }
 
 basic-table tbody td {

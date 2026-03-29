@@ -1,39 +1,55 @@
 basic-tabs {
-    --basic-tabs-gap: var(--basic-stack-gap);
+    --basic-tabs-list-gap: var(--basic-space-1);
+    --basic-tabs-list-padding-inline: var(--basic-space-2);
+    --basic-tabs-list-padding-block-start: var(--basic-space-2);
     --basic-tabs-panel-padding: var(--basic-panel-padding);
+    --basic-tabs-panel-background: var(--basic-color-surface-selected);
+    --basic-tabs-panel-border: var(--basic-color-border-selected);
     display: grid;
-    gap: var(--basic-tabs-gap);
+    gap: 0;
 }
 
 basic-tabs [data-tabs-list] {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--basic-space-2);
+    align-items: flex-end;
+    gap: var(--basic-tabs-list-gap);
+    padding-inline: var(--basic-tabs-list-padding-inline);
+    padding-block-start: var(--basic-tabs-list-padding-block-start);
 }
 
 basic-tabs [data-tab] {
+    --basic-interaction-text-rest: var(--basic-color-text-muted);
+    --basic-interaction-text-hover: var(--basic-color-text);
+    --basic-interaction-text-active: var(--basic-color-text);
+    --basic-interaction-text-selected: var(--basic-color-text);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    margin: 0;
     padding: var(--basic-control-padding-block) var(--basic-control-padding-inline);
     border: var(--basic-border-width) solid var(--basic-color-border);
-    border-radius: var(--basic-radius);
-    background: var(--basic-color-surface);
-    color: var(--basic-color-text-muted);
+    border-radius: var(--basic-radius) var(--basic-radius) 0 0;
+    background: transparent;
     cursor: pointer;
+    position: relative;
+    z-index: 1;
 }
 
 basic-tabs [data-tab][aria-selected="true"] {
-    background: var(--basic-color-surface-muted);
-    color: inherit;
+    border-bottom-color: var(--basic-tabs-panel-background);
     font-weight: 600;
+    z-index: 2;
 }
 
 basic-tabs [data-tab-panel] {
+    margin-block-start: calc(var(--basic-border-width) * -1);
     padding: var(--basic-tabs-panel-padding);
-    border: var(--basic-border-width) solid var(--basic-color-border);
+    border: var(--basic-border-width) solid var(--basic-tabs-panel-border);
     border-radius: var(--basic-radius);
-    background: var(--basic-color-surface);
+    background: var(--basic-tabs-panel-background);
+    position: relative;
+    z-index: 0;
 }
 
 basic-tabs [data-tab-panel] > :where(*) {

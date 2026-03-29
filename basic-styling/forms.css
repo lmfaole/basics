@@ -1,0 +1,55 @@
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--basic-space-3);
+    align-items: start;
+    padding: var(--basic-space-4);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    background: var(--basic-color-surface);
+    color: inherit;
+    cursor: pointer;
+}
+
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]:enabled):where(:hover) {
+    border-color: var(--basic-color-border-hover);
+    background: var(--basic-color-surface-hover);
+}
+
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]:checked) {
+    border-color: var(--basic-color-border-selected);
+    background: var(--basic-color-surface-selected);
+}
+
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]:disabled) {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]:focus-visible) {
+    outline: 3px solid var(--basic-color-focus);
+    outline-offset: 2px;
+}
+
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]) > input:is([type="checkbox"], [type="radio"])[data-panel] {
+    width: auto;
+    margin-top: 0.15rem;
+}
+
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]) > :not(input:is([type="checkbox"], [type="radio"])[data-panel]) {
+    min-width: 0;
+}
+
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]) > :not(input:is([type="checkbox"], [type="radio"])[data-panel]):where(span, div) {
+    display: grid;
+    gap: var(--basic-space-1);
+}
+
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]) strong {
+    display: block;
+    color: var(--basic-color-text);
+}
+
+:where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]) :is(p, small) {
+    margin: 0;
+    color: var(--basic-color-text-muted);
+}

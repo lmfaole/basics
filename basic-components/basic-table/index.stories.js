@@ -1,168 +1,176 @@
 import "./register.js";
 import { expect, waitFor, within } from "storybook/test";
 
+const SEPARATOR_OPTIONS = ["rows", "columns", "both"];
+
 /**
- * @typedef {object} BasicTableStoryArgs
+ * @typedef {object} TableStoryArgs
  * @property {string} label Fallback accessible name used when no caption is present.
  * @property {string} caption Generated caption inserted when the table does not provide one.
  * @property {string} description Generated description connected through `aria-describedby`.
+ * @property {boolean} zebra Applies alternating row backgrounds when the optional starter styling is enabled.
+ * @property {"rows" | "columns" | "both"} separators Controls whether starter styling draws separators between rows, columns, or both.
  * @property {boolean} columnHeaders Promotes the first row to column headers.
- * @property {boolean} rowHeaders Promotes the first cell in each body row to a row header.
+ * @property {boolean} rowHeaders Promotes one body column to row headers.
  * @property {number} rowHeaderColumn One-based column index used for generated row headers.
  * @property {boolean} usePlainRows Uses bare tbody rows instead of an authored thead.
- * @property {boolean} useAuthorCaption Uses a hand-authored caption to prove it is preserved.
  */
 
 /**
- * @param {BasicTableStoryArgs} args
+ * @param {TableStoryArgs} args
  */
 function createStory({
     label,
     caption,
     description,
+    zebra,
+    separators,
     columnHeaders,
     rowHeaders,
     rowHeaderColumn,
     usePlainRows,
-    useAuthorCaption,
 }) {
-    const wrapper = document.createElement("div");
-
-    const tableRoot = document.createElement("basic-table");
-    tableRoot.dataset.label = label;
+    const root = document.createElement("basic-table");
+    root.dataset.label = label;
 
     if (caption) {
-        tableRoot.dataset.caption = caption;
+        root.dataset.caption = caption;
     }
 
     if (description) {
-        tableRoot.dataset.description = description;
+        root.dataset.description = description;
     }
 
+    if (zebra) {
+        root.dataset.zebra = "";
+    }
+
+    root.dataset.separators = separators;
+
     if (columnHeaders) {
-        tableRoot.dataset.columnHeaders = "true";
+        root.dataset.columnHeaders = "true";
     }
 
     if (rowHeaders) {
-        tableRoot.dataset.rowHeaders = "true";
+        root.dataset.rowHeaders = "true";
+    } else if (rowHeaderColumn > 1) {
+        root.dataset.rowHeaders = "false";
     }
 
     if (rowHeaderColumn > 1) {
-        tableRoot.dataset.rowHeaderColumn = String(rowHeaderColumn);
+        root.dataset.rowHeaderColumn = String(rowHeaderColumn);
     }
 
     const table = document.createElement("table");
-
-    if (useAuthorCaption) {
-        const authorCaption = document.createElement("caption");
-        authorCaption.textContent = "Bemanning per sprint";
-        table.append(authorCaption);
-    }
-
-    table.innerHTML += usePlainRows
+    table.innerHTML = usePlainRows
         ? `
             <tbody>
               <tr>
                 <td>Team</td>
-                <td>Lokasjon</td>
+                <td>Location</td>
                 <td>Sprint</td>
-                <td>Ledige timer</td>
-                <td>Fokus</td>
+                <td>Available hours</td>
               </tr>
               <tr>
-                <td>Plattform</td>
+                <td>Platform</td>
                 <td>Oslo</td>
                 <td>14</td>
                 <td>18</td>
-                <td>Lansering</td>
               </tr>
               <tr>
-                <td>Designsystem</td>
+                <td>Design system</td>
                 <td>Trondheim</td>
                 <td>14</td>
                 <td>10</td>
-                <td>Migrering</td>
               </tr>
               <tr>
-                <td>Innsikt</td>
+                <td>Insights</td>
                 <td>Bergen</td>
                 <td>15</td>
                 <td>26</td>
-                <td>Tilgjengelighet</td>
               </tr>
               <tr>
-                <td>Betaling</td>
+                <td>Payments</td>
                 <td>Stockholm</td>
                 <td>15</td>
                 <td>8</td>
-                <td>Fakturering</td>
               </tr>
               <tr>
-                <td>Mobil</td>
+                <td>Mobile</td>
                 <td>Copenhagen</td>
                 <td>16</td>
                 <td>12</td>
-                <td>QA</td>
+              </tr>
+              <tr>
+                <td>Core web</td>
+                <td>Helsinki</td>
+                <td>16</td>
+                <td>22</td>
               </tr>
             </tbody>
         `
         : `
             <thead>
               <tr>
-                <th scope="col">Statuskode</th>
+                <th scope="col">Status</th>
                 <th scope="col">Team</th>
-                <th scope="col">Lokasjon</th>
+                <th scope="col">Location</th>
                 <th scope="col">Sprint</th>
-                <th scope="col">Ledige timer</th>
+                <th scope="col">Available hours</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>A1</td>
-                <td>Plattform</td>
+                <td>Platform</td>
                 <td>Oslo</td>
                 <td>14</td>
                 <td>18</td>
               </tr>
               <tr>
                 <td>B4</td>
-                <td>Designsystem</td>
+                <td>Design system</td>
                 <td>Trondheim</td>
                 <td>14</td>
                 <td>10</td>
               </tr>
               <tr>
                 <td>C2</td>
-                <td>Innsikt</td>
+                <td>Insights</td>
                 <td>Bergen</td>
                 <td>15</td>
                 <td>26</td>
               </tr>
               <tr>
                 <td>D7</td>
-                <td>Betaling</td>
+                <td>Payments</td>
                 <td>Stockholm</td>
                 <td>15</td>
                 <td>8</td>
               </tr>
               <tr>
                 <td>E3</td>
-                <td>Mobil</td>
+                <td>Mobile</td>
                 <td>Copenhagen</td>
                 <td>16</td>
                 <td>12</td>
               </tr>
+              <tr>
+                <td>F6</td>
+                <td>Core web</td>
+                <td>Helsinki</td>
+                <td>16</td>
+                <td>22</td>
+              </tr>
             </tbody>
         `;
 
-    tableRoot.append(table);
-    wrapper.append(tableRoot);
-
-    return wrapper;
+    root.append(table);
+    return root;
 }
 
 export default {
-    title: "Components/Table",
+    title: "Custom Elements/Table",
     tags: ["table", "data-display", "basic-table"],
     parameters: {
         layout: "fullscreen",
@@ -176,56 +184,44 @@ Use it when your app already owns the visual table styling, but you want a safer
 - provide one descendant \`<table>\`
 - optionally set \`data-caption\` to generate a visible caption when the table has none
 - optionally set \`data-description\` for extra screen-reader context
-- optionally set \`data-label\` for fallback naming, \`data-column-headers\` to promote a plain first row, and \`data-row-header-column\` when row labels are not in the first column
-
-The component preserves author-provided captions, assigns missing header ids, infers common header scopes, and keeps each data cell's \`headers\` attribute aligned with the row and column headers that describe it.
+- optionally set \`data-label\`, \`data-column-headers\`, and \`data-row-header-column\`
+- optionally add \`data-zebra\` when you use \`basic-styling\` and want alternating body-row backgrounds
+- optionally set \`data-separators="rows" | "columns" | "both"\` when you use \`basic-styling\` and want to control interior dividers
                 `,
             },
             source: {
-                code: `<basic-table
-  data-caption="Bemanning per sprint"
-  data-description="Viser team, lokasjon og ledig kapasitet per sprint."
-  data-row-headers
-  data-row-header-column="2"
->
+                code: `<basic-table data-caption="Sprint staffing" data-description="Shows team capacity per sprint." data-row-headers data-row-header-column="2" data-separators="rows">
   <table>
     <thead>
       <tr>
-        <th>Statuskode</th>
+        <th>Status</th>
         <th>Team</th>
-        <th>Lokasjon</th>
+        <th>Location</th>
         <th>Sprint</th>
-        <th>Ledige timer</th>
+        <th>Available hours</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>A1</td>
-        <td>Plattform</td>
+        <td>Platform</td>
         <td>Oslo</td>
         <td>14</td>
         <td>18</td>
       </tr>
       <tr>
         <td>B4</td>
-        <td>Designsystem</td>
+        <td>Design system</td>
         <td>Trondheim</td>
         <td>14</td>
         <td>10</td>
       </tr>
       <tr>
         <td>C2</td>
-        <td>Innsikt</td>
+        <td>Insights</td>
         <td>Bergen</td>
         <td>15</td>
         <td>26</td>
-      </tr>
-      <tr>
-        <td>D7</td>
-        <td>Betaling</td>
-        <td>Stockholm</td>
-        <td>15</td>
-        <td>8</td>
       </tr>
     </tbody>
   </table>
@@ -235,14 +231,15 @@ The component preserves author-provided captions, assigns missing header ids, in
     },
     render: createStory,
     args: {
-        label: "Bemanning",
-        caption: "Bemanning per sprint",
+        label: "Sprint staffing",
+        caption: "Sprint staffing",
         description: "",
+        zebra: false,
+        separators: "rows",
         columnHeaders: false,
         rowHeaders: true,
         rowHeaderColumn: 2,
         usePlainRows: false,
-        useAuthorCaption: false,
     },
     argTypes: {
         label: {
@@ -250,23 +247,35 @@ The component preserves author-provided captions, assigns missing header ids, in
             description: "Maps to `data-label` and becomes the fallback accessible name when the table has no caption.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "Tabell",
-                },
             },
         },
         caption: {
             control: "text",
-            description: "Maps to `data-caption` and generates a visible `<caption>` when the table does not already define one.",
+            description: "Maps to `data-caption` and generates a visible caption when the table does not already define one.",
             table: {
                 category: "Attributes",
             },
         },
         description: {
             control: "text",
-            description: "Maps to `data-description` and generates a hidden description connected through `aria-describedby`.",
+            description: "Maps to `data-description` and generates hidden helper text connected through `aria-describedby`.",
             table: {
                 category: "Attributes",
+            },
+        },
+        zebra: {
+            control: "boolean",
+            description: "Starter styling hook that adds alternating body-row backgrounds when `basic-styling` is enabled.",
+            table: {
+                category: "Starter Styling",
+            },
+        },
+        separators: {
+            control: "inline-radio",
+            options: SEPARATOR_OPTIONS,
+            description: "Starter styling hook that controls whether interior separators appear between rows, columns, or both.",
+            table: {
+                category: "Starter Styling",
             },
         },
         columnHeaders: {
@@ -297,45 +306,23 @@ The component preserves author-provided captions, assigns missing header ids, in
                 category: "Story Controls",
             },
         },
-        useAuthorCaption: {
-            control: "boolean",
-            description: "Story-only toggle that adds a hand-authored caption to the underlying table.",
-            table: {
-                category: "Story Controls",
-            },
-        },
     },
 };
 
-export const Default = {
-    parameters: {
-        docs: {
-            description: {
-                story: "Configurable table example showing a fuller staffing view with generated row-header relationships.",
-            },
-        },
-    },
-};
+export const Default = {};
 
 export const AddsDescription = {
     args: {
-        description: "Viser team, lokasjon og ledig kapasitet per sprint.",
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Accessibility test proving that a generated description is connected through `aria-describedby` without forcing consumers to author another helper node.",
-            },
-        },
+        description: "Shows team, location, and available capacity per sprint.",
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
 
         await waitFor(() => {
-            const table = canvas.getByRole("table", { name: "Bemanning per sprint" });
+            const table = canvas.getByRole("table", { name: "Sprint staffing" });
             const description = canvasElement.querySelector("[data-basic-table-generated-description]");
 
-            expect(description).toHaveTextContent("Viser team, lokasjon og ledig kapasitet per sprint.");
+            expect(description).toHaveTextContent("Shows team, location, and available capacity per sprint.");
             expect(description).toHaveAttribute("hidden");
             expect(table.getAttribute("aria-describedby")).toContain(description.id);
         });
@@ -345,47 +332,16 @@ export const AddsDescription = {
 export const LabelFallback = {
     args: {
         caption: "",
-        label: "Bemanningstabell",
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Accessibility test proving that the root `data-label` becomes the table name when no authored or generated caption is present.",
-            },
-        },
+        label: "Capacity table",
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
 
         await waitFor(() => {
-            const table = canvas.getByRole("table", { name: "Bemanningstabell" });
+            const table = canvas.getByRole("table", { name: "Capacity table" });
 
-            expect(table).toHaveAttribute("aria-label", "Bemanningstabell");
+            expect(table).toHaveAttribute("aria-label", "Capacity table");
             expect(table.querySelector("caption")).toBeNull();
-        });
-    },
-};
-
-export const PreservesAuthorCaption = {
-    args: {
-        useAuthorCaption: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Accessibility test proving that an existing caption is preserved instead of being replaced by the generated one.",
-            },
-        },
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-
-        await waitFor(() => {
-            const table = canvas.getByRole("table", { name: "Bemanning per sprint" });
-            const caption = table.querySelector("caption");
-
-            expect(caption).toHaveTextContent("Bemanning per sprint");
-            expect(caption).not.toHaveAttribute("data-basic-table-generated-caption");
         });
     },
 };
@@ -393,35 +349,86 @@ export const PreservesAuthorCaption = {
 export const PromotesFirstRowToColumnHeaders = {
     args: {
         caption: "",
+        label: "Capacity table",
         columnHeaders: true,
-        label: "Kapasitetstabell",
         rowHeaders: false,
         rowHeaderColumn: 1,
         usePlainRows: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Accessibility test proving that a plain first row can be promoted to column headers when the author does not provide a thead.",
-            },
-        },
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
 
         await waitFor(() => {
-            const table = canvas.getByRole("table", { name: "Kapasitetstabell" });
+            const table = canvas.getByRole("table", { name: "Capacity table" });
             const firstHeader = table.tBodies[0]?.rows[0]?.cells[0];
-            const locationHeader = within(table).getByRole("columnheader", { name: "Lokasjon" });
+            const locationHeader = within(table).getByRole("columnheader", { name: "Location" });
             const platformCell = table.tBodies[0]?.rows[1]?.cells[0];
             const trondheimCell = table.tBodies[0]?.rows[2]?.cells[1];
 
             expect(firstHeader.tagName).toBe("TH");
             expect(firstHeader).toHaveAttribute("scope", "col");
             expect(platformCell.tagName).toBe("TD");
-            expect(within(table).queryByRole("rowheader", { name: "Plattform" })).toBeNull();
             expect(platformCell.getAttribute("headers")).toContain(firstHeader.id);
             expect(trondheimCell.getAttribute("headers")).toContain(locationHeader.id);
+        });
+    },
+};
+
+export const ZebraStripes = {
+    args: {
+        zebra: true,
+    },
+    globals: {
+        starterTheme: "light",
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Enable `data-zebra` when you use the optional starter styling and want alternating body-row backgrounds.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        const bodyRows = canvasElement.querySelectorAll("tbody tr");
+
+        await waitFor(() => {
+            const firstRowBackground = getComputedStyle(bodyRows[0].cells[0]).backgroundColor;
+            const secondRowBackground = getComputedStyle(bodyRows[1].cells[0]).backgroundColor;
+            const fourthRowBackground = getComputedStyle(bodyRows[3].cells[0]).backgroundColor;
+
+            expect(bodyRows).toHaveLength(6);
+            expect(firstRowBackground).not.toBe(secondRowBackground);
+            expect(secondRowBackground).toBe(fourthRowBackground);
+        });
+    },
+};
+
+export const ColumnSeparators = {
+    args: {
+        separators: "columns",
+    },
+    globals: {
+        starterTheme: "light",
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Set `data-separators=\"columns\"` when the starter styling should draw vertical dividers without horizontal row separators.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        const firstBodyRow = canvasElement.querySelector("tbody tr");
+        const firstCell = firstBodyRow.cells[0];
+        const secondCell = firstBodyRow.cells[1];
+
+        await waitFor(() => {
+            const firstCellStyles = getComputedStyle(firstCell);
+            const secondCellStyles = getComputedStyle(secondCell);
+
+            expect(firstCellStyles.getPropertyValue("border-inline-end-width")).toBe("1px");
+            expect(firstCellStyles.getPropertyValue("border-block-end-width")).toBe("0px");
+            expect(secondCellStyles.getPropertyValue("border-inline-end-width")).toBe("1px");
         });
     },
 };

@@ -153,6 +153,102 @@
               "$description": "slate computed muted surface color for dark mode."
             }
           },
+          "surface-hover": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  93.32,
+                  0.03292,
+                  255.946
+                ]
+              },
+              "$description": "slate computed hover surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  36.38,
+                  0.0594,
+                  256.403
+                ]
+              },
+              "$description": "slate computed hover surface color for dark mode."
+            }
+          },
+          "surface-active": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  91.56,
+                  0.04256,
+                  256.261
+                ]
+              },
+              "$description": "slate computed active surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  38.954,
+                  0.06732,
+                  256.27
+                ]
+              },
+              "$description": "slate computed active surface color for dark mode."
+            }
+          },
+          "surface-selected": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  92.44,
+                  0.03774,
+                  256.103
+                ]
+              },
+              "$description": "slate computed selected surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  38.096,
+                  0.06468,
+                  256.314
+                ]
+              },
+              "$description": "slate computed selected surface color for dark mode."
+            }
+          },
+          "surface-checked": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  90.68,
+                  0.04738,
+                  256.419
+                ]
+              },
+              "$description": "slate computed checked surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  40.67,
+                  0.0726,
+                  256.181
+                ]
+              },
+              "$description": "slate computed checked surface color for dark mode."
+            }
+          },
           "text-muted": {
             "light": {
               "$value": {
@@ -199,6 +295,102 @@
                 ]
               },
               "$description": "slate computed border color for dark mode."
+            }
+          },
+          "border-hover": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  80.499,
+                  0.051316,
+                  257.686
+                ]
+              },
+              "$description": "slate computed hover border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  52.029,
+                  0.064603,
+                  254.669
+                ]
+              },
+              "$description": "slate computed hover border color for dark mode."
+            }
+          },
+          "border-active": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  78.604,
+                  0.065488,
+                  258.066
+                ]
+              },
+              "$description": "slate computed active border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  54.104,
+                  0.075758,
+                  254.664
+                ]
+              },
+              "$description": "slate computed active border color for dark mode."
+            }
+          },
+          "border-selected": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  79.236,
+                  0.060764,
+                  257.94
+                ]
+              },
+              "$description": "slate computed selected border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  53.585,
+                  0.07297,
+                  254.665
+                ]
+              },
+              "$description": "slate computed selected border color for dark mode."
+            }
+          },
+          "border-checked": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  77.34,
+                  0.074936,
+                  258.32
+                ]
+              },
+              "$description": "slate computed checked border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  55.141,
+                  0.081336,
+                  254.661
+                ]
+              },
+              "$description": "slate computed checked border color for dark mode."
             }
           },
           "overlay": {
@@ -406,6 +598,102 @@
               "$description": "sand computed muted surface color for dark mode."
             }
           },
+          "surface-hover": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  93.624,
+                  0.03216,
+                  81.76
+                ]
+              },
+              "$description": "sand computed hover surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  39.6,
+                  0.0456,
+                  74.4
+                ]
+              },
+              "$description": "sand computed hover surface color for dark mode."
+            }
+          },
+          "surface-active": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  92.232,
+                  0.03888,
+                  80.68
+                ]
+              },
+              "$description": "sand computed active surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  42.33,
+                  0.05268,
+                  74.22
+                ]
+              },
+              "$description": "sand computed active surface color for dark mode."
+            }
+          },
+          "surface-selected": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  92.928,
+                  0.03552,
+                  81.22
+                ]
+              },
+              "$description": "sand computed selected surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  41.42,
+                  0.05032,
+                  74.28
+                ]
+              },
+              "$description": "sand computed selected surface color for dark mode."
+            }
+          },
+          "surface-checked": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  91.536,
+                  0.04224,
+                  80.14
+                ]
+              },
+              "$description": "sand computed checked surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  44.15,
+                  0.0574,
+                  74.1
+                ]
+              },
+              "$description": "sand computed checked surface color for dark mode."
+            }
+          },
           "text-muted": {
             "light": {
               "$value": {
@@ -452,6 +740,102 @@
                 ]
               },
               "$description": "sand computed border color for dark mode."
+            }
+          },
+          "border-hover": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  82.509,
+                  0.044339,
+                  77.516
+                ]
+              },
+              "$description": "sand computed hover border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  54.628,
+                  0.052966,
+                  75.888
+                ]
+              },
+              "$description": "sand computed hover border color for dark mode."
+            }
+          },
+          "border-active": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  81.082,
+                  0.054266,
+                  76.088
+                ]
+              },
+              "$description": "sand computed active border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  57.002,
+                  0.062637,
+                  75.456
+                ]
+              },
+              "$description": "sand computed active border color for dark mode."
+            }
+          },
+          "border-selected": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  81.558,
+                  0.050957,
+                  76.564
+                ]
+              },
+              "$description": "sand computed selected border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  56.409,
+                  0.060219,
+                  75.564
+                ]
+              },
+              "$description": "sand computed selected border color for dark mode."
+            }
+          },
+          "border-checked": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  80.13,
+                  0.060883,
+                  75.136
+                ]
+              },
+              "$description": "sand computed checked border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  58.19,
+                  0.067472,
+                  75.24
+                ]
+              },
+              "$description": "sand computed checked border color for dark mode."
             }
           },
           "overlay": {
@@ -659,6 +1043,102 @@
               "$description": "ocean computed muted surface color for dark mode."
             }
           },
+          "surface-hover": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  93.152,
+                  0.0256,
+                  224.64
+                ]
+              },
+              "$description": "ocean computed hover surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  39.4,
+                  0.054,
+                  238
+                ]
+              },
+              "$description": "ocean computed hover surface color for dark mode."
+            }
+          },
+          "surface-active": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  91.736,
+                  0.0308,
+                  224.52
+                ]
+              },
+              "$description": "ocean computed active surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  42.22,
+                  0.0582,
+                  235.9
+                ]
+              },
+              "$description": "ocean computed active surface color for dark mode."
+            }
+          },
+          "surface-selected": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  92.444,
+                  0.0282,
+                  224.58
+                ]
+              },
+              "$description": "ocean computed selected surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  41.28,
+                  0.0568,
+                  236.6
+                ]
+              },
+              "$description": "ocean computed selected surface color for dark mode."
+            }
+          },
+          "surface-checked": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  91.028,
+                  0.0334,
+                  224.46
+                ]
+              },
+              "$description": "ocean computed checked surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  44.1,
+                  0.061,
+                  234.5
+                ]
+              },
+              "$description": "ocean computed checked surface color for dark mode."
+            }
+          },
           "text-muted": {
             "light": {
               "$value": {
@@ -705,6 +1185,102 @@
                 ]
               },
               "$description": "ocean computed border color for dark mode."
+            }
+          },
+          "border-hover": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  81.923,
+                  0.038648,
+                  227.74
+                ]
+              },
+              "$description": "ocean computed hover border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  54.427,
+                  0.054416,
+                  231.744
+                ]
+              },
+              "$description": "ocean computed hover border color for dark mode."
+            }
+          },
+          "border-active": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  80.465,
+                  0.046064,
+                  227.32
+                ]
+              },
+              "$description": "ocean computed active border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  56.935,
+                  0.060592,
+                  229.328
+                ]
+              },
+              "$description": "ocean computed active border color for dark mode."
+            }
+          },
+          "border-selected": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  80.951,
+                  0.043592,
+                  227.46
+                ]
+              },
+              "$description": "ocean computed selected border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  56.308,
+                  0.059048,
+                  229.932
+                ]
+              },
+              "$description": "ocean computed selected border color for dark mode."
+            }
+          },
+          "border-checked": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  79.493,
+                  0.051008,
+                  227.04
+                ]
+              },
+              "$description": "ocean computed checked border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  58.189,
+                  0.06368,
+                  228.12
+                ]
+              },
+              "$description": "ocean computed checked border color for dark mode."
             }
           },
           "overlay": {
@@ -912,6 +1488,102 @@
               "$description": "berry computed muted surface color for dark mode."
             }
           },
+          "surface-hover": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  92.736,
+                  0.03456,
+                  10.24
+                ]
+              },
+              "$description": "berry computed hover surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  38.76,
+                  0.072,
+                  5.6
+                ]
+              },
+              "$description": "berry computed hover surface color for dark mode."
+            }
+          },
+          "surface-active": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  91.248,
+                  0.04208,
+                  10.32
+                ]
+              },
+              "$description": "berry computed active surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  41.328,
+                  0.0786,
+                  5.78
+                ]
+              },
+              "$description": "berry computed active surface color for dark mode."
+            }
+          },
+          "surface-selected": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  91.992,
+                  0.03832,
+                  10.28
+                ]
+              },
+              "$description": "berry computed selected surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  40.472,
+                  0.0764,
+                  5.72
+                ]
+              },
+              "$description": "berry computed selected surface color for dark mode."
+            }
+          },
+          "surface-checked": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  90.504,
+                  0.04584,
+                  10.36
+                ]
+              },
+              "$description": "berry computed checked surface color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  43.04,
+                  0.083,
+                  5.9
+                ]
+              },
+              "$description": "berry computed checked surface color for dark mode."
+            }
+          },
           "text-muted": {
             "light": {
               "$value": {
@@ -958,6 +1630,102 @@
                 ]
               },
               "$description": "berry computed border color for dark mode."
+            }
+          },
+          "border-hover": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  81.359,
+                  0.052138,
+                  10.098
+                ]
+              },
+              "$description": "berry computed hover border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  53.52,
+                  0.074234,
+                  6.358
+                ]
+              },
+              "$description": "berry computed hover border color for dark mode."
+            }
+          },
+          "border-active": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  79.796,
+                  0.062957,
+                  10.237
+                ]
+              },
+              "$description": "berry computed active border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  55.684,
+                  0.083763,
+                  6.541
+                ]
+              },
+              "$description": "berry computed active border color for dark mode."
+            }
+          },
+          "border-selected": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  80.317,
+                  0.05935,
+                  10.19
+                ]
+              },
+              "$description": "berry computed selected border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  55.143,
+                  0.081381,
+                  6.495
+                ]
+              },
+              "$description": "berry computed selected border color for dark mode."
+            }
+          },
+          "border-checked": {
+            "light": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  78.755,
+                  0.07017,
+                  10.33
+                ]
+              },
+              "$description": "berry computed checked border color for light mode."
+            },
+            "dark": {
+              "$value": {
+                "colorSpace": "oklch",
+                "components": [
+                  56.766,
+                  0.088528,
+                  6.632
+                ]
+              },
+              "$description": "berry computed checked border color for dark mode."
             }
           },
           "overlay": {

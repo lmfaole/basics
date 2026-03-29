@@ -1,15 +1,5 @@
 import "./register.js";
-
-/**
- * @typedef {object} ToastStoryArgs
- * @property {string} label Fallback accessible name when the toast has no title element.
- * @property {"assertive" | "polite"} live Controls whether the toast announces as `alert` or `status`.
- * @property {number} duration Auto-dismiss timeout in milliseconds. Use `0` to keep the toast open.
- * @property {string} position Starter CSS preset used to place the top-layer toast in the viewport.
- * @property {boolean} includeTitle Renders a heading that becomes the toast name.
- * @property {boolean} includeCloseButton Adds a dismiss button inside the toast panel.
- * @property {boolean} openInitially Shows the toast immediately on first render.
- */
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const POSITION_OPTIONS = [
     "top-left",
@@ -22,6 +12,17 @@ const POSITION_OPTIONS = [
     "bottom-center",
     "bottom-right",
 ];
+
+/**
+ * @typedef {object} ToastStoryArgs
+ * @property {string} label Fallback accessible name when the toast has no title element.
+ * @property {"assertive" | "polite"} live Controls whether the toast announces as `alert` or `status`.
+ * @property {number} duration Auto-dismiss timeout in milliseconds. Use `0` to keep the toast open.
+ * @property {string} position Starter CSS preset used to place the top-layer toast.
+ * @property {boolean} includeTitle Renders a title that becomes the toast name.
+ * @property {boolean} includeCloseButton Adds a dismiss button inside the toast panel.
+ * @property {boolean} openInitially Shows the toast immediately on first render.
+ */
 
 /**
  * @param {ToastStoryArgs} args
@@ -52,16 +53,18 @@ function createStory({
 
     const panel = document.createElement("section");
     panel.dataset.toastPanel = "";
+    panel.style.inlineSize = "20rem";
+    panel.style.padding = "1rem";
 
     if (includeTitle) {
         const title = document.createElement("h2");
         title.dataset.toastTitle = "";
-        title.textContent = "Lagret";
+        title.textContent = "Saved";
         panel.append(title);
     }
 
     const body = document.createElement("p");
-    body.textContent = "Toasten viser en kort melding uten at komponenten eier layouten rundt den.";
+    body.textContent = "The toast keeps announcement and open state in sync without owning surrounding layout.";
     panel.append(body);
 
     if (includeCloseButton) {
@@ -77,7 +80,7 @@ function createStory({
 }
 
 export default {
-    title: "Components/Toast",
+    title: "Custom Elements/Toast",
     tags: ["toast", "notification", "feedback", "basic-toast"],
     parameters: {
         layout: "fullscreen",
@@ -93,23 +96,15 @@ Use it when the page already owns the content and placement, but still needs a p
 - optionally add \`[data-toast-close]\` for explicit dismissal
 - optionally add \`[data-toast-title]\` for the accessible name
 - optionally set \`data-duration="0"\` to disable auto-dismiss
-
-The component manages the live-region role, accessible name, open state, and optional timeout without taking over your content structure.
-When the platform supports the Popover API, the toast panel is shown in the top layer. The starter toast CSS can then place it with a simple root attribute such as \`data-toast-position="top-right"\`, \`data-toast-position="bottom-center"\`, or \`data-toast-position="center"\`.
                 `,
             },
             source: {
-                code: `<basic-toast
-  data-label="Lagring fullfort"
-  data-duration="5000"
-  data-toast-position="top-right"
->
+                code: `<basic-toast data-label="Save complete" data-duration="5000" data-toast-position="top-right">
   <button type="button" data-toast-open>Show toast</button>
 
   <section data-toast-panel>
-    <h2 data-toast-title>Lagret</h2>
-    <p>Meldingen ble lagret uten feil.</p>
-    <button type="button" data-toast-close>Dismiss</button>
+    <h2 data-toast-title>Saved</h2>
+    <p>Your changes were saved successfully.</p>
   </section>
 </basic-toast>`,
             },
@@ -117,12 +112,12 @@ When the platform supports the Popover API, the toast panel is shown in the top 
     },
     render: createStory,
     args: {
-        label: "Lagring fullfort",
+        label: "Save complete",
         live: "polite",
         duration: 5000,
         position: "bottom-right",
         includeTitle: true,
-        includeCloseButton: true,
+        includeCloseButton: false,
         openInitially: false,
     },
     argTypes: {
@@ -131,9 +126,6 @@ When the platform supports the Popover API, the toast panel is shown in the top 
             description: "Maps to `data-label` and becomes the fallback accessible name when no title is present.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "Lagring fullfort",
-                },
             },
         },
         live: {
@@ -142,9 +134,6 @@ When the platform supports the Popover API, the toast panel is shown in the top 
             description: "Maps to `data-live` and switches between `status` and `alert` semantics.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "polite",
-                },
             },
         },
         duration: {
@@ -152,9 +141,6 @@ When the platform supports the Popover API, the toast panel is shown in the top 
             description: "Maps to `data-duration` in milliseconds. Use `0` to disable auto-dismiss.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "5000",
-                },
             },
         },
         position: {
@@ -163,12 +149,6 @@ When the platform supports the Popover API, the toast panel is shown in the top 
             description: "Starter styling hook that sets `data-toast-position` for top-layer placement.",
             table: {
                 category: "Starter Styling",
-                defaultValue: {
-                    summary: "bottom-right",
-                },
-                type: {
-                    summary: POSITION_OPTIONS.join(" | "),
-                },
             },
         },
         includeTitle: {
@@ -180,7 +160,7 @@ When the platform supports the Popover API, the toast panel is shown in the top 
         },
         includeCloseButton: {
             control: "boolean",
-            description: "Story-only toggle that renders a `[data-toast-close]` dismiss button.",
+            description: "Story-only toggle that renders a `[data-toast-close]` button.",
             table: {
                 category: "Story Controls",
             },
@@ -195,41 +175,33 @@ When the platform supports the Popover API, the toast panel is shown in the top 
     },
 };
 
-export const Default = {
-    parameters: {
-        docs: {
-            description: {
-                story: "Simple configurable toast example with one trigger, one panel, and optional auto-dismiss.",
-            },
-        },
-    },
-};
+export const Default = {};
 
 export const Persistent = {
     args: {
         duration: 0,
         openInitially: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Set `data-duration=\"0\"` when the toast should stay open until the user dismisses it.",
-            },
-        },
+        position: "top-center",
     },
 };
 
-export const Positioned = {
+export const LabelFallback = {
     args: {
         duration: 0,
-        openInitially: true,
-        position: "top-center",
+        includeTitle: false,
+        label: "Saved notification",
     },
-    parameters: {
-        docs: {
-            description: {
-                story: "With the optional starter styling enabled, move the top-layer toast by changing `data-toast-position` to a corner or center preset such as `top-right`, `bottom-center`, or `center`.",
-            },
-        },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const opener = canvas.getByRole("button", { name: "Show toast" });
+
+        await userEvent.click(opener);
+
+        await waitFor(() => {
+            const toast = canvas.getByRole("group", { name: "Saved notification" });
+
+            expect(toast).toHaveAttribute("aria-label", "Saved notification");
+            expect(toast).not.toHaveAttribute("aria-labelledby");
+        });
     },
 };

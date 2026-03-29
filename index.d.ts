@@ -1,5 +1,6 @@
 export * from "./basic-components/basic-alert";
 export * from "./basic-components/basic-accordion";
+export * from "./basic-components/basic-carousel";
 export * from "./basic-components/basic-dialog";
 export * from "./basic-components/basic-popover";
 export * from "./basic-components/basic-summary-table";

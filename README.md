@@ -1,6 +1,6 @@
 # `@lmfaole/basics`
 
-Simple custom elements and DOM helpers, with optional starter styles.
+Unstyled custom elements for common UI patterns, with an optional starter CSS layer.
 
 ## Install
 
@@ -8,222 +8,18 @@ Simple custom elements and DOM helpers, with optional starter styles.
 pnpm add @lmfaole/basics
 ```
 
-## Optional Styling
+## Quick Start
 
-Import the full starter layer:
-
-```css
-@import "@lmfaole/basics/basic-styling";
-```
-
-Or split it into the global layer and component styles:
-
-```css
-@import "@lmfaole/basics/basic-styling/global.css";
-@import "@lmfaole/basics/basic-styling/components.css";
-```
-
-Individual token and component files are also exported:
-
-- `@lmfaole/basics/basic-styling/tokens/base.css`
-- `@lmfaole/basics/basic-styling/tokens/palette.css`
-- `@lmfaole/basics/basic-styling/tokens/palette.tokens.json`
-- `@lmfaole/basics/basic-styling/components/basic-alert.css`
-- `@lmfaole/basics/basic-styling/components/basic-accordion.css`
-- `@lmfaole/basics/basic-styling/components/basic-dialog.css`
-- `@lmfaole/basics/basic-styling/components/basic-popover.css`
-- `@lmfaole/basics/basic-styling/components/basic-summary-table.css`
-- `@lmfaole/basics/basic-styling/components/basic-table.css`
-- `@lmfaole/basics/basic-styling/components/basic-tabs.css`
-- `@lmfaole/basics/basic-styling/components/basic-toc.css`
-- `@lmfaole/basics/basic-styling/components/basic-toast.css`
-
-The core components remain unstyled by default. The `basic-styling` subpath is optional and meant as a very simple token-based baseline that focuses on spacing, padding, and margins first. The shared token sources live under `basic-styling/tokens/`, while the component-specific styles live under `basic-styling/components/`. `base.css` defines the non-color primitives, `palette.css` holds the computed color tokens and alternate palettes that the global layer consumes, and `palette.tokens.json` exposes the same palette data in W3C design-token format.
-
-Component entrypoints are exported under `@lmfaole/basics/basic-components/...`. The older `@lmfaole/basics/components/...` subpaths remain as compatibility aliases.
-
-## Storybook
-
-```sh
-pnpm storybook
-```
-
-```sh
-pnpm build-storybook
-```
-
-```sh
-pnpm test:storybook
-```
-
-```sh
-pnpm test:storybook:coverage
-```
-
-Autodocs is enabled globally for the package stories, and the Docs page includes Storybook's built-in Code panel for rendered examples.
-Use the `Styling` toolbar control in Storybook to toggle the optional `basic-styling` layer on or off across all stories.
-Use the `Theme` toolbar control to preview the starter styling in light, dark, or system mode through the CSS `light-dark()` tokens.
-Use the `Palette` toolbar control to swap the computed starter palettes between `slate`, `sand`, `ocean`, and `berry`.
-The `Techniques/Color` stories show how to force a local `color-scheme`, scope a different palette with `data-basic-palette`, and override the semantic `--basic-color-*` tokens for one section.
-The `Overview/Palette Tokens` docs page renders the exported token values with Storybook's built-in `ColorPalette` and `ColorItem` blocks.
-Storybook Test coverage is enabled through the Vitest addon. In the Storybook UI, turn coverage on in the testing panel to see the summary and open the full report at `/coverage/index.html`. From the CLI, `test:storybook:coverage` writes reports to `coverage/storybook/`.
-
-The Visual Tests panel is provided by `@chromatic-com/storybook`. To run cloud visual checks, connect the addon to a Chromatic project from the Storybook UI.
-
-GitHub Actions now splits Storybook automation by purpose:
-
-- `CI` runs the browser-backed Storybook test suite on pull requests and pushes to `main`.
-- `Storybook Preview` builds Storybook for pull requests and uploads `storybook-static` as an artifact.
-- `Storybook Pages` deploys the built Storybook from `main` to GitHub Pages.
-- `Chromatic` publishes Storybook builds on branch pushes when the `CHROMATIC_PROJECT_TOKEN` repository secret is configured.
-
-## Contributing
-
-Contributor workflow, release notes, codemod policy, and local setup now live in [CONTRIBUTING.md](./CONTRIBUTING.md). Security reporting details live in [SECURITY.md](./SECURITY.md).
-
-## Browser Support
-
-The package targets modern evergreen browsers with Custom Elements support.
-
-- `basic-alert`, `basic-accordion`, `basic-table`, `basic-summary-table`, `basic-tabs`, and `basic-toc` only depend on standard modern DOM APIs.
-- `basic-dialog` requires the HTML `dialog` element and `showModal()`. Without that platform support, the custom element does not provide a modal fallback on its own.
-- `basic-popover` requires the Popover API to open its managed panel. The optional `data-anchor-trigger` placement is progressive enhancement on top of that and depends on support for anchor-positioning properties such as `position-area`.
-- `basic-toast` works without the Popover API, but when Popover is available it uses the top layer for viewport placement. Without Popover, it falls back to normal DOM visibility with `hidden`.
-- The optional `basic-styling` layer targets browsers that support CSS custom properties, `oklch()`, and `light-dark()`. Manual `color-scheme` overrides are shown in the `Techniques/Color` stories in Storybook.
-
-## Basic Alert
+1. Import the register module for the component you want to use.
+2. Render the expected HTML markup.
+3. Optionally import the starter styles.
 
 ```html
-<basic-alert data-label="Lagring fullfort" data-live="polite">
-  <h2 data-alert-title>Endringer lagret</h2>
-  <p>Meldingen ble lagret uten feil.</p>
-  <button type="button" data-alert-close>Dismiss</button>
-</basic-alert>
-
-<script type="module">
-  import "@lmfaole/basics/basic-components/basic-alert/register";
-</script>
-```
-
-The element upgrades inline content into a named live-region alert without adding any styles of its own.
-
-### Attributes
-
-- `data-label`: fallback accessible name when the alert has no `aria-label`, `aria-labelledby`, or `[data-alert-title]`.
-- `data-live`: chooses the live-region mode. Use `assertive` for `role="alert"` or `polite` for `role="status"`.
-
-### Behavior
-
-- Applies the matching live-region role, `aria-live`, and `aria-atomic="true"` on the root element.
-- Uses `[data-alert-title]` as the accessible name when present, otherwise falls back to `data-label`.
-- `[data-alert-close]` controls hide the alert and remove its managed `data-open` state.
-- `show()` and `hide()` methods can be used for programmatic visibility changes.
-
-### Markup Contract
-
-- Put the content directly inside `<basic-alert>`.
-- Use `[data-alert-title]` when the alert should have a visible accessible name.
-- Use `[data-alert-close]` when the alert should be dismissible.
-- Keep layout and styling outside the package; the component only manages semantics and simple dismissal behavior.
-
-## Basic Toast
-
-```html
-<basic-toast data-label="Lagring fullfort" data-duration="5000">
-  <button type="button" data-toast-open>Show toast</button>
-
-  <section data-toast-panel>
-    <h2 data-toast-title>Lagret</h2>
-    <p>Meldingen ble lagret uten feil.</p>
-    <button type="button" data-toast-close>Dismiss</button>
-  </section>
-</basic-toast>
-
-<script type="module">
-  import "@lmfaole/basics/basic-components/basic-toast/register";
-</script>
-```
-
-The element upgrades trigger-and-panel markup into a toast notification flow without adding any styles of its own.
-
-### Attributes
-
-- `data-label`: fallback accessible name when the toast panel has no `aria-label`, `aria-labelledby`, or `[data-toast-title]`.
-- `data-live`: chooses the live-region mode. Use `polite` for `role="status"` or `assertive` for `role="alert"`.
-- `data-duration`: auto-dismiss timeout in milliseconds. Use `0` to disable auto-dismiss.
-- `data-open`: optional initial open state for the toast panel.
-
-### Behavior
-
-- Uses the Popover API in manual mode when available so the toast panel can render in the top layer.
-- Syncs the panel's open state, `hidden`, and `data-open` on the toast panel and root element.
-- Uses `[data-toast-title]` as the accessible name when present, otherwise falls back to `data-label`.
-- `[data-toast-open]` toggles the toast, while `[data-toast-close]` dismisses it.
-- Auto-dismisses after `data-duration` milliseconds unless the duration is `0`.
-- `show()`, `hide()`, and `toggle()` methods support programmatic control.
-
-### Markup Contract
-
-- Provide one descendant `[data-toast-panel]`.
-- Use `[data-toast-open]` on buttons that should show or toggle the toast.
-- Use `[data-toast-close]` when the toast should expose an explicit dismiss action.
-- Use `[data-toast-title]` when the toast should have a visible accessible name.
-- When using the optional starter styling, set `data-toast-position` to presets such as `top-right`, `bottom-center`, or `center` to move the top-layer toast around the viewport.
-- Keep layout and styling outside the package; the component only manages semantics, open state, and optional auto-dismiss behavior.
-
-## Basic Popover
-
-```html
-<basic-popover data-label="Filtre" data-anchor-trigger data-position-area="bottom">
-  <button type="button" data-popover-open>Toggle popover</button>
-
-  <section data-popover-panel>
-    <h2 data-popover-title>Filtre</h2>
-    <p>Popover body.</p>
-    <button type="button" data-popover-close>Close</button>
-  </section>
-</basic-popover>
-
-<script type="module">
-  import "@lmfaole/basics/basic-components/basic-popover/register";
-</script>
-```
-
-The element upgrades popover trigger-and-panel markup into an accessible non-modal overlay without adding any styles of its own.
-
-### Attributes
-
-- `data-label`: fallback accessible name when the popover has no `aria-label`, `aria-labelledby`, or `[data-popover-title]`.
-- `data-anchor-trigger`: uses the opener as the popover's implicit anchor so consumer CSS can position the panel relative to the trigger.
-- `data-position-area`: sets the CSS anchor-positioning area used when `data-anchor-trigger` is enabled. Defaults to `bottom`.
-- `data-position-try-fallbacks`: optional comma-separated fallback list used when the default anchored placement would overflow. By default the component derives a sensible sequence from `data-position-area`.
-
-### Behavior
-
-- Uses the native Popover API in auto mode for outside-click and `Esc` dismissal.
-- Syncs `aria-expanded`, `aria-controls`, and `data-open` between the trigger and panel.
-- Restores focus to the opener when dismissal should return to it, while preserving focus on an outside control the user explicitly clicked.
-- When `data-anchor-trigger` is set, opening the popover passes the trigger as the Popover API `source`, establishes the panel's implicit anchor, and applies the configured `position-area`.
-- When `data-anchor-trigger` is set and `data-position-try-fallbacks` is not provided, the component derives a fallback sequence from the default placement:
-  `bottom` or `top` start with `flip-block`, while `left` or `right` start with `flip-inline`.
-- `[data-popover-close]` controls can dismiss the panel from inside the overlay.
-
-### Markup Contract
-
-- Provide one descendant `[data-popover-panel]`.
-- Use `[data-popover-open]` on buttons that should toggle the panel.
-- Use `[data-popover-title]` for the popover heading when you want it to become the accessible name.
-- If you set `data-anchor-trigger`, you can tune the default anchored placement with `data-position-area` and optionally override its overflow fallbacks with `data-position-try-fallbacks`.
-- Keep layout and styling outside the package; the component only manages semantics and open or close behavior.
-
-## Basic Dialog
-
-```html
-<basic-dialog data-label="Bekreft handling" data-backdrop-close>
+<basic-dialog data-label="Confirm action">
   <button type="button" data-dialog-open>Open dialog</button>
 
   <dialog data-dialog-panel>
-    <h2 data-dialog-title>Bekreft handling</h2>
+    <h2 data-dialog-title>Confirm action</h2>
     <p>Dialog body.</p>
     <button type="button" data-dialog-close>Cancel</button>
     <button type="button" data-dialog-close data-dialog-close-value="confirmed">
@@ -237,313 +33,107 @@ The element upgrades popover trigger-and-panel markup into an accessible non-mod
 </script>
 ```
 
-The element upgrades native `<dialog>` markup into an accessible modal flow without adding any styles of its own.
+Import register modules once in your app entry point. They define the custom element and leave styling to your application unless you also opt into `basic-styling`.
 
-### Attributes
+## Component Guides
 
-- `data-label`: fallback accessible name when the dialog has no `aria-label`, `aria-labelledby`, or `[data-dialog-title]`.
-- `data-backdrop-close`: allows clicks on the dialog backdrop to close the modal.
+Each component now has its own colocated README with markup, attributes, behavior, and usage notes:
 
-### Behavior
+- [`basic-alert`](./basic-components/basic-alert/README.md): inline live-region alerts
+- [`basic-accordion`](./basic-components/basic-accordion/README.md): single-open or multi-open disclosure sections
+- [`basic-carousel`](./basic-components/basic-carousel/README.md): scroll-snap carousels with native CSS controls where supported
+- [`basic-dialog`](./basic-components/basic-dialog/README.md): modal dialogs built on native `<dialog>`
+- [`basic-popover`](./basic-components/basic-popover/README.md): non-modal overlays using the Popover API
+- [`basic-summary-table`](./basic-components/basic-summary-table/README.md): tables with generated totals in `<tfoot>`
+- [`basic-table`](./basic-components/basic-table/README.md): accessible table naming and header relationships
+- [`basic-tabs`](./basic-components/basic-tabs/README.md): accessible tablists and panels
+- [`basic-toast`](./basic-components/basic-toast/README.md): transient toast notifications
+- [`basic-toc`](./basic-components/basic-toc/README.md): generated table-of-contents navigation
 
-- Uses the native dialog element's modal behavior via `showModal()`.
-- Restores focus to the element that opened the dialog when the modal closes.
-- `Esc` closes the modal through the platform's dialog behavior.
-- `[data-dialog-close]` controls can optionally set `data-dialog-close-value` to pass a close value.
+## Optional Styling
 
-### Markup Contract
+The components are unstyled by default. To opt into the starter CSS:
 
-- Provide one descendant `<dialog data-dialog-panel>`.
-- Use `[data-dialog-open]` on buttons that should open the modal.
-- Use `[data-dialog-title]` for the dialog heading when you want it to become the accessible name.
-- Keep layout and styling outside the package; the component only manages semantics and open or close behavior.
-
-## Basic Accordion
-
-```html
-<basic-accordion>
-  <details open>
-    <summary>Oversikt</summary>
-    <p>Viser en kort oppsummering.</p>
-  </details>
-
-  <details>
-    <summary>Implementasjon</summary>
-    <p>Viser implementasjonsdetaljer.</p>
-  </details>
-</basic-accordion>
-
-<script type="module">
-  import "@lmfaole/basics/basic-components/basic-accordion/register";
-</script>
+```css
+@import "@lmfaole/basics/basic-styling";
 ```
 
-The element coordinates direct child `details` items into an accordion without adding any styles of its own.
+Or import the global layer and component layer separately:
 
-### Attributes
-
-- `data-multiple`: allows multiple items to stay open at the same time.
-- `data-collapsible`: allows the last open item in single mode to close.
-
-### Markup Contract
-
-- Provide direct child `<details>` items, each with a first-child `<summary>`.
-- Add `open` to any item that should start expanded.
-- Add `data-disabled` to a `<details>` item when it should be skipped by arrow-key navigation and blocked from toggling.
-- Keep layout and styling outside the package; the component only manages root-level open-state rules and keyboard behavior.
-
-### Behavior
-
-- Native `details` and `summary` semantics are preserved.
-- `data-open` stays in sync with the normalized open state for optional styling hooks.
-- `ArrowUp`, `ArrowDown`, `Home`, and `End` move focus between enabled summaries.
-- `Enter` and `Space` keep using the platform's native `summary` toggle behavior.
-- In single-open mode, the component keeps one enabled item open unless `data-collapsible` is set.
-
-## Basic Tabs
-
-```html
-<basic-tabs data-label="Eksempelkode">
-  <div data-tabs-list>
-    <button type="button" data-tab>Oversikt</button>
-    <button type="button" data-tab>Implementasjon</button>
-    <button type="button" data-tab>Tilgjengelighet</button>
-  </div>
-
-  <section data-tab-panel>
-    <p>Viser en kort oppsummering.</p>
-  </section>
-  <section data-tab-panel>
-    <p>Viser implementasjonsdetaljer.</p>
-  </section>
-  <section data-tab-panel>
-    <p>Viser tilgjengelighetsnotater.</p>
-  </section>
-</basic-tabs>
-
-<script type="module">
-  import "@lmfaole/basics/basic-components/basic-tabs/register";
-</script>
+```css
+@import "@lmfaole/basics/basic-styling/global.css";
+@import "@lmfaole/basics/basic-styling/components.css";
 ```
 
-The element upgrades existing markup into an accessible tab interface without adding any styles of its own.
+You can also import individual files from:
 
-### Attributes
+- `@lmfaole/basics/basic-styling/forms.css`
+- `@lmfaole/basics/basic-styling/tokens/*`
+- `@lmfaole/basics/basic-styling/components/basic-*.css`
 
-- `data-label`: sets the generated tablist's accessible name when the tablist does not already have `aria-label` or `aria-labelledby`. Defaults to `Faner`.
-- `data-activation`: chooses whether arrow-key focus changes also activate the panel. Supported values are `automatic` and `manual`.
-- `data-selected-index`: sets the initially selected tab by zero-based index. Defaults to the first enabled tab.
+The starter styling is intentionally minimal. It provides tokens, spacing, and baseline component styles without taking over your design system.
 
-### Behavior
+### Selection Panels
 
-- Missing tab and panel ids are generated automatically.
-- `aria-selected`, `aria-controls`, `aria-labelledby`, `hidden`, and `data-selected` stay in sync with the active tab.
-- Click, `ArrowLeft`, `ArrowRight`, `Home`, and `End` move between tabs.
-- Disabled tabs are skipped during keyboard navigation.
-- In `manual` mode, arrow keys move focus and `Enter` or `Space` activates the focused tab.
-
-### Markup Contract
-
-- Provide one descendant element with `data-tabs-list` to hold the interactive tab controls.
-- Provide matching counts of `[data-tab]` and `[data-tab-panel]` descendants in the same order.
-- Prefer `<button>` elements for tabs so click and keyboard activation stay native.
-- Keep layout and styling outside the package; the component only manages semantics, state, and keyboard behavior.
-
-## Basic Table
+The form layer can render a native checkbox or radio like a selectable panel by adding `data-panel` to the input.
 
 ```html
-<basic-table
-  data-caption="Bemanning per sprint"
-  data-description="Viser team, lokasjon og ledig kapasitet per sprint."
-  data-row-headers
-  data-row-header-column="2"
->
-  <table>
-    <thead>
-      <tr>
-        <th>Statuskode</th>
-        <th>Team</th>
-        <th>Lokasjon</th>
-        <th>Sprint</th>
-        <th>Ledige timer</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>A1</td>
-        <td>Plattform</td>
-        <td>Oslo</td>
-        <td>14</td>
-        <td>18</td>
-      </tr>
-      <tr>
-        <td>B4</td>
-        <td>Designsystem</td>
-        <td>Trondheim</td>
-        <td>14</td>
-        <td>10</td>
-      </tr>
-      <tr>
-        <td>C2</td>
-        <td>Innsikt</td>
-        <td>Bergen</td>
-        <td>15</td>
-        <td>26</td>
-      </tr>
-      <tr>
-        <td>D7</td>
-        <td>Betaling</td>
-        <td>Stockholm</td>
-        <td>15</td>
-        <td>8</td>
-      </tr>
-    </tbody>
-  </table>
-</basic-table>
-
-<script type="module">
-  import "@lmfaole/basics/basic-components/basic-table/register";
-</script>
+<label>
+  <input type="checkbox" name="days" value="day-1" data-panel checked />
+  <span>
+    <strong>Day 1: Product systems</strong>
+    <span>Keynotes, leadership sessions, and case studies.</span>
+  </span>
+</label>
 ```
 
-The element upgrades a regular table with stronger accessible naming and header associations without imposing any styles.
+Use the pattern like this:
 
-### Attributes
+- Import `@lmfaole/basics/basic-styling/forms.css`, `global.css`, or the full `basic-styling` entry point.
+- Put `data-panel` on the native checkbox or radio, not on the label.
+- Keep the control as a direct child of the label.
+- Place the visible body copy after the input in a sibling `span` or `div`.
+- Use native `fieldset` and `legend` when the choices belong to one group.
+- Keep shared `name` values on radio groups so the browser preserves single-select behavior.
 
-- `data-caption`: generates a visible `<caption>` when the wrapped table does not already define one.
-- `data-column-headers`: promotes the first row to column headers when the author provides a plain table without a header row.
-- `data-description`: generates a hidden description and connects it with `aria-describedby`.
-- `data-label`: sets a fallback accessible name when the table has no caption, `aria-label`, or `aria-labelledby`. Defaults to `Tabell`.
-- `data-row-header-column`: sets which one-based body column should become the generated row header. Defaults to `1`.
-- `data-row-headers`: enables generated row headers in body rows. If `data-row-header-column` is present, row-header mode is enabled automatically.
+This is still a native checkbox or radio. Keyboard behavior, form submission, validation, checked state, and radio-group semantics all stay browser-driven.
+See Storybook `Native Elements/Forms` for live examples of the same markup.
 
-### Behavior
+## Package Entry Points
 
-- Preserves author-provided captions and only generates one when needed.
-- Can generate hidden helper text for extra context without requiring a separate authored description element.
-- Can promote a plain first row to column headers when consumers start from simple body-only markup.
-- Infers common `scope` values for header cells and assigns missing header ids.
-- Populates each data cell's `headers` attribute from the matching row and column headers.
-- Re-runs automatically when the wrapped table changes.
+- Register a custom element: `@lmfaole/basics/basic-components/<component>/register`
+- Import a component module directly: `@lmfaole/basics/basic-components/<component>`
+- Root module exports the component classes and helpers from `@lmfaole/basics`
+- Legacy compatibility aliases remain available under `@lmfaole/basics/components/<component>`
 
-### Markup Contract
+## Browser Support
 
-- Provide one descendant `<table>` inside the custom element.
-- Use real table sections and header cells where possible; the component strengthens semantics but does not replace the HTML table model.
-- Add `data-row-headers` when one body column identifies each row, and use `data-row-header-column` when that column is not the first one.
-- Add `data-column-headers` when you want the component to promote a plain first row instead of authoring a header row yourself.
-- Keep layout and styling outside the package; the component only manages semantics and accessibility metadata.
+The package targets modern evergreen browsers. The live widgets below render in Storybook's Readme page via the official `<baseline-status>` custom element, and each line also links to the underlying feature page for plain Markdown viewers.
 
-## Basic Summary Table
+As of March 29, 2026, the biggest compatibility gaps are the shared style-query layer in Firefox and the native carousel marker/button controls outside Chromium-based browsers.
 
-```html
-<basic-summary-table
-  data-caption="Månedlig kostnadsoversikt"
-  data-description="Viser antall og summerte beløp for faste kostnader."
-  data-row-headers
-  data-summary-columns="2,4"
-  data-total-label="Totalt"
-  data-locale="nb-NO"
->
-  <table>
-    <thead>
-      <tr>
-        <th>Post</th>
-        <th>Antall</th>
-        <th>Enhetspris</th>
-        <th>Beløp</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Basisabonnement</td>
-        <td>12</td>
-        <td>49,00 kr</td>
-        <td>588,00 kr</td>
-      </tr>
-      <tr>
-        <td>Supportavtale</td>
-        <td>1</td>
-        <td>299,00 kr</td>
-        <td>299,00 kr</td>
-      </tr>
-      <tr>
-        <td>Lagringstillegg</td>
-        <td>4</td>
-        <td>120,00 kr</td>
-        <td>480,00 kr</td>
-      </tr>
-      <tr>
-        <td>Opplæringsplasser</td>
-        <td>3</td>
-        <td>180,00 kr</td>
-        <td>540,00 kr</td>
-      </tr>
-    </tbody>
-  </table>
-</basic-summary-table>
+- Core custom elements (`basic-alert`, `basic-accordion`, `basic-carousel`, `basic-summary-table`, `basic-table`, `basic-tabs`, `basic-toc`, `basic-toast`): <baseline-status featureId="autonomous-custom-elements"></baseline-status> ([Autonomous custom elements](https://web-platform-dx.github.io/web-features-explorer/features/autonomous-custom-elements/))
+- `basic-dialog` modal behavior: <baseline-status featureId="dialog"></baseline-status> ([`<dialog>`](https://web-platform-dx.github.io/web-features-explorer/features/dialog/))
+- `basic-popover` overlays and `basic-toast` top-layer placement: <baseline-status featureId="popover"></baseline-status> ([Popover](https://web-platform-dx.github.io/web-features-explorer/features/popover/))
+- `basic-carousel` scroll-snap foundation: <baseline-status featureId="scroll-snap"></baseline-status> ([Scroll snap](https://web-platform-dx.github.io/web-features-explorer/features/scroll-snap/))
+- `basic-carousel` native marker and arrow controls: <baseline-status featureId="scroll-markers"></baseline-status> <baseline-status featureId="scroll-buttons"></baseline-status> ([Scroll markers](https://web-platform-dx.github.io/web-features-explorer/features/scroll-markers/), [`::scroll-button`](https://web-platform-dx.github.io/web-features-explorer/features/scroll-buttons/))
+- Starter CSS color and selector baseline: <baseline-status featureId="nesting"></baseline-status> <baseline-status featureId="has"></baseline-status> <baseline-status featureId="light-dark"></baseline-status> <baseline-status featureId="oklab"></baseline-status> ([Nesting](https://web-platform-dx.github.io/web-features-explorer/features/nesting/), [`:has()`](https://web-platform-dx.github.io/web-features-explorer/features/has/), [`light-dark()`](https://web-platform-dx.github.io/web-features-explorer/features/light-dark/), [Oklab and OkLCh](https://web-platform-dx.github.io/web-features-explorer/features/oklab/))
+- Shared interaction state layer and other style-query-driven refinements: <baseline-status featureId="container-style-queries"></baseline-status> ([Container style queries](https://web-platform-dx.github.io/web-features-explorer/features/container-style-queries/))
 
-<script type="module">
-  import "@lmfaole/basics/basic-components/basic-summary-table/register";
-</script>
+## Storybook
+
+```sh
+pnpm storybook
 ```
 
-The element upgrades a calculation-heavy table with an automatically maintained totals row in `<tfoot>`.
-
-### Attributes
-
-- `data-caption`: generates a visible `<caption>` when the wrapped table does not already define one.
-- `data-description`: generates hidden helper text and connects it with `aria-describedby`.
-- `data-label`: sets a fallback accessible name when the table has no caption, `aria-label`, or `aria-labelledby`. Defaults to `Tabell`.
-- `data-row-headers`: enables generated row headers in body rows.
-- `data-row-header-column`: sets which one-based body column should become the generated row header. Defaults to `1`.
-- `data-summary-columns`: chooses which one-based columns should be totalled in the generated footer row. If omitted, numeric body columns are inferred automatically.
-- `data-total-label`: sets the footer row label. Defaults to `Totalt`.
-- `data-locale`: passes a locale through to `Intl.NumberFormat` for generated footer totals.
-
-### Behavior
-
-- Inherits caption, description, row-header, and `headers` association behavior from `basic-table`.
-- Parses numbers from cell text and supports raw calculation values through `data-value` on individual body cells.
-- Generates or updates a totals row in `<tfoot>` without requiring consumers to author the footer manually.
-- Preserves a consistent displayed unit or currency affix such as `kr`, `%`, or `t` in generated footer totals.
-- Recalculates totals automatically when body rows or `data-value` attributes change.
-
-### Markup Contract
-
-- Provide one descendant `<table>` with line items in `<tbody>`.
-- Prefer a label column such as `Post` or `Kategori` and enable `data-row-headers` so each line item remains easy to navigate.
-- Use `data-value` on cells when the displayed text is formatted differently from the numeric value you want summed.
-- Keep layout and styling outside the package; the component only manages semantics, totals, and footer structure.
-
-## Basic Toc
-
-```html
-<basic-toc data-title="Innhold">
-  <nav aria-label="Innhold" data-page-toc-nav></nav>
-</basic-toc>
-
-<script type="module">
-  import "@lmfaole/basics/basic-components/basic-toc/register";
-</script>
+```sh
+pnpm build-storybook
 ```
 
-The element reads headings from the nearest `<main>` and updates automatically when that content changes.
+Storybook now focuses on package documentation pages such as the readme, changelog, contributing guide, security policy, and palette tokens.
 
-### Attributes
+## More Docs
 
-- `data-title`: sets the generated nav's accessible label. Defaults to `Innhold`.
-- `data-heading-selector`: limits which headings are indexed. Defaults to `h1, h2, h3, h4, h5, h6`.
-
-### Behavior
-
-- Missing heading ids are generated automatically.
-- Duplicate headings receive unique fragment ids.
-- Hidden headings are ignored.
-- The outline is rebuilt when matching headings are added or changed.
-
-### Markup Contract
-
-- Render the element inside the same `<main>` that contains the content it should index.
-- Provide a descendant element with `data-page-toc-nav` for the generated links.
-- Keep layout and styling outside the package; the component only manages structure and link generation.
+- [CHANGELOG.md](./CHANGELOG.md)
+- [CONTRIBUTING.md](./CONTRIBUTING.md)
+- [SECURITY.md](./SECURITY.md)

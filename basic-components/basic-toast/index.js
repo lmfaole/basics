@@ -11,9 +11,36 @@ const PANEL_SELECTOR = "[data-toast-panel]";
 const TITLE_SELECTOR = "[data-toast-title]";
 const OPEN_SELECTOR = "[data-toast-open]";
 const CLOSE_SELECTOR = "[data-toast-close]";
+const ANNOUNCER_ATTRIBUTE = "data-basic-toast-announcer";
 const MANAGED_LABEL_ATTRIBUTE = "data-basic-toast-managed-label";
 const MANAGED_LABELLEDBY_ATTRIBUTE = "data-basic-toast-managed-labelledby";
 const MANAGED_POPOVER_ATTRIBUTE = "data-basic-toast-managed-popover";
+const INTERACTIVE_PANEL_SELECTOR = [
+    "a[href]",
+    "area[href]",
+    "button",
+    "input",
+    "select",
+    "textarea",
+    "summary",
+    "iframe",
+    "audio[controls]",
+    "video[controls]",
+    "[contenteditable]:not([contenteditable=\"false\"])",
+    "[tabindex]:not([tabindex=\"-1\"])",
+].join(", ");
+const VISUALLY_HIDDEN_ANNOUNCER_STYLE = [
+    "position:absolute",
+    "inline-size:1px",
+    "block-size:1px",
+    "margin:-1px",
+    "padding:0",
+    "overflow:hidden",
+    "clip:rect(0 0 0 0)",
+    "clip-path:inset(50%)",
+    "white-space:nowrap",
+    "border:0",
+].join(";");
 
 let nextToastInstanceId = 1;
 
@@ -39,6 +66,98 @@ function isToastPanelOpen(panel) {
     } catch {
         return panel.hasAttribute("data-open") || !panel.hidden;
     }
+}
+
+function normalizeToastText(value) {
+    return value?.replace(/\s+/g, " ").trim() || "";
+}
+
+function getToastTextFromIdRefs(ownerDocument, value) {
+    if (!ownerDocument || !value) {
+        return "";
+    }
+
+    return value
+        .split(/\s+/)
+        .map((id) => normalizeToastText(ownerDocument.getElementById(id)?.textContent))
+        .filter(Boolean)
+        .join(" ");
+}
+
+function getToastAccessibleName(panel, title) {
+    if (!(panel instanceof HTMLElementBase)) {
+        return { includesTitle: false, text: "" };
+    }
+
+    const labelledBy = panel.getAttribute("aria-labelledby");
+
+    if (labelledBy) {
+        const ids = labelledBy.split(/\s+/).filter(Boolean);
+
+        return {
+            includesTitle: title instanceof HTMLElementBase && !!title.id && ids.includes(title.id),
+            text: getToastTextFromIdRefs(panel.ownerDocument, labelledBy),
+        };
+    }
+
+    const label = normalizeToastText(panel.getAttribute("aria-label"));
+
+    if (label) {
+        return { includesTitle: false, text: label };
+    }
+
+    if (title instanceof HTMLElementBase) {
+        return { includesTitle: true, text: normalizeToastText(title.textContent) };
+    }
+
+    return { includesTitle: false, text: "" };
+}
+
+function getToastBodyText(panel, excludeTitle = false) {
+    if (!(panel instanceof HTMLElementBase)) {
+        return "";
+    }
+
+    if (!excludeTitle) {
+        return normalizeToastText(panel.textContent);
+    }
+
+    const panelClone = panel.cloneNode(true);
+
+    if (!(panelClone instanceof HTMLElementBase)) {
+        return normalizeToastText(panel.textContent);
+    }
+
+    for (const title of panelClone.querySelectorAll(TITLE_SELECTOR)) {
+        title.remove();
+    }
+
+    return normalizeToastText(panelClone.textContent);
+}
+
+function getToastAnnouncementText(panel, title) {
+    const { includesTitle, text: name } = getToastAccessibleName(panel, title);
+    const body = getToastBodyText(panel, includesTitle);
+
+    if (!name) {
+        return body;
+    }
+
+    if (!body || body === name || body.startsWith(`${name} `) || body.startsWith(`${name}.`)) {
+        return name;
+    }
+
+    return `${name}. ${body}`;
+}
+
+function findInteractiveToastDescendants(panel) {
+    if (!(panel instanceof HTMLElementBase)) {
+        return [];
+    }
+
+    return Array.from(panel.querySelectorAll(INTERACTIVE_PANEL_SELECTOR)).filter(
+        (element) => element instanceof HTMLElementBase && !element.hidden,
+    );
 }
 
 export function normalizeToastLabel(value) {
@@ -88,6 +207,10 @@ export class ToastElement extends HTMLElementBase {
     #closeButtons = [];
     #restoreFocusTo = null;
     #dismissTimer = 0;
+    #announcementTimer = 0;
+    #announcer = null;
+    #open = false;
+    #hasWarnedAboutInteractiveContent = false;
     #eventsBound = false;
 
     connectedCallback() {
@@ -110,6 +233,7 @@ export class ToastElement extends HTMLElementBase {
         this.#eventsBound = false;
         this.#syncPanelEvents(null);
         this.#clearDismissTimer();
+        this.#clearAnnouncement();
     }
 
     attributeChangedCallback() {
@@ -223,6 +347,34 @@ export class ToastElement extends HTMLElementBase {
         this.#applyState();
     }
 
+    #ensureAnnouncer() {
+        if (this.#announcer instanceof HTMLElementBase && this.#announcer.isConnected) {
+            this.#announcer.setAttribute("style", VISUALLY_HIDDEN_ANNOUNCER_STYLE);
+            return this.#announcer;
+        }
+
+        const existingAnnouncer = Array.from(this.children).find(
+            (element) => element instanceof HTMLElementBase && element.hasAttribute(ANNOUNCER_ATTRIBUTE),
+        );
+
+        if (existingAnnouncer instanceof HTMLElementBase) {
+            existingAnnouncer.setAttribute("style", VISUALLY_HIDDEN_ANNOUNCER_STYLE);
+            this.#announcer = existingAnnouncer;
+            return existingAnnouncer;
+        }
+
+        if (!this.ownerDocument?.createElement) {
+            return null;
+        }
+
+        const announcer = this.ownerDocument.createElement("div");
+        announcer.setAttribute(ANNOUNCER_ATTRIBUTE, "");
+        announcer.setAttribute("style", VISUALLY_HIDDEN_ANNOUNCER_STYLE);
+        this.append(announcer);
+        this.#announcer = announcer;
+        return announcer;
+    }
+
     #syncPanelEvents(nextPanel) {
         if (this.#panelWithEvents === nextPanel) {
             return;
@@ -264,6 +416,7 @@ export class ToastElement extends HTMLElementBase {
 
         if (!(this.#panel instanceof HTMLElementBase)) {
             this.#clearDismissTimer();
+            this.#clearAnnouncement();
             return;
         }
 
@@ -273,11 +426,13 @@ export class ToastElement extends HTMLElementBase {
             this.#title.id = `${baseId}-title`;
         }
 
-        this.#panel.setAttribute("role", getToastRoleForLive(this.getAttribute("data-live")));
-        this.#panel.setAttribute("aria-live", normalizeToastLive(this.getAttribute("data-live")));
-        this.#panel.setAttribute("aria-atomic", "true");
+        this.#panel.setAttribute("role", "group");
+        this.#panel.removeAttribute("aria-live");
+        this.#panel.removeAttribute("aria-atomic");
         this.#syncAccessibleLabel();
         this.#syncPopoverState();
+        this.#syncAnnouncerState();
+        this.#warnOnInteractiveContent();
         this.#syncOpenState();
     }
 
@@ -309,6 +464,15 @@ export class ToastElement extends HTMLElementBase {
         this.#dismissTimer = 0;
     }
 
+    #clearAnnouncementTimer() {
+        if (this.#announcementTimer === 0 || typeof window === "undefined") {
+            return;
+        }
+
+        window.clearTimeout(this.#announcementTimer);
+        this.#announcementTimer = 0;
+    }
+
     #syncPopoverState() {
         if (!(this.#panel instanceof HTMLElementBase) || !supportsToastPopover(this.#panel)) {
             return;
@@ -323,6 +487,7 @@ export class ToastElement extends HTMLElementBase {
     #syncOpenState() {
         if (!(this.#panel instanceof HTMLElementBase)) {
             this.#clearDismissTimer();
+            this.#clearAnnouncement();
             return;
         }
 
@@ -350,21 +515,29 @@ export class ToastElement extends HTMLElementBase {
     #syncStateFromPanel() {
         if (!(this.#panel instanceof HTMLElementBase)) {
             this.#clearDismissTimer();
+            this.#clearAnnouncement();
             return;
         }
 
+        const wasOpen = this.#open;
         const open = supportsToastPopover(this.#panel)
             ? isToastPanelOpen(this.#panel)
             : !this.#panel.hidden;
 
+        this.#open = open;
         this.#panel.hidden = !open;
         this.#panel.toggleAttribute("data-open", open);
         this.toggleAttribute("data-open", open);
 
         if (open) {
+            this.#syncAnnouncerState();
             this.#scheduleDismiss();
+            if (!wasOpen) {
+                this.#announce();
+            }
         } else {
             this.#clearDismissTimer();
+            this.#clearAnnouncement();
         }
     }
 
@@ -413,6 +586,94 @@ export class ToastElement extends HTMLElementBase {
 
         this.#panel.setAttribute("aria-label", nextLabel);
         this.#panel.setAttribute(MANAGED_LABEL_ATTRIBUTE, "");
+    }
+
+    #syncAnnouncerState() {
+        if (!this.#open) {
+            if (this.#announcer instanceof HTMLElementBase) {
+                this.#announcer.textContent = "";
+                this.#announcer.removeAttribute("role");
+                this.#announcer.removeAttribute("aria-live");
+                this.#announcer.removeAttribute("aria-atomic");
+                this.#announcer.removeAttribute("aria-relevant");
+            }
+            return;
+        }
+
+        const announcer = this.#ensureAnnouncer();
+
+        if (!(announcer instanceof HTMLElementBase)) {
+            return;
+        }
+
+        announcer.setAttribute("role", getToastRoleForLive(this.getAttribute("data-live")));
+        announcer.setAttribute("aria-live", normalizeToastLive(this.getAttribute("data-live")));
+        announcer.setAttribute("aria-atomic", "true");
+        announcer.setAttribute("aria-relevant", "additions text");
+    }
+
+    #clearAnnouncement() {
+        this.#clearAnnouncementTimer();
+        this.#open = false;
+
+        if (!(this.#announcer instanceof HTMLElementBase)) {
+            return;
+        }
+
+        this.#announcer.textContent = "";
+        this.#announcer.removeAttribute("role");
+        this.#announcer.removeAttribute("aria-live");
+        this.#announcer.removeAttribute("aria-atomic");
+        this.#announcer.removeAttribute("aria-relevant");
+    }
+
+    #announce() {
+        const announcement = getToastAnnouncementText(this.#panel, this.#title);
+        const announcer = this.#ensureAnnouncer();
+
+        if (!announcement || !(announcer instanceof HTMLElementBase)) {
+            return;
+        }
+
+        this.#clearAnnouncementTimer();
+        this.#syncAnnouncerState();
+        announcer.textContent = "";
+
+        if (typeof window === "undefined") {
+            announcer.textContent = announcement;
+            return;
+        }
+
+        this.#announcementTimer = window.setTimeout(() => {
+            this.#announcementTimer = 0;
+
+            if (!this.#open || !(this.#announcer instanceof HTMLElementBase)) {
+                return;
+            }
+
+            this.#announcer.textContent = announcement;
+        }, 0);
+    }
+
+    #warnOnInteractiveContent() {
+        if (
+            this.#hasWarnedAboutInteractiveContent
+            || !(this.#panel instanceof HTMLElementBase)
+            || typeof globalThis.console?.warn !== "function"
+        ) {
+            return;
+        }
+
+        if (findInteractiveToastDescendants(this.#panel).length === 0) {
+            return;
+        }
+
+        this.#hasWarnedAboutInteractiveContent = true;
+        globalThis.console.warn(
+            "basic-toast panels should only contain non-interactive message content. "
+            + "Move links, buttons, and other focusable controls outside [data-toast-panel], "
+            + "or use a more appropriate pattern such as basic-alert or basic-dialog.",
+        );
     }
 }
 

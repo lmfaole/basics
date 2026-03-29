@@ -7,6 +7,8 @@ basic-popover {
 
 basic-popover [data-popover-open],
 basic-popover [data-popover-close] {
+    --basic-interaction-surface-selected: var(--basic-color-surface-muted);
+    --basic-interaction-border-selected: var(--basic-color-border);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -17,10 +19,6 @@ basic-popover [data-popover-close] {
     background: var(--basic-color-surface);
     color: inherit;
     cursor: pointer;
-}
-
-basic-popover [data-popover-open][aria-expanded="true"] {
-    background: var(--basic-color-surface-muted);
 }
 
 basic-popover [data-popover-panel] {

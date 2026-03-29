@@ -2,6 +2,8 @@ import type { Preview } from "@storybook/web-components-vite";
 import basicStylingCss from "../basic-styling/index.css?inline";
 
 const STARTER_STYLING_STYLE_ID = "basic-styling-storybook-preview";
+const BASELINE_STATUS_SCRIPT_ID = "baseline-status-storybook-preview";
+const BASELINE_STATUS_SCRIPT_SRC = "https://cdn.jsdelivr.net/npm/baseline-status@1/baseline-status.min.js";
 
 function syncStarterStyling(mode: string) {
     if (typeof document === "undefined") {
@@ -59,13 +61,29 @@ function syncPreviewPalette(mode: string) {
     document.documentElement.dataset.basicPalette = mode;
 }
 
+function ensureBaselineStatusWidget(shouldLoad: boolean) {
+    if (typeof document === "undefined" || !shouldLoad) {
+        return;
+    }
+
+    if (document.getElementById(BASELINE_STATUS_SCRIPT_ID)) {
+        return;
+    }
+
+    const script = document.createElement("script");
+    script.id = BASELINE_STATUS_SCRIPT_ID;
+    script.src = BASELINE_STATUS_SCRIPT_SRC;
+    script.type = "module";
+    document.head.append(script);
+}
+
 const preview: Preview = {
     tags: ["autodocs"],
     globalTypes: {
         starterStyling: {
             name: "Styling",
             description: "Toggle the optional basic-styling starter CSS for all stories.",
-            defaultValue: "off",
+            defaultValue: "on",
             toolbar: {
                 title: "Styling",
                 icon: "paintbrush",
@@ -108,11 +126,15 @@ const preview: Preview = {
             },
         },
     },
+    initialGlobals: {
+        starterStyling: "on",
+    },
     decorators: [
         (story, context) => {
             syncStarterStyling(String(context.globals.starterStyling ?? "off"));
             syncPreviewTheme(String(context.globals.starterTheme ?? "light"));
             syncPreviewPalette(String(context.globals.starterPalette ?? "slate"));
+            ensureBaselineStatusWidget(context.title === "Overview/Readme");
             return story();
         },
     ],
@@ -130,6 +152,9 @@ const preview: Preview = {
         },
         docs: {
             codePanel: true,
+            toc: {
+                headingSelector: "h1, h2, h3",
+            },
             source: {
                 language: "html",
                 state: "open",
@@ -140,33 +165,12 @@ const preview: Preview = {
             storySort: {
                 order: [
                     "Overview",
-                    ["Readme", "Palette Tokens"],
-                    "Techniques",
-                    ["Color"],
-                    "Components",
-                    [
-                        "Accordion",
-                        "Alert",
-                        "Dialog",
-                        "Popover",
-                        "Tabs",
-                        "Table of Contents",
-                        "Table",
-                        "Summary Table",
-                        "Toast",
-                    ],
-                    "Testing",
-                    [
-                        "Accordion",
-                        "Alert",
-                        "Dialog",
-                        "Popover",
-                        "Tabs",
-                        "Table of Contents",
-                        "Table",
-                        "Summary Table",
-                        "Toast",
-                    ],
+                    ["Readme", "Changelog", "Contributing", "Security", "Palette Tokens"],
+                    "Custom Elements",
+                    "Native Elements",
+                    ["Color", "Forms"],
+                    "Pages",
+                    ["Complete Form"],
                     "*",
                 ],
             },

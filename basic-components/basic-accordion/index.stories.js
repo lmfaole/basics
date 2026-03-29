@@ -21,7 +21,7 @@ const ACCORDION_ITEMS = [
     },
     {
         label: "Tilgjengelighet",
-        body: "Triggerne får stabile aria-koblinger, og tastaturnavigasjonen holder seg på knappene.",
+        body: "Triggerne beholder native details-semantikk, mens komponenten normaliserer åpen tilstand.",
     },
 ];
 
@@ -50,16 +50,16 @@ function createStory({
     for (const [index, item] of ACCORDION_ITEMS.entries()) {
         const details = document.createElement("details");
         const summary = document.createElement("summary");
+        const paragraph = document.createElement("p");
+
         summary.textContent = item.label;
+        paragraph.textContent = item.body;
 
         if (openStates[index]) {
             details.open = true;
         }
 
-        const paragraph = document.createElement("p");
-        paragraph.textContent = item.body;
         details.append(summary, paragraph);
-
         accordion.append(details);
     }
 
@@ -67,7 +67,7 @@ function createStory({
 }
 
 export default {
-    title: "Components/Accordion",
+    title: "Custom Elements/Accordion",
     tags: ["accordion", "details", "disclosure", "expand-collapse", "basic-accordion"],
     parameters: {
         layout: "fullscreen",
@@ -162,7 +162,7 @@ export const Semantics = {
     parameters: {
         docs: {
             description: {
-                story: "Semantics test proving that the accordion preserves native `details` markup while normalizing initial single-open state.",
+                story: "Proves that the accordion keeps native `details` markup while normalizing initial single-open state.",
             },
         },
     },
@@ -192,7 +192,7 @@ export const Collapsible = {
     parameters: {
         docs: {
             description: {
-                story: "Interaction test proving that single mode can close its last open item when `data-collapsible` is set.",
+                story: "Shows that single-open mode can close its last open item when `data-collapsible` is set.",
             },
         },
     },
@@ -221,7 +221,7 @@ export const MultipleOpen = {
     parameters: {
         docs: {
             description: {
-                story: "Semantics test proving that `data-multiple` allows more than one `details` item to stay open.",
+                story: "Shows that `data-multiple` allows more than one `details` item to stay open.",
             },
         },
     },

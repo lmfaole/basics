@@ -1,6 +1,8 @@
 import "./register.js";
 import { expect, waitFor, within } from "storybook/test";
 
+const SEPARATOR_OPTIONS = ["rows", "columns", "both"];
+
 /**
  * @typedef {object} SummaryTableStoryArgs
  * @property {string} caption Generated caption inserted when the table does not provide one.
@@ -8,6 +10,8 @@ import { expect, waitFor, within } from "storybook/test";
  * @property {string} summaryColumns Comma-separated one-based columns that should be totalled.
  * @property {string} totalLabel Label used for the generated footer row.
  * @property {string} locale Locale passed to `Intl.NumberFormat`.
+ * @property {boolean} zebra Applies alternating row backgrounds when the optional starter styling is enabled.
+ * @property {"rows" | "columns" | "both"} separators Controls whether starter styling draws separators between rows, columns, or both.
  * @property {boolean} useDataValues Uses formatted display values backed by raw `data-value` attributes.
  */
 
@@ -20,17 +24,23 @@ function createStory({
     summaryColumns,
     totalLabel,
     locale,
+    zebra,
+    separators,
     useDataValues,
 }) {
-    const wrapper = document.createElement("div");
-
     const root = document.createElement("basic-summary-table");
-    root.dataset.caption = caption;
     root.dataset.rowHeaders = "true";
-    root.dataset.summaryColumns = summaryColumns;
+
+    if (caption) {
+        root.dataset.caption = caption;
+    }
 
     if (description) {
         root.dataset.description = description;
+    }
+
+    if (summaryColumns) {
+        root.dataset.summaryColumns = summaryColumns;
     }
 
     if (totalLabel) {
@@ -41,91 +51,110 @@ function createStory({
         root.dataset.locale = locale;
     }
 
-    const table = document.createElement("table");
+    if (zebra) {
+        root.dataset.zebra = "";
+    }
 
+    root.dataset.separators = separators;
+
+    const table = document.createElement("table");
     table.innerHTML = useDataValues
         ? `
             <thead>
               <tr>
-                <th scope="col">Post</th>
-                <th scope="col">Timer</th>
-                <th scope="col">Beløp</th>
+                <th scope="col">Item</th>
+                <th scope="col">Hours</th>
+                <th scope="col">Amount</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Rådgivning</td>
-                <td data-value="8.5">8,5 t</td>
+                <td>Consulting</td>
+                <td data-value="8.5">8,5 h</td>
                 <td data-value="1250.50">1 250,50 kr</td>
               </tr>
               <tr>
-                <td>Implementering</td>
-                <td data-value="14.25">14,25 t</td>
+                <td>Implementation</td>
+                <td data-value="14.25">14,25 h</td>
                 <td data-value="2140.00">2 140,00 kr</td>
               </tr>
               <tr>
                 <td>QA</td>
-                <td data-value="6.75">6,75 t</td>
+                <td data-value="6.75">6,75 h</td>
                 <td data-value="810.00">810,00 kr</td>
               </tr>
               <tr>
                 <td>Support</td>
-                <td data-value="3.25">3,25 t</td>
+                <td data-value="3.25">3,25 h</td>
                 <td data-value="420.00">420,00 kr</td>
+              </tr>
+              <tr>
+                <td>Research</td>
+                <td data-value="4.5">4,5 h</td>
+                <td data-value="560.00">560,00 kr</td>
+              </tr>
+              <tr>
+                <td>Rollout</td>
+                <td data-value="2.0">2,0 h</td>
+                <td data-value="300.00">300,00 kr</td>
               </tr>
             </tbody>
         `
         : `
             <thead>
               <tr>
-                <th scope="col">Post</th>
-                <th scope="col">Antall</th>
-                <th scope="col">Enhetspris</th>
-                <th scope="col">Beløp</th>
+                <th scope="col">Item</th>
+                <th scope="col">Count</th>
+                <th scope="col">Unit price</th>
+                <th scope="col">Amount</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Basisabonnement</td>
+                <td>Base subscription</td>
                 <td>12</td>
                 <td>49,00 kr</td>
                 <td>588,00 kr</td>
               </tr>
               <tr>
-                <td>Supportavtale</td>
+                <td>Support contract</td>
                 <td>1</td>
                 <td>299,00 kr</td>
                 <td>299,00 kr</td>
               </tr>
               <tr>
-                <td>Lagringstillegg</td>
+                <td>Storage add-on</td>
                 <td>4</td>
                 <td>120,00 kr</td>
                 <td>480,00 kr</td>
               </tr>
               <tr>
-                <td>Opplæringsplasser</td>
+                <td>Training seats</td>
                 <td>3</td>
                 <td>180,00 kr</td>
                 <td>540,00 kr</td>
               </tr>
               <tr>
-                <td>Levering</td>
+                <td>Delivery</td>
                 <td>1</td>
                 <td>95,00 kr</td>
                 <td>95,00 kr</td>
+              </tr>
+              <tr>
+                <td>Priority support</td>
+                <td>2</td>
+                <td>225,00 kr</td>
+                <td>450,00 kr</td>
               </tr>
             </tbody>
         `;
 
     root.append(table);
-    wrapper.append(root);
-
-    return wrapper;
+    return root;
 }
 
 export default {
-    title: "Components/Summary Table",
+    title: "Custom Elements/Summary Table",
     tags: ["summary-table", "table", "totals", "data-display", "basic-summary-table"],
     parameters: {
         layout: "fullscreen",
@@ -139,52 +168,39 @@ Use it when you want a regular semantic table plus an automatically maintained t
 - provide one descendant \`<table>\` with line items in \`<tbody>\`
 - set \`data-summary-columns\` when you want explicit control over which one-based columns are totalled
 - optionally set \`data-total-label\`, \`data-locale\`, and \`data-description\`
-
-The component inherits the accessible naming and row-header behavior from \`basic-table\`, parses numeric values from cell text or \`data-value\`, and keeps a generated footer row in sync with the body rows.
+- optionally add \`data-zebra\` when you use \`basic-styling\` and want alternating body-row backgrounds
+- optionally set \`data-separators="rows" | "columns" | "both"\` when you use \`basic-styling\` and want to control interior dividers
                 `,
             },
             source: {
-                code: `<basic-summary-table
-  data-caption="Månedlig kostnadsoversikt"
-  data-description="Viser antall og summerte beløp for faste kostnader."
-  data-row-headers
-  data-summary-columns="2,4"
-  data-total-label="Totalt"
-  data-locale="nb-NO"
->
+                code: `<basic-summary-table data-caption="Monthly costs" data-row-headers data-summary-columns="2,4" data-separators="rows">
   <table>
     <thead>
       <tr>
-        <th>Post</th>
-        <th>Antall</th>
-        <th>Enhetspris</th>
-        <th>Beløp</th>
+        <th>Item</th>
+        <th>Count</th>
+        <th>Unit price</th>
+        <th>Amount</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>Basisabonnement</td>
+        <td>Base subscription</td>
         <td>12</td>
         <td>49,00 kr</td>
         <td>588,00 kr</td>
       </tr>
       <tr>
-        <td>Supportavtale</td>
+        <td>Support contract</td>
         <td>1</td>
         <td>299,00 kr</td>
         <td>299,00 kr</td>
       </tr>
       <tr>
-        <td>Lagringstillegg</td>
+        <td>Storage add-on</td>
         <td>4</td>
         <td>120,00 kr</td>
         <td>480,00 kr</td>
-      </tr>
-      <tr>
-        <td>Opplæringsplasser</td>
-        <td>3</td>
-        <td>180,00 kr</td>
-        <td>540,00 kr</td>
       </tr>
     </tbody>
   </table>
@@ -194,11 +210,13 @@ The component inherits the accessible naming and row-header behavior from \`basi
     },
     render: createStory,
     args: {
-        caption: "Månedlig kostnadsoversikt",
+        caption: "Monthly costs",
         description: "",
         summaryColumns: "2,4",
-        totalLabel: "Totalt",
+        totalLabel: "Total",
         locale: "nb-NO",
+        zebra: false,
+        separators: "rows",
         useDataValues: false,
     },
     argTypes: {
@@ -207,29 +225,20 @@ The component inherits the accessible naming and row-header behavior from \`basi
             description: "Maps to `data-caption` and generates a visible caption when the table does not already define one.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "none",
-                },
             },
         },
         description: {
             control: "text",
-            description: "Maps to `data-description` and generates hidden helper text connected through `aria-describedby`.",
+            description: "Maps to `data-description` and generates helper text connected through `aria-describedby`.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "none",
-                },
             },
         },
         summaryColumns: {
             control: "text",
-            description: "Maps to `data-summary-columns` and selects which one-based columns are totalled in the footer.",
+            description: "Maps to `data-summary-columns` and selects which one-based columns are totalled.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "infer numeric columns",
-                },
             },
         },
         totalLabel: {
@@ -237,9 +246,6 @@ The component inherits the accessible naming and row-header behavior from \`basi
             description: "Maps to `data-total-label` and becomes the footer row label.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "Totalt",
-                },
             },
         },
         locale: {
@@ -247,70 +253,124 @@ The component inherits the accessible naming and row-header behavior from \`basi
             description: "Maps to `data-locale` and controls `Intl.NumberFormat` output in the footer.",
             table: {
                 category: "Attributes",
-                defaultValue: {
-                    summary: "browser default",
-                },
+            },
+        },
+        zebra: {
+            control: "boolean",
+            description: "Starter styling hook that adds alternating body-row backgrounds when `basic-styling` is enabled.",
+            table: {
+                category: "Starter Styling",
+            },
+        },
+        separators: {
+            control: "inline-radio",
+            options: SEPARATOR_OPTIONS,
+            description: "Starter styling hook that controls whether interior separators appear between rows, columns, or both.",
+            table: {
+                category: "Starter Styling",
             },
         },
         useDataValues: {
             control: "boolean",
-            description: "Story-only toggle that uses formatted currency text backed by raw `data-value` attributes.",
+            description: "Story-only toggle that uses formatted cell text backed by raw `data-value` attributes.",
             table: {
                 category: "Story Controls",
-                defaultValue: {
-                    summary: "false",
-                },
             },
         },
     },
 };
 
-export const Default = {
-    parameters: {
-        docs: {
-            description: {
-                story: "Configurable summary table example with Norwegian defaults, kroner-formatted values, and generated totals.",
-            },
-        },
-    },
-};
+export const Default = {};
 
 export const UsesDataValueOverrides = {
     args: {
-        caption: "Fakturagrunnlag",
-        description: "Viser summerte timer og beløp med formatterte visningsverdier.",
-        locale: "nb-NO",
+        caption: "Invoice basis",
+        description: "Shows summed hours and totals while the body keeps its own formatting.",
         summaryColumns: "2,3",
-        totalLabel: "Totalt",
+        totalLabel: "Total",
         useDataValues: true,
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: "Accessibility test proving that footer totals can be calculated from raw `data-value` attributes while the body cells remain independently formatted.",
-            },
-        },
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
 
         await waitFor(() => {
-            const table = canvas.getByRole("table", { name: "Fakturagrunnlag" });
+            const table = canvas.getByRole("table", { name: "Invoice basis" });
             const footerRow = table.tFoot?.rows[0];
-            const totalRowHeader = within(table).getByRole("rowheader", { name: "Totalt" });
-            const costHeader = within(table).getByRole("columnheader", { name: "Beløp" });
+            const totalRowHeader = within(table).getByRole("rowheader", { name: "Total" });
+            const amountHeader = within(table).getByRole("columnheader", { name: "Amount" });
             const hoursTotal = footerRow?.cells[1];
-            const costTotal = footerRow?.cells[2];
+            const amountTotal = footerRow?.cells[2];
             const description = canvasElement.querySelector("[data-basic-table-generated-description]");
-            const costHeaderIds = costTotal?.getAttribute("headers")?.split(/\s+/) ?? [];
+            const amountHeaderIds = amountTotal?.getAttribute("headers")?.split(/\s+/) ?? [];
 
-            expect(hoursTotal).toHaveTextContent("32,75 t");
-            expect(costTotal?.textContent ?? "").toMatch(/4(?:\s|\u00a0)620,50 kr/);
-            expect(costTotal.getAttribute("data-value")).toBe("4620.5");
-            expect(description).toHaveTextContent("Viser summerte timer og beløp med formatterte visningsverdier.");
-            expect(description).toHaveAttribute("hidden");
+            expect(hoursTotal).toHaveTextContent("39,25 h");
+            expect(amountTotal?.textContent ?? "").toMatch(/5(?:\s|\u00a0)480,50 kr/);
+            expect(amountTotal?.getAttribute("data-value")).toBe("5480.5");
+            expect(description).toHaveTextContent("Shows summed hours and totals while the body keeps its own formatting.");
             expect(table.getAttribute("aria-describedby")).toContain(description.id);
-            expect(costHeaderIds).toEqual(expect.arrayContaining([totalRowHeader.id, costHeader.id]));
+            expect(amountHeaderIds).toEqual(expect.arrayContaining([totalRowHeader.id, amountHeader.id]));
+        });
+    },
+};
+
+export const ZebraStripes = {
+    args: {
+        zebra: true,
+    },
+    globals: {
+        starterTheme: "light",
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Enable `data-zebra` when you use the optional starter styling and want alternating body-row backgrounds without affecting the generated footer row.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        const bodyRows = canvasElement.querySelectorAll("tbody tr");
+        const footerRow = canvasElement.querySelector("tfoot tr");
+
+        await waitFor(() => {
+            const firstRowBackground = getComputedStyle(bodyRows[0].cells[0]).backgroundColor;
+            const secondRowBackground = getComputedStyle(bodyRows[1].cells[0]).backgroundColor;
+            const fourthRowBackground = getComputedStyle(bodyRows[3].cells[0]).backgroundColor;
+            const footerBackground = getComputedStyle(footerRow.cells[0]).backgroundColor;
+
+            expect(bodyRows).toHaveLength(6);
+            expect(firstRowBackground).not.toBe(secondRowBackground);
+            expect(secondRowBackground).toBe(fourthRowBackground);
+            expect(footerBackground).not.toBe(secondRowBackground);
+        });
+    },
+};
+
+export const BothSeparators = {
+    args: {
+        separators: "both",
+    },
+    globals: {
+        starterTheme: "light",
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Set `data-separators=\"both\"` when the starter styling should draw both row and column dividers, including the summary section split.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        const firstBodyRow = canvasElement.querySelector("tbody tr");
+        const firstCell = firstBodyRow.cells[0];
+        const footerRow = canvasElement.querySelector("tfoot tr");
+
+        await waitFor(() => {
+            const firstCellStyles = getComputedStyle(firstCell);
+            const footerFirstCellStyles = getComputedStyle(footerRow.cells[0]);
+
+            expect(firstCellStyles.getPropertyValue("border-inline-end-width")).toBe("1px");
+            expect(firstCellStyles.getPropertyValue("border-block-end-width")).toBe("1px");
+            expect(footerFirstCellStyles.getPropertyValue("border-block-start-width")).toBe("2px");
         });
     },
 };

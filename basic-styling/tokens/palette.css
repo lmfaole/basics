@@ -58,6 +58,46 @@
         var(--basic-palette-accent-dark) 18%,
         var(--basic-palette-surface-dark)
     );
+    --basic-palette-surface-hover-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 12%,
+        var(--basic-palette-surface-light)
+    );
+    --basic-palette-surface-hover-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 20%,
+        var(--basic-palette-surface-dark)
+    );
+    --basic-palette-surface-active-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 16%,
+        var(--basic-palette-surface-light)
+    );
+    --basic-palette-surface-active-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 26%,
+        var(--basic-palette-surface-dark)
+    );
+    --basic-palette-surface-selected-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 14%,
+        var(--basic-palette-surface-light)
+    );
+    --basic-palette-surface-selected-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 24%,
+        var(--basic-palette-surface-dark)
+    );
+    --basic-palette-surface-checked-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 18%,
+        var(--basic-palette-surface-light)
+    );
+    --basic-palette-surface-checked-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 30%,
+        var(--basic-palette-surface-dark)
+    );
     --basic-palette-text-muted-light: color-mix(
         in oklch,
         var(--basic-palette-text-light) 68%,
@@ -77,6 +117,46 @@
         in oklch,
         var(--basic-palette-text-dark) 24%,
         var(--basic-palette-surface-dark)
+    );
+    --basic-palette-border-hover-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 18%,
+        var(--basic-palette-border-light)
+    );
+    --basic-palette-border-hover-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 28%,
+        var(--basic-palette-border-dark)
+    );
+    --basic-palette-border-active-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 24%,
+        var(--basic-palette-border-light)
+    );
+    --basic-palette-border-active-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 36%,
+        var(--basic-palette-border-dark)
+    );
+    --basic-palette-border-selected-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 22%,
+        var(--basic-palette-border-light)
+    );
+    --basic-palette-border-selected-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 34%,
+        var(--basic-palette-border-dark)
+    );
+    --basic-palette-border-checked-light: color-mix(
+        in oklch,
+        var(--basic-palette-accent-light) 28%,
+        var(--basic-palette-border-light)
+    );
+    --basic-palette-border-checked-dark: color-mix(
+        in oklch,
+        var(--basic-palette-accent-dark) 40%,
+        var(--basic-palette-border-dark)
     );
     --basic-palette-overlay-light: color-mix(
         in oklch,
@@ -106,12 +186,44 @@
         var(--basic-palette-surface-muted-light),
         var(--basic-palette-surface-muted-dark)
     );
+    --basic-color-surface-hover: light-dark(
+        var(--basic-palette-surface-hover-light),
+        var(--basic-palette-surface-hover-dark)
+    );
+    --basic-color-surface-active: light-dark(
+        var(--basic-palette-surface-active-light),
+        var(--basic-palette-surface-active-dark)
+    );
+    --basic-color-surface-selected: light-dark(
+        var(--basic-palette-surface-selected-light),
+        var(--basic-palette-surface-selected-dark)
+    );
+    --basic-color-surface-checked: light-dark(
+        var(--basic-palette-surface-checked-light),
+        var(--basic-palette-surface-checked-dark)
+    );
     --basic-color-text: light-dark(var(--basic-palette-text-light), var(--basic-palette-text-dark));
     --basic-color-text-muted: light-dark(
         var(--basic-palette-text-muted-light),
         var(--basic-palette-text-muted-dark)
     );
     --basic-color-border: light-dark(var(--basic-palette-border-light), var(--basic-palette-border-dark));
+    --basic-color-border-hover: light-dark(
+        var(--basic-palette-border-hover-light),
+        var(--basic-palette-border-hover-dark)
+    );
+    --basic-color-border-active: light-dark(
+        var(--basic-palette-border-active-light),
+        var(--basic-palette-border-active-dark)
+    );
+    --basic-color-border-selected: light-dark(
+        var(--basic-palette-border-selected-light),
+        var(--basic-palette-border-selected-dark)
+    );
+    --basic-color-border-checked: light-dark(
+        var(--basic-palette-border-checked-light),
+        var(--basic-palette-border-checked-dark)
+    );
     --basic-color-overlay: light-dark(var(--basic-palette-overlay-light), var(--basic-palette-overlay-dark));
     --basic-color-focus: light-dark(var(--basic-palette-focus-light), var(--basic-palette-focus-dark));
 }

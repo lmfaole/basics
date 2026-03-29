@@ -1,16 +1,20 @@
 basic-accordion {
     --basic-accordion-padding: var(--basic-panel-padding);
     display: grid;
+    gap: 0;
 }
 
 basic-accordion > details {
     margin: 0;
-    border: var(--basic-border-width) solid var(--basic-color-border);
-    border-radius: var(--basic-radius);
+    border-inline: var(--basic-border-width) solid var(--basic-color-border);
     background: var(--basic-color-surface);
 }
 
 basic-accordion > details > summary {
+    --basic-interaction-border-rest: transparent;
+    --basic-interaction-border-hover: transparent;
+    --basic-interaction-border-active: transparent;
+    --basic-interaction-border-selected: transparent;
     list-style: none;
     display: flex;
     align-items: center;
@@ -20,6 +24,7 @@ basic-accordion > details > summary {
     font-weight: 600;
     text-align: left;
     cursor: pointer;
+    background: transparent;
 }
 
 basic-accordion > details > summary::-webkit-details-marker {
@@ -34,9 +39,34 @@ basic-accordion > details > summary::after {
     line-height: 1;
 }
 
+basic-accordion > details:first-child {
+    border-block-start: var(--basic-border-width) solid var(--basic-color-border);
+    border-start-start-radius: var(--basic-radius);
+    border-start-end-radius: var(--basic-radius);
+}
+
+basic-accordion > details:first-child > summary {
+    border-start-start-radius: var(--basic-radius);
+    border-start-end-radius: var(--basic-radius);
+}
+
+basic-accordion > details + details {
+    border-block-start: var(--basic-border-width) solid var(--basic-color-border);
+}
+
+basic-accordion > details:last-child {
+    border-block-end: var(--basic-border-width) solid var(--basic-color-border);
+    border-end-start-radius: var(--basic-radius);
+    border-end-end-radius: var(--basic-radius);
+}
+
+basic-accordion > details:last-child:not([open]) > summary {
+    border-end-start-radius: var(--basic-radius);
+    border-end-end-radius: var(--basic-radius);
+}
+
 basic-accordion > details[open] > summary {
-    background: var(--basic-color-surface-muted);
-    margin-block-end: var(--basic-flow-space);
+    border-block-end: var(--basic-border-width) solid var(--basic-color-border-selected);
 }
 
 basic-accordion > details[open] > summary::after {
@@ -46,6 +76,10 @@ basic-accordion > details[open] > summary::after {
 
 basic-accordion > details[open] {
     padding-block-end: var(--basic-accordion-padding);
+}
+
+basic-accordion > details[open] > summary + :where(*) {
+    margin-block-start: var(--basic-accordion-padding);
 }
 
 basic-accordion > details > :where(:not(summary)) {

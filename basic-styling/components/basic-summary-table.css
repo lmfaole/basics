@@ -2,6 +2,11 @@ basic-summary-table {
     --basic-summary-table-caption-gap: var(--basic-flow-space);
     --basic-summary-table-cell-padding-block: var(--basic-space-3);
     --basic-summary-table-cell-padding-inline: var(--basic-space-4);
+    --basic-summary-table-row-background-zebra: color-mix(
+        in oklch,
+        var(--basic-color-surface-muted) 48%,
+        var(--basic-color-surface)
+    );
 
     display: block;
     overflow-x: auto;
@@ -33,8 +38,17 @@ basic-summary-table tr {
 basic-summary-table th,
 basic-summary-table td {
     padding: var(--basic-summary-table-cell-padding-block) var(--basic-summary-table-cell-padding-inline);
-    border-block-end: var(--basic-border-width) solid var(--basic-color-border);
+    border: 0 solid var(--basic-color-border);
     vertical-align: top;
+}
+
+basic-summary-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) th,
+basic-summary-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) td {
+    border-block-end-width: var(--basic-border-width);
+}
+
+basic-summary-table:is([data-separators="columns"], [data-separators="both"]) tr > :is(th, td):not(:last-child) {
+    border-inline-end-width: var(--basic-border-width);
 }
 
 basic-summary-table td {
@@ -46,13 +60,17 @@ basic-summary-table thead th {
     font-weight: 700;
 }
 
-basic-summary-table tbody tr:last-child th,
-basic-summary-table tbody tr:last-child td {
-    border-block-end: 0;
+basic-summary-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) tbody tr:last-child th,
+basic-summary-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) tbody tr:last-child td {
+    border-block-end-width: 0;
 }
 
 basic-summary-table tbody th {
     font-weight: 600;
+}
+
+basic-summary-table[data-zebra] tbody tr:nth-child(even) > :is(th, td) {
+    background: var(--basic-summary-table-row-background-zebra);
 }
 
 basic-summary-table tbody td {
@@ -61,10 +79,14 @@ basic-summary-table tbody td {
 
 basic-summary-table tfoot th,
 basic-summary-table tfoot td {
-    border-block-start: calc(var(--basic-border-width) * 2) solid var(--basic-color-border);
     border-block-end: 0;
     background: var(--basic-color-surface-muted);
     font-weight: 700;
+}
+
+basic-summary-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) tfoot th,
+basic-summary-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) tfoot td {
+    border-block-start: calc(var(--basic-border-width) * 2) solid var(--basic-color-border);
 }
 
 basic-summary-table tfoot td[data-summary-empty] {
