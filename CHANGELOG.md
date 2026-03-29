@@ -1,5 +1,20 @@
 # @lmfaole/basics
 
+## 0.5.0
+
+### Minor Changes
+
+- 58db2c0: Add a `basic-carousel` component with native CSS scroll buttons and scroll markers in the optional starter styling layer.
+
+### Patch Changes
+
+- 58db2c0: Add configurable native controls and snap alignment to `basic-carousel`, and add a Baseline-powered browser support overview to the README.
+- 58db2c0: Add semantic hover, active, selected, and checked color tokens to the optional starter palette layer and use them in the starter accordion and tabs styles.
+- 58db2c0: Refactor the optional starter component styles to use a shared style-query interaction layer for hover, active, and selected surface colors across accordion, tabs, popover, and button-like controls.
+- 9dfb854: Rename the component source folder to `basic-components`, add matching `@lmfaole/basics/basic-components/*` exports, and keep the older `components` subpaths as compatibility aliases.
+- 9dfb854: Add published Node.js engine metadata and formal project governance files for contributing, security reporting, and GitHub contribution templates.
+- 58db2c0: Extend the optional `basic-styling/forms.css` `data-panel` hook to native radio groups and document the radio-panel pattern in Storybook and the README.
+
 ## 0.4.0
 
 ### Minor Changes
