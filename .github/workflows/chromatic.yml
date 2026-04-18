@@ -51,6 +51,6 @@ jobs:
 
       - name: Publish Storybook to Chromatic
         if: steps.chromatic-token.outputs.available == 'true'
-        uses: chromaui/action@v16.0.0
+        uses: chromaui/action@v16.3.0
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
