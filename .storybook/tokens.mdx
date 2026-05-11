@@ -1,0 +1,156 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Overview/Base Tokens" />
+
+# Base Tokens
+
+The starter base tokens live in `@lmfaole/basics/basic-styling/tokens/base.css`.
+They cover typography, spacing, and shape — everything the components consume that is not a palette color.
+Override them on `:root` (or any subtree) to retune the visual scale without rewriting component CSS.
+
+<style>{`
+  .basic-tokens-grid {
+    display: grid;
+    gap: var(--basic-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    margin-block: var(--basic-space-4);
+  }
+  .basic-tokens-row {
+    display: grid;
+    gap: var(--basic-space-1);
+    padding: var(--basic-space-3);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    border-radius: var(--basic-radius);
+    background: var(--basic-color-surface);
+  }
+  .basic-tokens-row__name {
+    color: var(--basic-color-text-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--basic-font-size-small);
+  }
+  .basic-tokens-row__sample {
+    color: var(--basic-color-text);
+  }
+  .basic-tokens-space-bar {
+    display: inline-block;
+    height: var(--basic-space-3);
+    background: var(--basic-color-surface-selected);
+    border: var(--basic-border-width) solid var(--basic-color-border-selected);
+    vertical-align: middle;
+  }
+  .basic-tokens-shape {
+    display: inline-block;
+    inline-size: 3rem;
+    block-size: 3rem;
+    background: var(--basic-color-surface-selected);
+    border: var(--basic-border-width) solid var(--basic-color-border-selected);
+    vertical-align: middle;
+  }
+  .basic-tokens-focus {
+    display: inline-block;
+    inline-size: 3rem;
+    block-size: 1.5rem;
+    background: var(--basic-color-surface);
+    border: var(--basic-border-width) solid var(--basic-color-border);
+    outline: var(--basic-focus-ring-width) solid var(--basic-color-focus);
+    outline-offset: var(--basic-focus-ring-offset);
+    vertical-align: middle;
+  }
+`}</style>
+
+## Typography
+
+<div className="basic-tokens-grid">
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-font-family</span>
+    <span className="basic-tokens-row__sample" style={{ fontFamily: "var(--basic-font-family)" }}>The quick brown fox jumps over the lazy dog.</span>
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-font-size (1rem)</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size)" }}>Body copy size.</span>
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-font-size-small (0.875rem)</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-small)" }}>Secondary copy size.</span>
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-font-size-title (1.125rem)</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Panel and dialog title size.</span>
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-line-height (1.5)</span>
+    <span className="basic-tokens-row__sample" style={{ lineHeight: "var(--basic-line-height)" }}>Body line height keeps paragraphs comfortable to read across two or three lines of running copy.</span>
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-line-height-tight (1.2)</span>
+    <span className="basic-tokens-row__sample" style={{ lineHeight: "var(--basic-line-height-tight)" }}>Title line height — keeps multi-line titles compact without crowding descenders.</span>
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-font-weight-medium (600)</span>
+    <span className="basic-tokens-row__sample" style={{ fontWeight: "var(--basic-font-weight-medium)" }}>Interactive controls, selected tabs, table row headers.</span>
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-font-weight-strong (700)</span>
+    <span className="basic-tokens-row__sample" style={{ fontWeight: "var(--basic-font-weight-strong)" }}>Table captions, column headers, eyebrows.</span>
+  </div>
+</div>
+
+## Spacing
+
+The spacing scale is a five-step progression. Compositional tokens (`--basic-flow-space`, `--basic-panel-padding`, `--basic-control-padding-*`) resolve to specific steps so components keep a consistent rhythm.
+
+<div className="basic-tokens-grid">
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-space-1 (0.25rem)</span>
+    <span className="basic-tokens-space-bar" style={{ inlineSize: "var(--basic-space-1)" }} />
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-space-2 (0.5rem)</span>
+    <span className="basic-tokens-space-bar" style={{ inlineSize: "var(--basic-space-2)" }} />
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-space-3 (0.75rem)</span>
+    <span className="basic-tokens-space-bar" style={{ inlineSize: "var(--basic-space-3)" }} />
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-space-4 (1rem)</span>
+    <span className="basic-tokens-space-bar" style={{ inlineSize: "var(--basic-space-4)" }} />
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-space-5 (1.5rem)</span>
+    <span className="basic-tokens-space-bar" style={{ inlineSize: "var(--basic-space-5)" }} />
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-flow-space</span>
+    <span className="basic-tokens-row__sample">Vertical gap between siblings inside a panel. Defaults to <code>--basic-space-3</code>.</span>
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-panel-padding</span>
+    <span className="basic-tokens-row__sample">Inner padding of panel-shaped components. Defaults to <code>--basic-space-4</code>.</span>
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-control-padding-block / -inline</span>
+    <span className="basic-tokens-row__sample">Vertical and horizontal padding of pill-shaped controls (buttons, tabs, alert dismiss).</span>
+  </div>
+</div>
+
+## Shape
+
+<div className="basic-tokens-grid">
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-border-width (1px)</span>
+    <span className="basic-tokens-shape" style={{ borderRadius: 0 }} />
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-radius (0.5rem)</span>
+    <span className="basic-tokens-shape" style={{ borderRadius: "var(--basic-radius)" }} />
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-radius-pill (999px)</span>
+    <span className="basic-tokens-shape" style={{ borderRadius: "var(--basic-radius-pill)" }} />
+  </div>
+  <div className="basic-tokens-row">
+    <span className="basic-tokens-row__name">--basic-focus-ring-width / -offset</span>
+    <span className="basic-tokens-focus" />
+  </div>
+</div>

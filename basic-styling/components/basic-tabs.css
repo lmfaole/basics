@@ -38,7 +38,7 @@ basic-tabs [data-tab] {
 
 basic-tabs [data-tab][aria-selected="true"] {
     border-bottom-color: var(--basic-tabs-panel-background);
-    font-weight: 600;
+    font-weight: var(--basic-font-weight-medium);
     z-index: 2;
 }
 

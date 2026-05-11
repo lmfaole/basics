@@ -48,5 +48,5 @@ basic-popover [data-popover-panel] label {
 
 basic-popover [data-popover-title] {
     font-size: var(--basic-font-size-title);
-    line-height: 1.2;
+    line-height: var(--basic-line-height-tight);
 }

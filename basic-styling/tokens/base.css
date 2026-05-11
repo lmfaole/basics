@@ -1,16 +1,25 @@
 :root {
     --basic-font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --basic-font-size: 1rem;
+    --basic-font-size-small: 0.875rem;
     --basic-font-size-title: 1.125rem;
     --basic-line-height: 1.5;
+    --basic-line-height-tight: 1.2;
+    --basic-font-weight-medium: 600;
+    --basic-font-weight-strong: 700;
+
     --basic-border-width: 1px;
     --basic-radius: 0.5rem;
     --basic-radius-pill: 999px;
+    --basic-focus-ring-width: 3px;
+    --basic-focus-ring-offset: 2px;
+
     --basic-space-1: 0.25rem;
     --basic-space-2: 0.5rem;
     --basic-space-3: 0.75rem;
     --basic-space-4: 1rem;
     --basic-space-5: 1.5rem;
+
     --basic-flow-space: var(--basic-space-3);
     --basic-panel-padding: var(--basic-space-4);
     --basic-control-padding-block: 0.625rem;

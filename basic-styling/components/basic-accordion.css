@@ -21,7 +21,7 @@ basic-accordion > details > summary {
     justify-content: space-between;
     padding: var(--basic-control-padding-block) var(--basic-control-padding-inline);
     color: inherit;
-    font-weight: 600;
+    font-weight: var(--basic-font-weight-medium);
     text-align: left;
     cursor: pointer;
     background: transparent;

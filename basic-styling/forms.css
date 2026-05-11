@@ -26,8 +26,8 @@
 }
 
 :where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]:focus-visible) {
-    outline: 3px solid var(--basic-color-focus);
-    outline-offset: 2px;
+    outline: var(--basic-focus-ring-width) solid var(--basic-color-focus);
+    outline-offset: var(--basic-focus-ring-offset);
 }
 
 :where(label):has(> input:is([type="checkbox"], [type="radio"])[data-panel]) > input:is([type="checkbox"], [type="radio"])[data-panel] {

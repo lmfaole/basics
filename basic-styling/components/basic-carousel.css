@@ -58,15 +58,15 @@ basic-carousel [data-carousel-track] > * > :where(* + *) {
 
 basic-carousel [data-carousel-track] > * > p:first-child {
     color: var(--basic-color-text-muted);
-    font-size: 0.875rem;
-    font-weight: 700;
+    font-size: var(--basic-font-size-small);
+    font-weight: var(--basic-font-weight-strong);
     letter-spacing: 0.06em;
     text-transform: uppercase;
 }
 
 basic-carousel [data-carousel-track] > * > a {
     color: inherit;
-    font-weight: 600;
+    font-weight: var(--basic-font-weight-medium);
 }
 
 @supports (scroll-marker-group: after) {
@@ -168,8 +168,8 @@ basic-carousel [data-carousel-track] > * > a {
         border-radius: var(--basic-radius-pill);
         background: var(--basic-color-surface);
         color: inherit;
-        font-size: 0.875rem;
-        font-weight: 600;
+        font-size: var(--basic-font-size-small);
+        font-weight: var(--basic-font-weight-medium);
     }
 
     basic-carousel:is([data-basic-carousel-controls="arrows"], [data-basic-carousel-controls="none"]) [data-carousel-track] > *::scroll-marker {
