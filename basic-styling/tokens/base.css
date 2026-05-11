@@ -12,7 +12,6 @@
     --basic-space-4: 1rem;
     --basic-space-5: 1.5rem;
     --basic-flow-space: var(--basic-space-3);
-    --basic-stack-gap: var(--basic-space-3);
     --basic-panel-padding: var(--basic-space-4);
     --basic-control-padding-block: 0.625rem;
     --basic-control-padding-inline: var(--basic-space-4);
