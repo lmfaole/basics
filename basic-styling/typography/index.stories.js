@@ -74,10 +74,6 @@ const scaleSource = withFrame(`<p>The three font-size tokens form the package's 
 ${scaleMarkup}`);
 
 const fluidComparisonExtraStyles = `
-  .basic-type-fluid-card {
-    --basic-fluid-min-viewport: 0rem;
-    --basic-fluid-max-viewport: 0.001rem;
-  }
   .basic-type-fluid-card[data-scale="0"] { --basic-fluid-scale: 0; }
   .basic-type-fluid-card[data-scale="0-5"] { --basic-fluid-scale: 0.5; }
   .basic-type-fluid-card[data-scale="1"] { --basic-fluid-scale: 1; }
@@ -85,37 +81,37 @@ const fluidComparisonExtraStyles = `
 `;
 
 const fluidComparisonMarkup = `<section class="basic-type-grid">
-  <article class="basic-type-card basic-type-fluid-card" data-scale="0">
+  <article class="basic-type-card basic-type-fluid-card" data-basic-typography data-scale="0">
     <span class="basic-type-card__label">--basic-fluid-scale: 0</span>
     <p class="basic-type-card__sample" style="font-size: var(--basic-font-size-title);" data-fluid-title="static">
       Title pinned to its min.
     </p>
   </article>
 
-  <article class="basic-type-card basic-type-fluid-card" data-scale="0-5">
+  <article class="basic-type-card basic-type-fluid-card" data-basic-typography data-scale="0-5">
     <span class="basic-type-card__label">--basic-fluid-scale: 0.5</span>
     <p class="basic-type-card__sample" style="font-size: var(--basic-font-size-title);" data-fluid-title="half">
-      Halfway between min and max.
+      Gentle scaling — halfway response to viewport.
     </p>
   </article>
 
-  <article class="basic-type-card basic-type-fluid-card" data-scale="1">
+  <article class="basic-type-card basic-type-fluid-card" data-basic-typography data-scale="1">
     <span class="basic-type-card__label">--basic-fluid-scale: 1</span>
     <p class="basic-type-card__sample" style="font-size: var(--basic-font-size-title);" data-fluid-title="default">
-      Default — title reaches its max.
+      Default response.
     </p>
   </article>
 
-  <article class="basic-type-card basic-type-fluid-card" data-scale="2">
+  <article class="basic-type-card basic-type-fluid-card" data-basic-typography data-scale="2">
     <span class="basic-type-card__label">--basic-fluid-scale: 2</span>
     <p class="basic-type-card__sample" style="font-size: var(--basic-font-size-title);" data-fluid-title="bold">
-      Capped at max — clamp() still bounds it.
+      Bolder — reaches max at half the viewport range.
     </p>
   </article>
 </section>`;
 
 const fluidComparisonSource = withFrame(
-    `<p>Each card pins <code>--basic-fluid-min-viewport</code> and <code>--basic-fluid-max-viewport</code> to ~0 so the only effective control is <code>--basic-fluid-scale</code>. With <code>0</code> the title sticks to its min; with <code>1</code> it reaches its max; higher values are clamped at the max.</p>
+    `<p>Each card sets <code>data-basic-typography</code> (so the clamp tokens recompute on that subtree) and pins <code>--basic-fluid-scale</code> to a different value. With <code>0</code> the title sticks to its min; with <code>1</code> it follows the default response; higher values reach max sooner.</p>
 ${fluidComparisonMarkup}`,
     fluidComparisonExtraStyles,
 );
@@ -134,14 +130,14 @@ const perSizeOverrideExtraStyles = `
 `;
 
 const perSizeOverrideMarkup = `<section class="basic-type-grid">
-  <article class="basic-type-card basic-type-bigger-titles">
+  <article class="basic-type-card basic-type-bigger-titles" data-basic-typography>
     <span class="basic-type-card__label">Bigger titles (1.5rem → 2.5rem)</span>
     <p class="basic-type-card__sample" style="font-size: var(--basic-font-size-title);" data-override="bigger-title">
       Override <code>--basic-font-size-title-min/-max</code> on a subtree to give it a louder title scale without touching anything else.
     </p>
   </article>
 
-  <article class="basic-type-card basic-type-smaller-body">
+  <article class="basic-type-card basic-type-smaller-body" data-basic-typography>
     <span class="basic-type-card__label">Compact body (0.875rem → 0.9375rem)</span>
     <p class="basic-type-card__sample" style="font-size: var(--basic-font-size);" data-override="smaller-body">
       Override the body and small bounds when a section needs denser copy.
@@ -150,7 +146,7 @@ const perSizeOverrideMarkup = `<section class="basic-type-grid">
 </section>`;
 
 const perSizeOverrideSource = withFrame(
-    `<p>Each fluid step exposes its own <code>--basic-font-size-*-min</code> and <code>--basic-font-size-*-max</code> tokens. Override them on a subtree to retune one step at a time — the rest of the scale stays put.</p>
+    `<p>Each fluid step exposes its own <code>--basic-font-size-*-min</code> and <code>--basic-font-size-*-max</code> tokens. Add <code>data-basic-typography</code> to the subtree so the clamp tokens recompute, then override the bounds — the rest of the scale stays put.</p>
 ${perSizeOverrideMarkup}`,
     perSizeOverrideExtraStyles,
 );
@@ -193,7 +189,7 @@ function renderPlayground({ fluidScale, minViewport, maxViewport }) {
   }
 </style>
 
-<section class="basic-type-playground">
+<section class="basic-type-playground" data-basic-typography>
   <pre class="basic-type-playground__readout">--basic-fluid-scale: ${fluidScale};
 --basic-fluid-min-viewport: ${minViewport}rem;
 --basic-fluid-max-viewport: ${maxViewport}rem;</pre>
@@ -278,7 +274,7 @@ export const FluidScaleComparison = {
 
             expect(staticPx).toBeLessThan(halfPx);
             expect(halfPx).toBeLessThan(defaultPx);
-            expect(defaultPx).toBeCloseTo(boldPx, 1);
+            expect(defaultPx).toBeLessThanOrEqual(boldPx);
         });
     },
 };

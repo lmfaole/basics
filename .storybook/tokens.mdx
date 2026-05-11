@@ -68,18 +68,19 @@ clamp(--basic-font-size-*-min, lerp, --basic-font-size-*-max)
 
 …where the middle term linearly interpolates as the viewport grows from `--basic-fluid-min-viewport` to `--basic-fluid-max-viewport`.
 
-A single multiplier — `--basic-fluid-scale` — controls how aggressively the type scales. Override it on `:root` or any subtree:
+A single multiplier — `--basic-fluid-scale` — controls how aggressively the type scales. Override it on `:root` for a global change, or on a subtree carrying `data-basic-typography` to retune only that section (the attribute mirrors how `data-basic-palette` opts a subtree into a different palette).
 
 ```css
 :root {
-    --basic-fluid-scale: 0;     /* disable fluidity (every size pins to its min) */
-    --basic-fluid-scale: 0.5;   /* gentler scaling, reaches max past the configured viewport */
-    --basic-fluid-scale: 1;     /* default — reaches max at --basic-fluid-max-viewport */
-    --basic-fluid-scale: 2;     /* bolder — reaches max at half the configured range */
+    --basic-fluid-scale: 2;     /* bolder global response */
+}
+
+[data-basic-typography].quiet-section {
+    --basic-fluid-scale: 0;     /* this subtree pins every size to its min */
 }
 ```
 
-Retune the viewport range with `--basic-fluid-min-viewport` (default `20rem` / 320px) and `--basic-fluid-max-viewport` (default `80rem` / 1280px). Override individual size bounds (e.g. `--basic-font-size-title-max`) when one step needs different limits.
+Retune the viewport range with `--basic-fluid-min-viewport` (default `20rem` / 320px) and `--basic-fluid-max-viewport` (default `80rem` / 1280px). Override individual size bounds (e.g. `--basic-font-size-title-max`) when one step needs different limits. Wrap the override target with `data-basic-typography` so the clamp tokens recompute on that subtree.
 
 <div className="basic-tokens-grid">
   <div className="basic-tokens-row">
@@ -118,22 +119,22 @@ Retune the viewport range with `--basic-fluid-min-viewport` (default `20rem` / 3
 
 ### Fluid Scale Comparison
 
-Each card below pins `--basic-fluid-scale` to a different value so you can compare how the title responds to viewport changes. Resize the window — the cards on the right should react faster than the ones on the left.
+Each card carries `data-basic-typography` and pins `--basic-fluid-scale` to a different value so the clamp tokens recompute on that subtree. Resize the window — the cards on the right should react faster than the ones on the left.
 
 <div className="basic-tokens-grid">
-  <div className="basic-tokens-row" style={{ "--basic-fluid-scale": 0 }}>
+  <div className="basic-tokens-row" data-basic-typography style={{ "--basic-fluid-scale": 0 }}>
     <span className="basic-tokens-row__name">--basic-fluid-scale: 0 (static)</span>
     <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Fixed title</span>
   </div>
-  <div className="basic-tokens-row" style={{ "--basic-fluid-scale": 0.5 }}>
+  <div className="basic-tokens-row" data-basic-typography style={{ "--basic-fluid-scale": 0.5 }}>
     <span className="basic-tokens-row__name">--basic-fluid-scale: 0.5</span>
     <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Gentle title</span>
   </div>
-  <div className="basic-tokens-row" style={{ "--basic-fluid-scale": 1 }}>
+  <div className="basic-tokens-row" data-basic-typography style={{ "--basic-fluid-scale": 1 }}>
     <span className="basic-tokens-row__name">--basic-fluid-scale: 1 (default)</span>
     <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Default title</span>
   </div>
-  <div className="basic-tokens-row" style={{ "--basic-fluid-scale": 2 }}>
+  <div className="basic-tokens-row" data-basic-typography style={{ "--basic-fluid-scale": 2 }}>
     <span className="basic-tokens-row__name">--basic-fluid-scale: 2 (bold)</span>
     <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Bold title</span>
   </div>
