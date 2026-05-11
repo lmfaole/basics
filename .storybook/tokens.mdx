@@ -5,7 +5,7 @@ import { Meta } from "@storybook/addon-docs/blocks";
 # Base Tokens
 
 The starter base tokens live in `@lmfaole/basics/basic-styling/tokens/base.css`.
-They cover typography, spacing, and shape — everything the components consume that is not a palette color.
+They cover typography (fluid by default), spacing, and shape — everything the components consume that is not a palette color.
 Override them on `:root` (or any subtree) to retune the visual scale without rewriting component CSS.
 
 <style>{`
@@ -58,7 +58,28 @@ Override them on `:root` (or any subtree) to retune the visual scale without rew
   }
 `}</style>
 
-## Typography
+## Fluid Typography
+
+The font-size tokens are fluid — they scale between a minimum and maximum across a viewport range. Each size resolves to:
+
+```
+clamp(--basic-font-size-*-min, lerp, --basic-font-size-*-max)
+```
+
+…where the middle term linearly interpolates as the viewport grows from `--basic-fluid-min-viewport` to `--basic-fluid-max-viewport`.
+
+A single multiplier — `--basic-fluid-scale` — controls how aggressively the type scales. Override it on `:root` or any subtree:
+
+```css
+:root {
+    --basic-fluid-scale: 0;     /* disable fluidity (every size pins to its min) */
+    --basic-fluid-scale: 0.5;   /* gentler scaling, reaches max past the configured viewport */
+    --basic-fluid-scale: 1;     /* default — reaches max at --basic-fluid-max-viewport */
+    --basic-fluid-scale: 2;     /* bolder — reaches max at half the configured range */
+}
+```
+
+Retune the viewport range with `--basic-fluid-min-viewport` (default `20rem` / 320px) and `--basic-fluid-max-viewport` (default `80rem` / 1280px). Override individual size bounds (e.g. `--basic-font-size-title-max`) when one step needs different limits.
 
 <div className="basic-tokens-grid">
   <div className="basic-tokens-row">
@@ -66,16 +87,16 @@ Override them on `:root` (or any subtree) to retune the visual scale without rew
     <span className="basic-tokens-row__sample" style={{ fontFamily: "var(--basic-font-family)" }}>The quick brown fox jumps over the lazy dog.</span>
   </div>
   <div className="basic-tokens-row">
-    <span className="basic-tokens-row__name">--basic-font-size (1rem)</span>
-    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size)" }}>Body copy size.</span>
+    <span className="basic-tokens-row__name">--basic-font-size (1rem → 1.0625rem)</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size)" }}>Body copy. Resize the window to see this size grow.</span>
   </div>
   <div className="basic-tokens-row">
-    <span className="basic-tokens-row__name">--basic-font-size-small (0.875rem)</span>
-    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-small)" }}>Secondary copy size.</span>
+    <span className="basic-tokens-row__name">--basic-font-size-small (0.875rem → 0.9375rem)</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-small)" }}>Secondary copy, labels, captions.</span>
   </div>
   <div className="basic-tokens-row">
-    <span className="basic-tokens-row__name">--basic-font-size-title (1.125rem)</span>
-    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Panel and dialog title size.</span>
+    <span className="basic-tokens-row__name">--basic-font-size-title (1.125rem → 1.375rem)</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Panel and dialog titles.</span>
   </div>
   <div className="basic-tokens-row">
     <span className="basic-tokens-row__name">--basic-line-height (1.5)</span>
@@ -92,6 +113,29 @@ Override them on `:root` (or any subtree) to retune the visual scale without rew
   <div className="basic-tokens-row">
     <span className="basic-tokens-row__name">--basic-font-weight-strong (700)</span>
     <span className="basic-tokens-row__sample" style={{ fontWeight: "var(--basic-font-weight-strong)" }}>Table captions, column headers, eyebrows.</span>
+  </div>
+</div>
+
+### Fluid Scale Comparison
+
+Each card below pins `--basic-fluid-scale` to a different value so you can compare how the title responds to viewport changes. Resize the window — the cards on the right should react faster than the ones on the left.
+
+<div className="basic-tokens-grid">
+  <div className="basic-tokens-row" style={{ "--basic-fluid-scale": 0 }}>
+    <span className="basic-tokens-row__name">--basic-fluid-scale: 0 (static)</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Fixed title</span>
+  </div>
+  <div className="basic-tokens-row" style={{ "--basic-fluid-scale": 0.5 }}>
+    <span className="basic-tokens-row__name">--basic-fluid-scale: 0.5</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Gentle title</span>
+  </div>
+  <div className="basic-tokens-row" style={{ "--basic-fluid-scale": 1 }}>
+    <span className="basic-tokens-row__name">--basic-fluid-scale: 1 (default)</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Default title</span>
+  </div>
+  <div className="basic-tokens-row" style={{ "--basic-fluid-scale": 2 }}>
+    <span className="basic-tokens-row__name">--basic-fluid-scale: 2 (bold)</span>
+    <span className="basic-tokens-row__sample" style={{ fontSize: "var(--basic-font-size-title)" }}>Bold title</span>
   </div>
 </div>
 
