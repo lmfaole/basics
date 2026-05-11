@@ -10,4 +10,6 @@ Consumers tune the fluidity with three new knobs:
 - `--basic-fluid-min-viewport` (default `20rem` / 320px) — viewport width where fluid scaling starts.
 - `--basic-fluid-max-viewport` (default `80rem` / 1280px) — viewport width where each size reaches its max.
 
-Per-size bounds are also overridable: `--basic-font-size-{small,title}-{min,max}` and `--basic-font-size-{min,max}`. The `Overview/Base Tokens` Storybook page now shows the fluid range for each size and includes a side-by-side comparison of different fluid-scale settings.
+Per-size bounds are also overridable: `--basic-font-size-{small,title}-{min,max}` and `--basic-font-size-{min,max}`.
+
+The fluid clamp tokens are declared on `:root, [data-basic-typography]` (mirroring how `palette.css` re-exposes computed palette tokens on `:root, [data-basic-palette]`). Apply `data-basic-typography` to a subtree to recompute the clamp outputs against locally overridden inputs — without it, child overrides of `--basic-fluid-scale` or the min/max tokens don't reach the inherited clamp values. Overrides on `:root` work without the attribute. The `Overview/Base Tokens` Storybook page documents the new API and shows a side-by-side comparison of fluid-scale settings.

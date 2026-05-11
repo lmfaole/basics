@@ -4,35 +4,13 @@
     --basic-fluid-min-viewport: 20rem;
     --basic-fluid-max-viewport: 80rem;
     --basic-fluid-scale: 1;
-    --basic-fluid-progress: calc(
-        var(--basic-fluid-scale) *
-        (100vw - var(--basic-fluid-min-viewport)) /
-        (var(--basic-fluid-max-viewport) - var(--basic-fluid-min-viewport))
-    );
 
     --basic-font-size-min: 1rem;
     --basic-font-size-max: 1.0625rem;
-    --basic-font-size: clamp(
-        var(--basic-font-size-min),
-        calc(var(--basic-font-size-min) + (var(--basic-font-size-max) - var(--basic-font-size-min)) * var(--basic-fluid-progress)),
-        var(--basic-font-size-max)
-    );
-
     --basic-font-size-small-min: 0.875rem;
     --basic-font-size-small-max: 0.9375rem;
-    --basic-font-size-small: clamp(
-        var(--basic-font-size-small-min),
-        calc(var(--basic-font-size-small-min) + (var(--basic-font-size-small-max) - var(--basic-font-size-small-min)) * var(--basic-fluid-progress)),
-        var(--basic-font-size-small-max)
-    );
-
     --basic-font-size-title-min: 1.125rem;
     --basic-font-size-title-max: 1.375rem;
-    --basic-font-size-title: clamp(
-        var(--basic-font-size-title-min),
-        calc(var(--basic-font-size-title-min) + (var(--basic-font-size-title-max) - var(--basic-font-size-title-min)) * var(--basic-fluid-progress)),
-        var(--basic-font-size-title-max)
-    );
 
     --basic-line-height: 1.5;
     --basic-line-height-tight: 1.2;
@@ -55,4 +33,31 @@
     --basic-panel-padding: var(--basic-space-4);
     --basic-control-padding-block: 0.625rem;
     --basic-control-padding-inline: var(--basic-space-4);
+}
+
+:root,
+[data-basic-typography] {
+    --basic-fluid-progress: calc(
+        var(--basic-fluid-scale) *
+        (100vw - var(--basic-fluid-min-viewport)) /
+        (var(--basic-fluid-max-viewport) - var(--basic-fluid-min-viewport))
+    );
+
+    --basic-font-size: clamp(
+        var(--basic-font-size-min),
+        calc(var(--basic-font-size-min) + (var(--basic-font-size-max) - var(--basic-font-size-min)) * var(--basic-fluid-progress)),
+        var(--basic-font-size-max)
+    );
+
+    --basic-font-size-small: clamp(
+        var(--basic-font-size-small-min),
+        calc(var(--basic-font-size-small-min) + (var(--basic-font-size-small-max) - var(--basic-font-size-small-min)) * var(--basic-fluid-progress)),
+        var(--basic-font-size-small-max)
+    );
+
+    --basic-font-size-title: clamp(
+        var(--basic-font-size-title-min),
+        calc(var(--basic-font-size-title-min) + (var(--basic-font-size-title-max) - var(--basic-font-size-title-min)) * var(--basic-fluid-progress)),
+        var(--basic-font-size-title-max)
+    );
 }
