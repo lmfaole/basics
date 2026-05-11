@@ -156,6 +156,28 @@ export const Default = {
             },
         },
     },
+    play: async ({ canvasElement }) => {
+        const summaries = canvasElement.querySelectorAll("basic-accordion > details > summary");
+
+        summaries[0].focus();
+        await userEvent.keyboard("{ArrowDown}");
+
+        await waitFor(() => {
+            expect(summaries[1]).toHaveFocus();
+        });
+
+        await userEvent.keyboard("{End}");
+
+        await waitFor(() => {
+            expect(summaries[2]).toHaveFocus();
+        });
+
+        await userEvent.keyboard("{Home}");
+
+        await waitFor(() => {
+            expect(summaries[0]).toHaveFocus();
+        });
+    },
 };
 
 export const Semantics = {
@@ -226,12 +248,31 @@ export const MultipleOpen = {
         },
     },
     play: async ({ canvasElement }) => {
+        const detailsItems = canvasElement.querySelectorAll("basic-accordion > details");
+
         await waitFor(() => {
             const openItems = canvasElement.querySelectorAll("basic-accordion > details[open]");
 
             expect(openItems).toHaveLength(2);
             expect(openItems[0].querySelector("summary")).toHaveTextContent("Oversikt");
             expect(openItems[1].querySelector("summary")).toHaveTextContent("Implementasjon");
+        });
+
+        await userEvent.click(detailsItems[2].querySelector("summary"));
+
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll("basic-accordion > details[open]")).toHaveLength(3);
+            expect(detailsItems[2]).toHaveAttribute("data-open");
+        });
+
+        await userEvent.click(detailsItems[0].querySelector("summary"));
+
+        await waitFor(() => {
+            const openItems = canvasElement.querySelectorAll("basic-accordion > details[open]");
+            expect(openItems).toHaveLength(2);
+            expect(detailsItems[0]).not.toHaveAttribute("data-open");
+            expect(detailsItems[1]).toHaveAttribute("data-open");
+            expect(detailsItems[2]).toHaveAttribute("data-open");
         });
     },
 };

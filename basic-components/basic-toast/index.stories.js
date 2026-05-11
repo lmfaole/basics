@@ -175,7 +175,31 @@ Use it when the page already owns the content and placement, but still needs a p
     },
 };
 
-export const Default = {};
+export const Default = {
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const opener = canvas.getByRole("button", { name: "Show toast" });
+        const root = canvasElement.querySelector("basic-toast");
+        const title = canvasElement.querySelector("[data-toast-title]");
+
+        await userEvent.click(opener);
+
+        await waitFor(() => {
+            const panel = canvas.getByRole("group", { name: "Saved" });
+
+            expect(panel).toHaveAttribute("data-open");
+            expect(root).toHaveAttribute("data-open");
+            expect(title.id).toBeTruthy();
+            expect(panel).toHaveAttribute("aria-labelledby", title.id);
+
+            const announcer = root.querySelector("[data-basic-toast-announcer]");
+            expect(announcer).toHaveAttribute("role", "status");
+            expect(announcer).toHaveAttribute("aria-live", "polite");
+            expect(announcer).toHaveAttribute("aria-atomic", "true");
+            expect(announcer.textContent).toMatch(/Saved/);
+        });
+    },
+};
 
 export const Persistent = {
     args: {
@@ -183,17 +207,60 @@ export const Persistent = {
         openInitially: true,
         position: "top-center",
     },
+    play: async ({ canvasElement }) => {
+        const root = canvasElement.querySelector("basic-toast");
+        const panel = canvasElement.querySelector("[data-toast-panel]");
+
+        await waitFor(() => {
+            expect(root).toHaveAttribute("data-open");
+            expect(panel).toHaveAttribute("data-open");
+        });
+    },
+};
+
+export const AutoDismiss = {
+    args: {
+        duration: 250,
+        position: "top-center",
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Opens the toast and lets the configured `data-duration` close it automatically.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const opener = canvas.getByRole("button", { name: "Show toast" });
+        const root = canvasElement.querySelector("basic-toast");
+
+        await userEvent.click(opener);
+
+        await waitFor(() => {
+            expect(root).toHaveAttribute("data-open");
+        });
+
+        await waitFor(
+            () => {
+                expect(root).not.toHaveAttribute("data-open");
+            },
+            { timeout: 2000 },
+        );
+    },
 };
 
 export const LabelFallback = {
     args: {
         duration: 0,
         includeTitle: false,
+        includeCloseButton: true,
         label: "Saved notification",
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const opener = canvas.getByRole("button", { name: "Show toast" });
+        const root = canvasElement.querySelector("basic-toast");
 
         await userEvent.click(opener);
 
@@ -202,6 +269,12 @@ export const LabelFallback = {
 
             expect(toast).toHaveAttribute("aria-label", "Saved notification");
             expect(toast).not.toHaveAttribute("aria-labelledby");
+        });
+
+        await userEvent.click(canvas.getByRole("button", { name: "Dismiss" }));
+
+        await waitFor(() => {
+            expect(root).not.toHaveAttribute("data-open");
         });
     },
 };

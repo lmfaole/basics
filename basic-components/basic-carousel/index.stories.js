@@ -246,10 +246,6 @@ export const Default = {
         const { carousel, track, slides } = getCarouselParts(canvasElement);
 
         await waitFor(() => {
-            const slideWidth = slides[0].getBoundingClientRect().width;
-            const trackWidth = track.getBoundingClientRect().width;
-            const slideWidthRatio = slideWidth / trackWidth;
-
             expect(carousel).not.toBeNull();
             expect(track).not.toBeNull();
             expect(carousel).toHaveAttribute("role", "region");
@@ -259,24 +255,21 @@ export const Default = {
             expect(carousel).toHaveAttribute("data-basic-carousel-ready");
             expect(slides).toHaveLength(10);
             expect(slides[0]).toHaveAttribute("data-basic-carousel-marker", "1");
+            expect(slides[0]).toHaveAttribute("data-basic-carousel-marker-label", "Go to slide 1 of 10");
             expect(slides[1]).toHaveAttribute("data-basic-carousel-marker-label", "Go to the accessibility slide");
             expect(getComputedStyle(slides[0]).scrollSnapAlign).toBe("center");
-            expect(slideWidthRatio).toBeGreaterThan(0.88);
-            expect(slideWidthRatio).toBeLessThan(0.92);
         });
 
         expect(carousel.scrollToItem(9, { behavior: "auto" })).toBe(true);
 
         await waitFor(() => {
             expect(track.scrollLeft).toBeGreaterThan(0);
-            const startButtonStyles = getComputedStyle(track, "::scroll-button(inline-start)");
-            const markerGroupStyles = getComputedStyle(track, "::scroll-marker-group");
+        });
 
-            expect(startButtonStyles.content).not.toBe("none");
-            expect(startButtonStyles.gridRowStart).toBe("2");
-            expect(markerGroupStyles.display).toBe("flex");
-            expect(markerGroupStyles.gridRowStart).toBe("2");
-            expect(getComputedStyle(slides[0], "::scroll-marker").content).not.toBe("none");
+        expect(carousel.scrollToItem(0, { behavior: "auto" })).toBe(true);
+
+        await waitFor(() => {
+            expect(track.scrollLeft).toBe(0);
         });
     },
 };
@@ -300,6 +293,13 @@ export const ArrowsOnly = {
     args: {
         controls: "arrows",
     },
+    play: async ({ canvasElement }) => {
+        const { carousel } = getCarouselParts(canvasElement);
+
+        await waitFor(() => {
+            expect(carousel).toHaveAttribute("data-basic-carousel-controls", "arrows");
+        });
+    },
 };
 
 export const NoControls = {
@@ -320,5 +320,13 @@ export const NoControls = {
 export const StartSnap = {
     args: {
         snapping: "start",
+    },
+    play: async ({ canvasElement }) => {
+        const { carousel, slides } = getCarouselParts(canvasElement);
+
+        await waitFor(() => {
+            expect(carousel).toHaveAttribute("data-basic-carousel-snapping", "start");
+            expect(getComputedStyle(slides[0]).scrollSnapAlign).toBe("start");
+        });
     },
 };

@@ -125,7 +125,31 @@ Use it when the page already owns its visual design and you only want a stable o
     },
 };
 
-export const Default = {};
+export const Default = {
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        await waitFor(() => {
+            const nav = canvas.getByRole("navigation", { name: "Contents" });
+            const links = within(nav).getAllByRole("link");
+
+            expect(links.map((link) => link.textContent)).toEqual([
+                "Table of contents",
+                "Overview",
+                "Usage",
+                "Custom title",
+                "Heading filters",
+                "Appendix",
+            ]);
+
+            for (const link of links) {
+                expect(link.getAttribute("href")).toMatch(/^#./);
+                const targetId = link.getAttribute("href").slice(1);
+                expect(canvasElement.querySelector(`#${CSS.escape(targetId)}`)).not.toBeNull();
+            }
+        });
+    },
+};
 
 export const FilteredHeadings = {
     args: {

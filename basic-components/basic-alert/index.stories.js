@@ -106,11 +106,33 @@ Use it when the page already owns the content and layout, but still needs predic
     },
 };
 
-export const Default = {};
+export const Default = {
+    play: async ({ canvasElement }) => {
+        const alert = canvasElement.querySelector("basic-alert");
+        const title = canvasElement.querySelector("[data-alert-title]");
+
+        await waitFor(() => {
+            expect(alert).toHaveAttribute("role", "alert");
+            expect(alert).toHaveAttribute("aria-live", "assertive");
+            expect(alert).toHaveAttribute("aria-atomic", "true");
+            expect(title.id).toBeTruthy();
+            expect(alert).toHaveAttribute("aria-labelledby", title.id);
+            expect(alert).not.toHaveAttribute("aria-label");
+        });
+    },
+};
 
 export const PoliteStatus = {
     args: {
         live: "polite",
+    },
+    play: async ({ canvasElement }) => {
+        const alert = canvasElement.querySelector("basic-alert");
+
+        await waitFor(() => {
+            expect(alert).toHaveAttribute("role", "status");
+            expect(alert).toHaveAttribute("aria-live", "polite");
+        });
     },
 };
 
