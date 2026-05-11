@@ -1,5 +1,36 @@
 # @lmfaole/basics
 
+## 0.6.0
+
+### Minor Changes
+
+- 5dc85c1: Expand and solidify the base token layer in `basic-styling/tokens/base.css`. Add typography tokens (`--basic-font-size-small`, `--basic-font-weight-medium`, `--basic-font-weight-strong`, `--basic-line-height-tight`) and focus-ring tokens (`--basic-focus-ring-width`, `--basic-focus-ring-offset`) that were previously hardcoded across the package CSS. All component sheets, `global.css`, and `forms.css` now consume these tokens, so consumers can retune typographic weight, secondary copy size, title leading, or the focus-ring shape from a single place. A new `Overview/Base Tokens` Storybook page documents each token.
+- 27f7022: Make the typography tokens fluid. `--basic-font-size`, `--basic-font-size-small`, and `--basic-font-size-title` now resolve through `clamp(min, lerp, max)` and scale between viewport endpoints. The same `--basic-font-size-*` tokens components already consume keep working — they just respond to viewport width now.
+
+  Consumers tune the fluidity with three new knobs:
+
+  - `--basic-fluid-scale` (default `1`) — single multiplier for fluid intensity. Set to `0` to disable fluidity entirely (every size pins to its min), to `0.5` for gentler scaling, or to `>1` for bolder scaling.
+  - `--basic-fluid-min-viewport` (default `20rem` / 320px) — viewport width where fluid scaling starts.
+  - `--basic-fluid-max-viewport` (default `80rem` / 1280px) — viewport width where each size reaches its max.
+
+  Per-size bounds are also overridable: `--basic-font-size-{small,title}-{min,max}` and `--basic-font-size-{min,max}`.
+
+  The fluid clamp tokens are declared on `:root, [data-basic-typography]` (mirroring how `palette.css` re-exposes computed palette tokens on `:root, [data-basic-palette]`). Apply `data-basic-typography` to a subtree to recompute the clamp outputs against locally overridden inputs — without it, child overrides of `--basic-fluid-scale` or the min/max tokens don't reach the inherited clamp values. Overrides on `:root` work without the attribute. The `Overview/Base Tokens` Storybook page documents the new API and shows a side-by-side comparison of fluid-scale settings.
+
+### Patch Changes
+
+- bac5781: `basic-carousel` scroll markers now meet the 44 × 44 px touch-target minimum. The default `--basic-carousel-marker-size` is bumped from `1.75rem` to `2.75rem` so a tap reliably hits the indicator. Override the variable to restore the previous visual size.
+- bac5781: `basic-toast` no longer logs a console warning when its panel contains interactive content. The same guidance is documented in the toast README; runtime logging violated the package's "no logging, no telemetry" rule.
+- bac5781: Remove the unused `--basic-stack-gap` CSS custom property from `basic-styling/tokens/base.css`. The token was defined but referenced nowhere, violating the project's "no token without two uses" rule.
+- c88ec2e: Add a `Native Elements/Typography` Storybook category with four stories that show off the fluid type scale and let consumers tweak the tokens live:
+
+  - **Scale** — overview of `--basic-font-size-small`, `--basic-font-size`, and `--basic-font-size-title` with their labels.
+  - **Fluid Scale Comparison** — side-by-side titles at `--basic-fluid-scale: 0`, `0.5`, `1`, and `2` (with viewport-range tokens pinned so scale is the only effective control).
+  - **Per Size Override** — demonstrates overriding `--basic-font-size-title-min/-max` and `--basic-font-size-min/-max` on a subtree.
+  - **Playground** — interactive sliders for `--basic-fluid-scale`, `--basic-fluid-min-viewport`, and `--basic-fluid-max-viewport` with a live readout so users can dial in their preferred fluidity before copying the values into their own CSS.
+
+  Each story includes a `play` function that asserts the expected size hierarchy and fluid behavior.
+
 ## 0.5.0
 
 ### Minor Changes
