@@ -136,4 +136,5 @@ Storybook now focuses on package documentation pages such as the readme, changel
 
 - [CHANGELOG.md](./CHANGELOG.md)
 - [CONTRIBUTING.md](./CONTRIBUTING.md)
+- [ROADMAP.md](./ROADMAP.md)
 - [SECURITY.md](./SECURITY.md)
