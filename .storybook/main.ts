@@ -6,6 +6,7 @@ const config: StorybookConfig = {
         "./changelog.mdx",
         "./contributing.mdx",
         "./security.mdx",
+        "./tokens.mdx",
         "./palette.mdx",
         "../basic-styling/**/*.stories.js",
         "../basic-components/**/index.stories.js",

@@ -23,7 +23,7 @@ function withFrame(innerMarkup) {
 
   .basic-form-technique-group > legend {
     padding-inline: var(--basic-space-2);
-    font-weight: 700;
+    font-weight: var(--basic-font-weight-strong);
   }
 
   .basic-form-technique-group > p,

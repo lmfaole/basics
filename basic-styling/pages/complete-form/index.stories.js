@@ -25,8 +25,8 @@ const completeFormSource = String.raw`<style>
   .registration-page__eyebrow {
     margin: 0 0 0.75rem;
     color: var(--basic-color-text-muted);
-    font-size: 0.875rem;
-    font-weight: 700;
+    font-size: var(--basic-font-size-small);
+    font-weight: var(--basic-font-weight-strong);
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
@@ -82,13 +82,13 @@ const completeFormSource = String.raw`<style>
   .registration-page__step-index {
     color: var(--basic-color-text-muted);
     font-size: 0.8rem;
-    font-weight: 700;
+    font-weight: var(--basic-font-weight-strong);
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   .registration-page__step-label {
-    font-weight: 600;
+    font-weight: var(--basic-font-weight-medium);
   }
 
   .registration-page__step[aria-current="step"] {
@@ -156,7 +156,7 @@ const completeFormSource = String.raw`<style>
 
   .registration-page label,
   .registration-page legend {
-    font-weight: 600;
+    font-weight: var(--basic-font-weight-medium);
   }
 
   .registration-page input,
@@ -235,7 +235,7 @@ const completeFormSource = String.raw`<style>
     border-radius: 999px;
     background: transparent;
     color: inherit;
-    font-weight: 600;
+    font-weight: var(--basic-font-weight-medium);
     text-decoration: none;
   }
 

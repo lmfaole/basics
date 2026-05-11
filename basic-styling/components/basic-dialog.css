@@ -37,5 +37,5 @@ basic-dialog [data-dialog-panel] > :where(* + *) {
 
 basic-dialog [data-dialog-title] {
     font-size: var(--basic-font-size-title);
-    line-height: 1.2;
+    line-height: var(--basic-line-height-tight);
 }

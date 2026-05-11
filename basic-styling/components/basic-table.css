@@ -22,7 +22,7 @@ basic-table table {
 basic-table caption {
     margin-bottom: var(--basic-table-caption-gap);
     color: var(--basic-color-text);
-    font-weight: 700;
+    font-weight: var(--basic-font-weight-strong);
     text-align: left;
 }
 
@@ -45,7 +45,7 @@ basic-table:is([data-separators="columns"], [data-separators="both"]) tr > :is(t
 
 basic-table thead th {
     background: var(--basic-color-surface-muted);
-    font-weight: 700;
+    font-weight: var(--basic-font-weight-strong);
 }
 
 basic-table:is(:not([data-separators]), [data-separators="rows"], [data-separators="both"]) tbody tr:last-child th,
@@ -54,7 +54,7 @@ basic-table:is(:not([data-separators]), [data-separators="rows"], [data-separato
 }
 
 basic-table tbody th {
-    font-weight: 600;
+    font-weight: var(--basic-font-weight-medium);
 }
 
 basic-table[data-zebra] tbody tr:nth-child(even) > :is(th, td) {
