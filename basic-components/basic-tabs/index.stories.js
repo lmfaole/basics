@@ -119,7 +119,49 @@ Use it when the page already owns the layout and visual treatment, but still nee
     },
 };
 
-export const Default = {};
+export const Default = {
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const overviewTab = canvas.getByRole("tab", { name: "Overview" });
+        const implementationTab = canvas.getByRole("tab", { name: "Implementation" });
+        const accessibilityTab = canvas.getByRole("tab", { name: "Accessibility" });
+
+        await waitFor(() => {
+            expect(overviewTab).toHaveAttribute("aria-selected", "true");
+            expect(implementationTab).toHaveAttribute("aria-selected", "false");
+            expect(canvas.getByRole("tabpanel", { name: "Overview" })).toBeInTheDocument();
+            expect(canvas.queryByRole("tabpanel", { name: "Implementation" })).not.toBeInTheDocument();
+            expect(overviewTab).toHaveAttribute("aria-controls");
+            const panelId = overviewTab.getAttribute("aria-controls");
+            const panel = canvasElement.querySelector(`#${CSS.escape(panelId)}`);
+            expect(panel).toHaveAttribute("aria-labelledby", overviewTab.id);
+        });
+
+        await userEvent.click(implementationTab);
+
+        await waitFor(() => {
+            expect(implementationTab).toHaveAttribute("aria-selected", "true");
+            expect(overviewTab).toHaveAttribute("aria-selected", "false");
+            expect(canvas.getByRole("tabpanel", { name: "Implementation" })).toBeInTheDocument();
+        });
+
+        implementationTab.focus();
+        await userEvent.keyboard("{ArrowRight}");
+
+        await waitFor(() => {
+            expect(accessibilityTab).toHaveFocus();
+            expect(accessibilityTab).toHaveAttribute("aria-selected", "true");
+            expect(canvas.getByRole("tabpanel", { name: "Accessibility" })).toBeInTheDocument();
+        });
+
+        await userEvent.keyboard("{Home}");
+
+        await waitFor(() => {
+            expect(overviewTab).toHaveFocus();
+            expect(overviewTab).toHaveAttribute("aria-selected", "true");
+        });
+    },
+};
 
 export const ManualActivation = {
     args: {

@@ -280,7 +280,27 @@ Use it when you want a regular semantic table plus an automatically maintained t
     },
 };
 
-export const Default = {};
+export const Default = {
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        await waitFor(() => {
+            const table = canvas.getByRole("table", { name: "Monthly costs" });
+            const footerRow = table.tFoot?.rows[0];
+            const totalRowHeader = within(table).getByRole("rowheader", { name: "Total" });
+            const countTotal = footerRow?.cells[1];
+            const unitPriceCell = footerRow?.cells[2];
+            const amountTotal = footerRow?.cells[3];
+
+            expect(footerRow).not.toBeNull();
+            expect(countTotal?.getAttribute("data-value")).toBe("23");
+            expect(amountTotal?.getAttribute("data-value")).toBe("2452");
+            expect(amountTotal?.textContent ?? "").toMatch(/2\s452,00 kr/);
+            expect(unitPriceCell).toHaveAttribute("data-summary-empty");
+            expect(totalRowHeader).toHaveAttribute("scope", "row");
+        });
+    },
+};
 
 export const UsesDataValueOverrides = {
     args: {

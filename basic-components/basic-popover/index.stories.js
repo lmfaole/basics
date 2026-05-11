@@ -176,7 +176,45 @@ Use it when the page already owns layout and styling, but still needs a stable o
     },
 };
 
-export const Default = {};
+export const Default = {
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const opener = canvas.getByRole("button", { name: "Toggle popover" });
+        const root = canvasElement.querySelector("basic-popover");
+        const panel = canvasElement.querySelector("[data-popover-panel]");
+
+        expect(opener).toHaveAttribute("aria-expanded", "false");
+
+        await userEvent.click(opener);
+
+        await waitFor(() => {
+            expect(opener).toHaveAttribute("aria-expanded", "true");
+            expect(panel).toHaveAttribute("data-open");
+            expect(root).toHaveAttribute("data-open");
+        });
+
+        await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+
+        await waitFor(() => {
+            expect(opener).toHaveAttribute("aria-expanded", "false");
+            expect(panel).not.toHaveAttribute("data-open");
+            expect(root).not.toHaveAttribute("data-open");
+        });
+
+        await userEvent.click(opener);
+
+        await waitFor(() => {
+            expect(opener).toHaveAttribute("aria-expanded", "true");
+        });
+
+        await userEvent.keyboard("{Escape}");
+
+        await waitFor(() => {
+            expect(opener).toHaveAttribute("aria-expanded", "false");
+            expect(panel).not.toHaveAttribute("data-open");
+        });
+    },
+};
 
 export const LabelFallback = {
     args: {
@@ -217,6 +255,7 @@ export const AnchoredToTrigger = {
 
             expect(panel).toHaveAttribute("data-basic-popover-anchored");
             expect(panel.style.getPropertyValue("--basic-popover-position-area").trim()).toBe("bottom");
+            expect(panel.style.getPropertyValue("--basic-popover-position-try-fallbacks").trim()).not.toBe("");
             expect(opener).toHaveAttribute("aria-expanded", "true");
         });
     },

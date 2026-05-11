@@ -131,7 +131,34 @@ Use it when the page already owns visual design and layout, but still needs pred
     },
 };
 
-export const Default = {};
+export const Default = {
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const opener = canvas.getByRole("button", { name: "Open dialog" });
+        const root = canvasElement.querySelector("basic-dialog");
+        const panel = canvasElement.querySelector("dialog[data-dialog-panel]");
+        const title = canvasElement.querySelector("[data-dialog-title]");
+
+        await userEvent.click(opener);
+
+        await waitFor(() => {
+            expect(panel.open).toBe(true);
+            expect(root).toHaveAttribute("data-open");
+            expect(panel).toHaveAttribute("aria-modal", "true");
+            expect(title.id).toBeTruthy();
+            expect(panel).toHaveAttribute("aria-labelledby", title.id);
+            expect(panel).not.toHaveAttribute("aria-label");
+        });
+
+        await userEvent.click(canvas.getByRole("button", { name: "Cancel" }));
+
+        await waitFor(() => {
+            expect(panel.open).toBe(false);
+            expect(root).not.toHaveAttribute("data-open");
+            expect(opener).toHaveFocus();
+        });
+    },
+};
 
 export const LabelFallback = {
     args: {
@@ -140,8 +167,9 @@ export const LabelFallback = {
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        const opener = canvas.getByRole("button", { name: "Open dialog" });
 
-        await userEvent.click(canvas.getByRole("button", { name: "Open dialog" }));
+        await userEvent.click(opener);
 
         await waitFor(() => {
             const dialog = canvas.getByRole("dialog", { name: "Delete item" });
@@ -150,11 +178,69 @@ export const LabelFallback = {
             expect(dialog).toHaveAttribute("aria-label", "Delete item");
             expect(dialog).not.toHaveAttribute("aria-labelledby");
         });
+
+        await userEvent.click(canvas.getByRole("button", { name: "Cancel" }));
+
+        await waitFor(() => {
+            const panel = canvasElement.querySelector("dialog[data-dialog-panel]");
+            expect(panel.open).toBe(false);
+            expect(opener).toHaveFocus();
+        });
     },
 };
 
 export const WithSecondaryAction = {
     args: {
         includeSecondaryAction: true,
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const panel = canvasElement.querySelector("dialog[data-dialog-panel]");
+
+        await userEvent.click(canvas.getByRole("button", { name: "Open dialog" }));
+
+        await waitFor(() => {
+            expect(panel.open).toBe(true);
+        });
+
+        await userEvent.click(canvas.getByRole("button", { name: "Confirm" }));
+
+        await waitFor(() => {
+            expect(panel.open).toBe(false);
+            expect(panel.returnValue).toBe("confirmed");
+        });
+    },
+};
+
+export const BackdropCloses = {
+    args: {
+        backdropClose: true,
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Adding `data-backdrop-close` lets clicks outside the panel close the dialog.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const panel = canvasElement.querySelector("dialog[data-dialog-panel]");
+
+        await userEvent.click(canvas.getByRole("button", { name: "Open dialog" }));
+
+        await waitFor(() => {
+            expect(panel.open).toBe(true);
+        });
+
+        panel.dispatchEvent(new MouseEvent("click", {
+            bubbles: true,
+            clientX: 0,
+            clientY: 0,
+        }));
+
+        await waitFor(() => {
+            expect(panel.open).toBe(false);
+        });
     },
 };

@@ -309,7 +309,26 @@ Use it when your app already owns the visual table styling, but you want a safer
     },
 };
 
-export const Default = {};
+export const Default = {
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        await waitFor(() => {
+            const table = canvas.getByRole("table", { name: "Sprint staffing" });
+            const platformRowHeader = within(table).getByRole("rowheader", { name: "Platform" });
+            const sprintHeader = within(table).getByRole("columnheader", { name: "Sprint" });
+            const platformSprintCell = platformRowHeader.parentElement?.cells[3];
+
+            expect(platformRowHeader.tagName).toBe("TH");
+            expect(platformRowHeader).toHaveAttribute("scope", "row");
+            expect(table.caption).not.toBeNull();
+            expect(table.caption?.textContent).toBe("Sprint staffing");
+
+            const headerIds = platformSprintCell?.getAttribute("headers")?.split(/\s+/) ?? [];
+            expect(headerIds).toEqual(expect.arrayContaining([platformRowHeader.id, sprintHeader.id]));
+        });
+    },
+};
 
 export const AddsDescription = {
     args: {
