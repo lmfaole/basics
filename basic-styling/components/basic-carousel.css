@@ -2,7 +2,7 @@ basic-carousel {
     --basic-carousel-gap: var(--basic-space-4);
     --basic-carousel-controls-gap: var(--basic-space-3);
     --basic-carousel-button-size: 2.75rem;
-    --basic-carousel-marker-size: 1.75rem;
+    --basic-carousel-marker-size: 2.75rem;
     --basic-carousel-item-width: 90%;
     --basic-carousel-track-padding: var(--basic-space-1);
     --basic-carousel-snap-align: center;

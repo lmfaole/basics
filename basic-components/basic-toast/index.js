@@ -15,20 +15,6 @@ const ANNOUNCER_ATTRIBUTE = "data-basic-toast-announcer";
 const MANAGED_LABEL_ATTRIBUTE = "data-basic-toast-managed-label";
 const MANAGED_LABELLEDBY_ATTRIBUTE = "data-basic-toast-managed-labelledby";
 const MANAGED_POPOVER_ATTRIBUTE = "data-basic-toast-managed-popover";
-const INTERACTIVE_PANEL_SELECTOR = [
-    "a[href]",
-    "area[href]",
-    "button",
-    "input",
-    "select",
-    "textarea",
-    "summary",
-    "iframe",
-    "audio[controls]",
-    "video[controls]",
-    "[contenteditable]:not([contenteditable=\"false\"])",
-    "[tabindex]:not([tabindex=\"-1\"])",
-].join(", ");
 const VISUALLY_HIDDEN_ANNOUNCER_STYLE = [
     "position:absolute",
     "inline-size:1px",
@@ -150,16 +136,6 @@ function getToastAnnouncementText(panel, title) {
     return `${name}. ${body}`;
 }
 
-function findInteractiveToastDescendants(panel) {
-    if (!(panel instanceof HTMLElementBase)) {
-        return [];
-    }
-
-    return Array.from(panel.querySelectorAll(INTERACTIVE_PANEL_SELECTOR)).filter(
-        (element) => element instanceof HTMLElementBase && !element.hidden,
-    );
-}
-
 export function normalizeToastLabel(value) {
     return value?.trim() || DEFAULT_LABEL;
 }
@@ -210,7 +186,6 @@ export class ToastElement extends HTMLElementBase {
     #announcementTimer = 0;
     #announcer = null;
     #open = false;
-    #hasWarnedAboutInteractiveContent = false;
     #eventsBound = false;
 
     connectedCallback() {
@@ -432,7 +407,6 @@ export class ToastElement extends HTMLElementBase {
         this.#syncAccessibleLabel();
         this.#syncPopoverState();
         this.#syncAnnouncerState();
-        this.#warnOnInteractiveContent();
         this.#syncOpenState();
     }
 
@@ -653,27 +627,6 @@ export class ToastElement extends HTMLElementBase {
 
             this.#announcer.textContent = announcement;
         }, 0);
-    }
-
-    #warnOnInteractiveContent() {
-        if (
-            this.#hasWarnedAboutInteractiveContent
-            || !(this.#panel instanceof HTMLElementBase)
-            || typeof globalThis.console?.warn !== "function"
-        ) {
-            return;
-        }
-
-        if (findInteractiveToastDescendants(this.#panel).length === 0) {
-            return;
-        }
-
-        this.#hasWarnedAboutInteractiveContent = true;
-        globalThis.console.warn(
-            "basic-toast panels should only contain non-interactive message content. "
-            + "Move links, buttons, and other focusable controls outside [data-toast-panel], "
-            + "or use a more appropriate pattern such as basic-alert or basic-dialog.",
-        );
     }
 }
 
