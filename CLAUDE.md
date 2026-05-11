@@ -127,6 +127,18 @@ These are binding. When a rule and convenience conflict, the rule wins.
 - Don't `test.skip` / `test.todo` without a dated TODO and an owner.
 - Delete tests with the code they cover. Never comment them out.
 
+### Codemods (`codemods/`)
+
+- Every major changeset needs a matching codemod folder at `codemods/<changeset-slug>/`, where the slug matches the `.changeset/<slug>.md` filename. `pnpm run check:breaking-change-codemods` enforces this in CI.
+- Each folder ships `index.mjs` and `README.md`. Start from `codemods/_template/`; don't invent a different layout.
+- `README.md` documents what the codemod rewrites, how to run it, which files it targets, and which manual steps still need follow-up.
+- Node built-ins only (`node:fs`, `node:path`, `node:url`). No runtime or dev dependencies — the codemod runs in the consumer's environment, and the lightweight rule applies here too.
+- Plain ESM that runs as-is on Node 24 — no build step, no TypeScript, no transpile.
+- Accept input file paths as CLI args (`process.argv.slice(2)`). Let the shell glob; don't pull in a glob library.
+- Idempotent: skip the write when `nextSource === previousSource`, and re-running the codemod must be a no-op.
+- One codemod per breaking change. Don't bundle migrations across releases into a single script, and don't reuse a slug for a later release.
+- If a rewrite can't be safely automated, ship the folder with a README-only migration guide and say so explicitly — the check still requires both files to exist.
+
 ### Simplicity
 
 - Match the size of the solution to the problem. A small feature does not get a generalized framework around it.
