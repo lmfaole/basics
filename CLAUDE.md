@@ -83,8 +83,93 @@ When adding a new component, copy an existing one, register its directory in `in
 
 `basic-styling/tokens/palette.css`, `palette.tokens.json`, and `palette-docs.js` are generated. Edit the palette definition in `scripts/generate-palette-tokens.mjs` and regenerate; never hand-edit the outputs (`check:generated-files` enforces this).
 
-## Style
+## Rules
+
+These are binding. When a rule and convenience conflict, the rule wins.
+
+### Lightweight
+
+- No runtime `dependencies`. This package ships with zero — every dependency would be a transitive burden on consumers.
+- No new `devDependencies` without justification. Today's set is Vitest, Storybook, Playwright, Changesets, Chromatic, TypeScript types. Don't add bundlers, minifiers, postcss, sass, tailwind, vite, esbuild, etc.
+- No frameworks (React, Vue, Lit, Solid, jQuery) and no utility libs (lodash, date-fns, zod, ramda). Consumers may use them; this package may not.
+- No polyfills, no analytics, no logging, no telemetry.
+- Use the platform first: `Intl`, `<dialog>` + `showModal`, `popover` + `popovertarget`, `<details>`, anchor positioning, `URLPattern`, `AbortController`, `crypto.randomUUID`, `structuredClone`, `Object.groupBy`, `toSorted`/`toReversed`/`with`, CSS nesting, `:has()`/`:is()`/`:where()`, `@container`, `field-sizing: content`, `color-mix()`/`light-dark()`, view transitions, custom-element lifecycle (`connectedCallback`, `disconnectedCallback`, `attributeChangedCallback` + `observedAttributes`).
+- Delete dead code and unused exports when you see them.
+
+### CSS (`basic-styling`)
+
+- The starter styling is token-driven. Reference variables from `basic-styling/tokens/*.css`; don't hardcode colors, spacing, or font sizes.
+- Palette files under `basic-styling/tokens/` (`palette.css`, `palette.tokens.json`, `palette-docs.js`) are generated. Edit `scripts/generate-palette-tokens.mjs` and regenerate — `pnpm run check:generated-files` enforces this.
+- Don't add a new token until it has at least two uses.
+- Don't add new `@layer`s. The existing structure is the contract.
+- Semantic HTML first (`<button>`, `<a href>`, `<dialog>`, `<details>`, `<table>`, `<form>`). Reach for ARIA only when HTML doesn't cover the case.
+- Use `:focus-visible` for focus styles; never strip outline without replacement.
+- Respect `prefers-reduced-motion`, `prefers-color-scheme`, `prefers-contrast`, `prefers-reduced-transparency`. Defaults must work without JS interaction-state shims.
+- Touch targets ≥ 44 × 44 px.
+- Animations: < 300 ms, must support understanding (no decorative motion).
+
+### Custom-element discipline
+
+(extends [Architecture > Custom element conventions](#custom-element-conventions))
+
+- Components are **dumb**: no global state, no implicit network, no business logic the consumer didn't opt into. They render from light-DOM children + `data-*` and emit when the user acts.
+- Data flows in via attributes (`observedAttributes` + `attributeChangedCallback`) or DOM children. Signals flow out via `dispatchEvent(new CustomEvent(...))`. No global event bus, no module-scope shared state.
+- Light DOM only — no shadow DOM. Consumers style with their own CSS.
+- When the element writes to an author-owned node (the `<dialog>` panel, a button), mark the write with a `data-basic-*-managed-*` sentinel so the next sync doesn't clobber an author override. See `MANAGED_LABELLEDBY_ATTRIBUTE` in `basic-components/basic-dialog/index.js` for the pattern.
+- The pure helpers (`normalize*`, ID parsing, attribute parsing) are the testable surface. Keep them exported and pure; let `index.test.js` cover them in Node without a DOM.
+
+### Tests
+
+- Pure helpers go in `*.test.js` under the Node Vitest config. End-to-end DOM behavior goes in `*.stories.js` `play` functions under the Storybook Vitest config.
+- Test behavior, not implementation. Don't assert against private internals — extract them into testable helpers or leave them.
+- Don't test the platform (`Intl`, `URL`, DOM, `<dialog>`). Test your use of it.
+- Keep tests deterministic. No `Date.now()`, `new Date()`, `Math.random()`, `crypto.randomUUID()` without injection.
+- Don't `test.skip` / `test.todo` without a dated TODO and an owner.
+- Delete tests with the code they cover. Never comment them out.
+
+### Simplicity
+
+- Match the size of the solution to the problem. A small feature does not get a generalized framework around it.
+- Aim under ~200 lines per module. Split when one file does more than one thing.
+- Don't add parameters, options, or config knobs without a caller that needs them.
+- Don't generalize before two real call sites exist. Don't DRY at copy #2 — wait for copy #3.
+- Don't wrap a function just to rename it. Don't write single-caller helpers — inline them.
+- Don't write defensive code for states the type system rules out.
+- Prefer deleting code to adding code.
+
+### Refactor first
+
+- Read nearby code before adding new code.
+- Extend or generalize existing patterns instead of writing a parallel copy.
+- Refactor and feature go in separate commits. Refactor first, run tests, then build the new thing.
+- Follow established patterns: helpers exported and unit-tested, `define<Name>(registry)` idempotent factory, `register.js` one-liner, `data-*` slotting, managed-ARIA sentinels, scoped `closest(TAG) === this` queries.
+- Don't introduce local exceptions to a convention. Change the convention everywhere or not at all.
+
+### Types
+
+- No `any`. Use `unknown` and narrow.
+- No `as` casts unless a real runtime narrowing step justifies it.
+- Don't wrap things in `try/catch` you can't handle meaningfully — let them propagate.
+- Don't null-check values the types already guarantee.
+
+### Files and imports
+
+- Lowercase filenames; kebab-case for multi-word; single word when possible.
+- Custom-element tag names: `basic-<name>`. Directory name matches the tag.
+- Relative imports only — no path aliases.
+- Named imports only — no `import * as foo`.
+- No circular imports.
+- Co-locate tests, stories, types, and component-local helpers in the component's directory.
+
+### Formatting
 
 - 4-space indent for JS/TS/CSS, 2-space for Markdown/YAML (`.editorconfig`).
 - LF line endings, final newline, no trailing whitespace.
 - No build step: write modern ESM that runs in Node 24 and evergreen browsers as-is.
+
+### When in doubt
+
+- Pick the option with the fewest files, fewest lines, fewest dependencies.
+- Platform > library > own code > copy.
+- If the spec doesn't mention it, it isn't in scope.
+- Ask before adding a new top-level concept, a new CSS layer, or a new dev dependency.
